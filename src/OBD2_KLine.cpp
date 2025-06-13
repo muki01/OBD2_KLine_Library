@@ -37,4 +37,13 @@ void OBD2_KLine::writeData(const byte mode, const byte pid) {
     delay(_writeDelay);
   }
 
+
+byte OBD2_KLine::calculateChecksum(const byte data[], int length) {
+  byte checksum = 0;
+  for (int i = 0; i < length; i++) {
+    checksum += data[i];
+  }
+  return checksum % 256;
+}
+
 }

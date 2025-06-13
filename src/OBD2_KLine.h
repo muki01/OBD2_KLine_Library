@@ -22,6 +22,7 @@ private:
   uint8_t _rxPin;
   uint8_t _txPin;
   uint16_t _writeDelay = 5;
+  byte calculateChecksum(const byte data[], int length);
 };
 
 #endif // OBD2_KLINE_H
