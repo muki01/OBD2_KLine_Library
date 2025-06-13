@@ -10,6 +10,7 @@ public:
 private:
   HardwareSerial& _serial;
   long _baudRate;
+  bool _customPins;
   uint8_t _rxPin;
   uint8_t _txPin;
 };
