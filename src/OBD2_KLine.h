@@ -7,6 +7,7 @@ class OBD2_KLine  {
 public:
   OBD2_KLine(HardwareSerial& serialPort, long baudRate, uint8_t rxPin, uint8_t txPin);
 
+  void beginSerial();
 private:
   HardwareSerial& _serial;
   long _baudRate;
