@@ -62,4 +62,8 @@ byte OBD2_KLine::calculateChecksum(const byte data[], int length) {
   return checksum % 256;
 }
 
+void OBD2_KLine::setWriteDelay(uint16_t delay) {
+  _writeDelay = delay;
+}
+
 }
