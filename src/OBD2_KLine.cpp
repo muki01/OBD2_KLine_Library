@@ -37,6 +37,22 @@ void OBD2_KLine::writeData(const byte mode, const byte pid) {
     delay(_writeDelay);
   }
 
+  clearEcho();
+}
+
+void OBD2_KLine::clearEcho() {
+  int result = _serial.available();
+  if (result > 0) {
+    //debugPrint("Cleared Echo Data: ");
+    for (int i = 0; i < result; i++) {
+      //debugPrintHex(_serial.read());
+      //debugPrint(" ");
+    }
+    //debugPrintln();
+  } else {
+    //debugPrintln("Not Received Echo Data");
+  }
+}
 
 byte OBD2_KLine::calculateChecksum(const byte data[], int length) {
   byte checksum = 0;
