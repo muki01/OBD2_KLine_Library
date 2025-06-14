@@ -66,6 +66,11 @@ void OBD2_KLine::setWriteDelay(uint16_t delay) {
   _writeDelay = delay;
 }
 
+void OBD2_KLine::setProtocol(const String& protocolName) {
+  protocol = protocolName;
+  //debugPrintln(("Protocol set to: " + protocol).c_str());
+}
+
 
 void OBD2_KLine::send5baud(uint8_t data) {
   byte even = 1;  // parity bit hesaplama için

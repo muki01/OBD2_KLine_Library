@@ -18,12 +18,15 @@ public:
   void send5baud(uint8_t data);
 
   void setWriteDelay(uint16_t delay);
+  void setProtocol(const String& protocolName);
+
 private:
   HardwareSerial& _serial;
   long _baudRate;
   bool _customPins;
   uint8_t _rxPin;
   uint8_t _txPin;
+  String protocol = "ISO9141";
   uint16_t _writeDelay = 5;
   byte calculateChecksum(const byte data[], int length);
   void clearEcho();
