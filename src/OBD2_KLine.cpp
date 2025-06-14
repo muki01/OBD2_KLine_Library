@@ -66,6 +66,10 @@ void OBD2_KLine::setWriteDelay(uint16_t delay) {
   _writeDelay = delay;
 }
 
+void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
+  _dataRequestInterval = interval;
+}
+
 void OBD2_KLine::setProtocol(const String& protocolName) {
   protocol = protocolName;
   //debugPrintln(("Protocol set to: " + protocol).c_str());

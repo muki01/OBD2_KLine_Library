@@ -18,6 +18,7 @@ public:
   void send5baud(uint8_t data);
 
   void setWriteDelay(uint16_t delay);
+  void setDataRequestInterval(uint16_t interval);
   void setProtocol(const String& protocolName);
 
 private:
@@ -28,6 +29,7 @@ private:
   uint8_t _txPin;
   String protocol = "ISO9141";
   uint16_t _writeDelay = 5;
+  uint16_t _dataRequestInterval = 60;
   byte calculateChecksum(const byte data[], int length);
   void clearEcho();
 };
