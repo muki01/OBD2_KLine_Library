@@ -66,4 +66,34 @@ void OBD2_KLine::setWriteDelay(uint16_t delay) {
   _writeDelay = delay;
 }
 
+
+void OBD2_KLine::send5baud(uint8_t data) {
+  byte even = 1;  // parity bit hesaplama için
+  byte bits[10];
+
+  bits[0] = 0;  // start bit
+  bits[9] = 1;  // stop bit
+
+  // 7-bit data ve parity hesaplama
+  for (int i = 1; i <= 7; i++) {
+    bits[i] = (data >> (i - 1)) & 1;
+    even ^= bits[i];
+  }
+
+  bits[8] = (even == 0) ? 1 : 0;  // parity biti
+
+  //debugPrint("5 Baud Init for Module 0x");
+  //debugPrintHex(data);
+  //debugPrint(": ");
+
+  // Pin'i OUTPUT yapmayı unutma (özellikle custom pin kullanılıyorsa)
+  pinMode(_txPin, OUTPUT);
+
+  for (int i = 0; i < 10; i++) {
+    //debugPrint(bits[i] ? "1" : "0");
+    digitalWrite(_txPin, bits[i] ? HIGH : LOW);
+    delay(200);
+  }
+
+  //debugPrintln();
 }

@@ -15,6 +15,8 @@ public:
 
   void beginSerial();
   void writeData(const byte mode, const byte pid);
+  void send5baud(uint8_t data);
+
   void setWriteDelay(uint16_t delay);
 private:
   HardwareSerial& _serial;
