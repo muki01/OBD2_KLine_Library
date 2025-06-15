@@ -14,6 +14,7 @@ public:
   OBD2_KLine(HardwareSerial& serialPort, long baudRate, uint8_t rxPin, uint8_t txPin);
 
   void beginSerial();
+  bool init_OBD2();
   void writeData(const byte mode, const byte pid);
   bool readData();
   void send5baud(uint8_t data);
@@ -31,6 +32,8 @@ private:
 
   byte resultBuffer[64] = { 0 };
   int errors = 0;
+  bool conectionStatus = false;
+
   String protocol = "ISO9141";
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;

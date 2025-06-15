@@ -10,6 +10,75 @@ void OBD2_KLine::beginSerial() {
     _serial.begin(_baudRate);
   }
 }
+
+bool OBD2_KLine::init_OBD2() {
+  if (protocol == "Automatic" || protocol == "ISO14230_Slow" || protocol == "ISO9141") {
+    //debugPrintln("Trying ISO9141 or ISO14230_Slow");
+
+    _serial.end();
+    pinMode(_rxPin, INPUT_PULLUP);
+    pinMode(_txPin, OUTPUT);
+    digitalWrite(_txPin, HIGH);
+    delay(3000);
+
+    send5baud(0x33);
+
+    beginSerial();
+
+    if (readData()) {
+      if (resultBuffer[0] == 0x55) {
+        if (resultBuffer[1] == resultBuffer[2]) {
+          //debugPrintln("Your Protocol is ISO9141");
+          protocol = "ISO9141";
+        } else {
+          //debugPrintln("Your Protocol is ISO14230_Slow");
+          protocol = "ISO14230_Slow";
+        }
+        //debugPrintln("Writing KW2 Reversed");
+        _serial.write(~resultBuffer[2]);  // 0xF7
+
+        if (readData()) {
+          if (resultBuffer[0]) {
+            return true;
+          } else {
+            //debugPrintln("No Data Retrieved from Car");
+          }
+        }
+      }
+    }
+  }
+
+  if (protocol == "Automatic" || protocol == "ISO14230_Fast") {
+    //debugPrintln("Trying ISO14230_Fast");
+
+    _serial.end();
+    pinMode(_rxPin, INPUT_PULLUP);
+    pinMode(_txPin, OUTPUT);
+    digitalWrite(_txPin, HIGH);
+    delay(3000);
+    digitalWrite(_txPin, LOW);
+    delay(25);
+    digitalWrite(_txPin, HIGH);
+    delay(25);
+
+    beginSerial();
+
+    writeData(init_OBD, 0x00);
+
+    if (readData()) {
+      if (resultBuffer[3] == 0xC1) {
+        //debugPrintln("Your Protocol is ISO14230_Fast");
+        protocol = "ISO14230_Fast";
+        return true;
+      }
+    }
+  }
+
+  //debugPrintln("No Protocol Found");
+  return false;
+}
+
+
 void OBD2_KLine::writeData(const byte mode, const byte pid) {
   //debugPrintln("Writing...");
   byte message[7] = { 0 };
