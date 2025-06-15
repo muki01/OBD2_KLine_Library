@@ -40,6 +40,52 @@ void OBD2_KLine::writeData(const byte mode, const byte pid) {
   clearEcho();
 }
 
+bool OBD2_KLine::readData() {
+  //debugPrintln("Reading...");
+  unsigned long startMillis = millis();
+  int bytesRead = 0;
+
+  // İlk byte için 1 saniye bekle
+  while (millis() - startMillis < 1000) {
+    if (_serial.available() > 0) {
+      unsigned long lastByteTime = millis();
+      memset(resultBuffer, 0, sizeof(resultBuffer));
+      errors = 0;
+
+      // İç döngü: bütün veriyi oku
+      //debugPrint("Received Data: ");
+      while (millis() - lastByteTime < _dataRequestInterval) {  // 60ms boyunca yeni veri bekle
+        if (_serial.available() > 0) {                          // Yeni veri varsa
+          if (bytesRead >= sizeof(resultBuffer)) {              // Buffer dolarsa dur
+            //debugPrintln("\nBuffer is full. Stopping data reception.");
+            return true;
+          }
+          resultBuffer[bytesRead] = _serial.read();
+          //debugPrintHex(resultBuffer[bytesRead]);
+          //debugPrint(" ");
+          bytesRead++;
+          lastByteTime = millis();  // Timer'ı resetle
+        }
+      }
+
+      //debugPrintln("\nData reception completed.");
+      return true;
+    }
+  }
+
+  // 1 saniyede veri gelmezse
+  //debugPrintln("Timeout: Not Received Data.");
+  errors++;
+  if (errors > 2) {
+    errors = 0;
+    if (conectionStatus) {
+      conectionStatus = false;
+    }
+  }
+  return false;
+}
+
+
 void OBD2_KLine::clearEcho() {
   int result = _serial.available();
   if (result > 0) {

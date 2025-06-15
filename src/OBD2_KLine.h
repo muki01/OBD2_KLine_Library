@@ -15,6 +15,7 @@ public:
 
   void beginSerial();
   void writeData(const byte mode, const byte pid);
+  bool readData();
   void send5baud(uint8_t data);
 
   void setWriteDelay(uint16_t delay);
@@ -27,6 +28,9 @@ private:
   bool _customPins;
   uint8_t _rxPin;
   uint8_t _txPin;
+
+  byte resultBuffer[64] = { 0 };
+  int errors = 0;
   String protocol = "ISO9141";
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
