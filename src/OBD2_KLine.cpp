@@ -160,8 +160,9 @@ void OBD2_KLine::clearEcho() {
   if (result > 0) {
     // debugPrint("Cleared Echo Data: ");
     for (int i = 0; i < result; i++) {
-      //debugPrintHex(_serial.read());
-      //debugPrint(" ");
+      byte readedByte = _serial.read();
+      // debugPrintHex(readedByte);
+      // debugPrint(" ");
     }
     // debugPrintln();
   } else {
