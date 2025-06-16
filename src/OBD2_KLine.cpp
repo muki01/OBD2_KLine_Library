@@ -220,3 +220,120 @@ void OBD2_KLine::send5baud(uint8_t data) {
 
   // debugPrintln();
 }
+
+int OBD2_KLine::getPID(const byte pid) {
+  writeData(read_LiveData, pid);
+
+  int len = readData();
+  if (len <= 0) {
+    return -1;  // Veri okunamadı
+  }
+
+  if (resultBuffer[4] != pid) {
+    return -2;  // Beklenen PID değil
+  }
+
+  int dataBytesLen = len - 6;
+  byte A = (dataBytesLen >= 1) ? resultBuffer[5] : 0;
+  byte B = (dataBytesLen >= 2) ? resultBuffer[6] : 0;
+  byte C = (dataBytesLen >= 3) ? resultBuffer[7] : 0;
+  byte D = (dataBytesLen >= 4) ? resultBuffer[8] : 0;
+
+  switch (pid) {
+    case 0x01:   // Monitor Status Since DTC Cleared (bit encoded)
+    case 0x02:   // Monitor Status Since DTC Cleared (bit encoded)
+    case 0x03:   // Fuel System Status (bit encoded)
+      return A;  // Bit olarak işlenebilir
+    case 0x04:   // Engine Load (%)
+      return A * 100 / 255;
+    case 0x05:  // Coolant Temperature (°C)
+      return A - 40;
+    case 0x06:  // Short Term Fuel Trim Bank 1 (%)
+    case 0x07:  // Long Term Fuel Trim Bank 1 (%)
+    case 0x08:  // Short Term Fuel Trim Bank 2 (%)
+    case 0x09:  // Long Term Fuel Trim Bank 2 (%)
+      return (int)((int8_t)A * 100 / 128);
+    case 0x0A:  // Fuel Pressure (kPa)
+      return A * 3;
+    case 0x0B:  // Intake Manifold Absolute Pressure (kPa)
+      return A;
+    case 0x0C:  // RPM
+      return ((A * 256) + B) / 4;
+    case 0x0D:  // Speed (km/h)
+      return A;
+    case 0x0E:  // Timing Advance (°)
+      return (int8_t)A / 2;
+    case 0x0F:  // Intake Air Temperature (°C)
+      return A - 40;
+    case 0x10:  // MAF Flow Rate (grams/sec)
+      return ((A * 256) + B) / 100;
+    case 0x11:  // Throttle Position (%)
+      return A * 100 / 255;
+    case 0x12:  // Commanded Secondary Air Status (bit encoded)
+    case 0x13:  // Oxygen Sensors Present 2 Banks (bit encoded)
+      return A;
+    case 0x14:         // Oxygen Sensor 1A Voltage (V)
+    case 0x15:         // Oxygen Sensor 2A Voltage (V)
+    case 0x16:         // Oxygen Sensor 3A Voltage (V)
+    case 0x17:         // Oxygen Sensor 4A Voltage (V)
+    case 0x18:         // Oxygen Sensor 5A Voltage (V)
+    case 0x19:         // Oxygen Sensor 6A Voltage (V)
+    case 0x1A:         // Oxygen Sensor 7A Voltage (V)
+    case 0x1B:         // Oxygen Sensor 8A Voltage (V)
+      return A / 200;  // Volt to mV (V*1000), float hesap gerekirse fonksiyon
+                       // float olmalı
+    case 0x1C:         // OBD Standards This Vehicle Conforms To (bit encoded)
+    case 0x1D:         // Oxygen Sensors Present 4 Banks (bit encoded)
+    case 0x1E:         // Auxiliary Input Status (bit encoded)
+      return A;
+    case 0x1F:  // Run Time Since Engine Start (seconds)
+    case 0x21:  // Distance Traveled With MIL On (km)
+      return (A * 256) + B;
+    case 0x22:  // Fuel Rail Pressure (kPa)
+    case 0x23:  // Fuel Rail Gauge Pressure (kPa)
+      return ((A * 256) + B) / 10;
+    case 0x24:                                    // Oxygen Sensor 1B (ratio voltage)
+    case 0x25:                                    // Oxygen Sensor 2B
+    case 0x26:                                    // Oxygen Sensor 3B
+    case 0x27:                                    // Oxygen Sensor 4B
+    case 0x28:                                    // Oxygen Sensor 5B
+    case 0x29:                                    // Oxygen Sensor 6B
+    case 0x2A:                                    // Oxygen Sensor 7B
+    case 0x2B:                                    // Oxygen Sensor 8B
+      return ((A * 256) + B) * 0.0000305 * 1000;  // ratio * 1000 (mV), float önerilir
+    case 0x2C:                                    // Commanded EGR (%)
+      return A * 100 / 255;
+    case 0x2D:  // EGR Error (%)
+      return (int8_t)A * 100 / 128;
+    case 0x2E:  // Commanded Evaporative Purge (%)
+    case 0x2F:  // Fuel Tank Level Input (%)
+      return A * 100 / 255;
+    case 0x30:  // Warm-ups Since Codes Cleared (count)
+      return A;
+    case 0x31:  // Distance Traveled Since Codes Cleared (km)
+      return (A * 256) + B;
+    case 0x32: {
+      // Evap System Vapor Pressure (Pa)
+      int16_t signedValue = (int16_t)((A << 8) | B);
+      return signedValue / 4;
+    }
+    case 0x33:  // Absolute Barometric Pressure (kPa)
+      return A;
+    case 0x34:                            // Oxygen Sensor 1C (current)
+    case 0x35:                            // Oxygen Sensor 2C
+    case 0x36:                            // Oxygen Sensor 3C
+    case 0x37:                            // Oxygen Sensor 4C
+    case 0x38:                            // Oxygen Sensor 5C
+    case 0x39:                            // Oxygen Sensor 6C
+    case 0x3A:                            // Oxygen Sensor 7C
+    case 0x3B:                            // Oxygen Sensor 8C
+      return ((A * 256) + B) * 0.000488;  // mA olarak float önerilir
+    case 0x3C:                            // Catalyst Temperature Bank 1 Sensor 1 (°C)
+    case 0x3D:                            // Catalyst Temperature Bank 2 Sensor 1 (°C)
+    case 0x3E:                            // Catalyst Temperature Bank 1 Sensor 2 (°C)
+    case 0x3F:                            // Catalyst Temperature Bank 2 Sensor 2 (°C)
+      return (A * 256) + B - 40;
+    default:
+      return -4;  // Bilinmeyen PID
+  }
+}

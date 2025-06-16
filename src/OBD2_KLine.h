@@ -19,6 +19,7 @@ class OBD2_KLine {
   void writeData(const byte mode, const byte pid);
   int readData();
   void send5baud(uint8_t data);
+  int getPID(byte pid);
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
