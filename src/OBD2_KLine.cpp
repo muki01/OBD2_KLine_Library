@@ -79,7 +79,6 @@ bool OBD2_KLine::init_OBD2() {
   return false;
 }
 
-
 void OBD2_KLine::writeData(const byte mode, const byte pid) {
   // debugPrintln("Writing...");
   byte message[7] = {0};
@@ -108,7 +107,7 @@ void OBD2_KLine::writeData(const byte mode, const byte pid) {
   clearEcho();
 }
 
-bool OBD2_KLine::readData() {
+int OBD2_KLine::readData() {
   // debugPrintln("Reading...");
   unsigned long startMillis = millis();
   int bytesRead = 0;
@@ -125,8 +124,8 @@ bool OBD2_KLine::readData() {
       while (millis() - lastByteTime < _dataRequestInterval) {  // 60ms boyunca yeni veri bekle
         if (_serial.available() > 0) {                          // Yeni veri varsa
           if (bytesRead >= sizeof(resultBuffer)) {              // Buffer dolarsa dur
-            return true;
             // debugPrintln("\nBuffer is full. Stopping data reception.");
+            return bytesRead;
           }
 
           resultBuffer[bytesRead] = _serial.read();
@@ -137,8 +136,8 @@ bool OBD2_KLine::readData() {
         }
       }
 
-      return true;
       // debugPrintln("\nData reception completed.");
+      return bytesRead;
     }
   }
 
@@ -151,9 +150,9 @@ bool OBD2_KLine::readData() {
       connectionStatus = false;
     }
   }
-  return false;
-}
 
+  return 0;
+}
 
 void OBD2_KLine::clearEcho() {
   int result = _serial.available();

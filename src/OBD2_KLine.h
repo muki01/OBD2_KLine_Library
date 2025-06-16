@@ -17,7 +17,7 @@ class OBD2_KLine {
   void beginSerial();
   bool init_OBD2();
   void writeData(const byte mode, const byte pid);
-  bool readData();
+  int readData();
   void send5baud(uint8_t data);
 
   void setWriteDelay(uint16_t delay);
