@@ -287,6 +287,29 @@ int OBD2_KLine::getPID(const byte pid) {
   }
 }
 
+int OBD2_KLine::readDTCs() {
+  // Request: C2 33 F1 03 F3
+  // example Response: 87 F1 11 43 01 70 01 34 00 00 72
+  // example Response: 87 F1 11 43 00 00 72
+  int dtcCount = 0;
+
+  writeData(read_DTCs, 0x00);
+
+  int len = readData();
+  if (len >= 3) {
+    for (int i = 0; i < len - 5; i += 2) {
+      byte b1 = resultBuffer[4 + i];
+      byte b2 = resultBuffer[4 + i + 1];
+
+      if (b1 == 0 && b2 == 0) break;
+
+      dtcBuffer[dtcCount++] = decodeDTC(b1, b2);
+    }
+  }
+
+  return dtcCount;
+}
+
 void OBD2_KLine::resetSerialLine() {
   _serial.end();
   pinMode(_rxPin, INPUT_PULLUP);

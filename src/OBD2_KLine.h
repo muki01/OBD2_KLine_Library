@@ -24,6 +24,7 @@ class OBD2_KLine {
   int readData();
   void send5baud(uint8_t data);
   int getPID(byte pid);
+  int readDTCs();
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
@@ -44,6 +45,7 @@ class OBD2_KLine {
   String protocol = "ISO9141";
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
+  String dtcBuffer[32];
 
   String decodeDTC(byte input_byte1, byte input_byte2);
   byte calculateChecksum(const byte data[], int length);
