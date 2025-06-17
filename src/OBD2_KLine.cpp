@@ -12,70 +12,73 @@ void OBD2_KLine::beginSerial() {
   }
 }
 
-bool OBD2_KLine::init_OBD2() {
+bool OBD2_KLine::initOBD2() {
+  if (connectionStatus) return true;
+
   if (protocol == "Automatic" || protocol == "ISO14230_Slow" || protocol == "ISO9141") {
-    // debugPrintln("Trying ISO9141 or ISO14230_Slow");
-
-    _serial.end();
-    pinMode(_rxPin, INPUT_PULLUP);
-    pinMode(_txPin, OUTPUT);
-    digitalWrite(_txPin, HIGH);
-    delay(3000);
-
-    send5baud(0x33);
-
-    beginSerial();
-
-    if (readData()) {
-      if (resultBuffer[0] == 0x55) {
-        if (resultBuffer[1] == resultBuffer[2]) {
-          // debugPrintln("Your Protocol is ISO9141");
-          protocol = "ISO9141";
-        } else {
-          // debugPrintln("Your Protocol is ISO14230_Slow");
-          protocol = "ISO14230_Slow";
-        }
-        // debugPrintln("Writing KW2 Reversed");
-        _serial.write(~resultBuffer[2]);  // 0xF7
-
-        if (readData()) {
-          if (resultBuffer[0]) {
-            return true;
-          } else {
-            // debugPrintln("No Data Retrieved from Car");
-          }
-        }
-      }
-    }
+    if (trySlowInit()) return true;
   }
 
   if (protocol == "Automatic" || protocol == "ISO14230_Fast") {
-    // debugPrintln("Trying ISO14230_Fast");
-
-    _serial.end();
-    pinMode(_rxPin, INPUT_PULLUP);
-    pinMode(_txPin, OUTPUT);
-    digitalWrite(_txPin, HIGH);
-    delay(3000);
-    digitalWrite(_txPin, LOW);
-    delay(25);
-    digitalWrite(_txPin, HIGH);
-    delay(25);
-
-    beginSerial();
-
-    writeData(init_OBD, 0x00);
-
-    if (readData()) {
-      if (resultBuffer[3] == 0xC1) {
-        // debugPrintln("Your Protocol is ISO14230_Fast");
-        protocol = "ISO14230_Fast";
-        return true;
-      }
-    }
+    if (tryFastInit()) return true;
   }
 
-  // debugPrintln("No Protocol Found");
+  debugPrintln("❌ No Protocol Matched. Initialization Failed.");
+  debugPrintln("");
+  return false;
+}
+
+bool OBD2_KLine::trySlowInit() {
+  debugPrintln("🔁 Trying ISO9141 / ISO14230_Slow");
+
+  resetSerialLine();
+  send5baud(0x33);
+  beginSerial();
+
+  if (!readData()) return false;
+
+  if (resultBuffer[0] != 0x55) return false;
+
+  protocol = (resultBuffer[1] == resultBuffer[2]) ? "ISO9141" : "ISO14230_Slow";
+  debugPrint("✅ Protocol Detected: ");
+  debugPrintln(protocol.c_str());
+
+  _serial.write(~resultBuffer[2]);
+
+  if (!readData()) return false;
+
+  if (resultBuffer[0]) {
+    debugPrintln("✅ Connection established with car (Slow Init)");
+    connectionStatus = true;
+    return true;
+  }
+
+  debugPrintln("❌ No response after KW2 write");
+  return false;
+}
+
+bool OBD2_KLine::tryFastInit() {
+  debugPrintln("🔁 Trying ISO14230_Fast");
+
+  resetSerialLine();
+
+  digitalWrite(_txPin, LOW);
+  delay(25);
+  digitalWrite(_txPin, HIGH);
+  delay(25);
+
+  beginSerial();
+  writeData(init_OBD, 0x00);
+
+  if (!readData()) return false;
+
+  if (resultBuffer[3] == 0xC1) {
+    debugPrintln("✅ Protocol Detected: ISO14230_Fast");
+    connectionStatus = true;
+    protocol = "ISO14230_Fast";
+    return true;
+  }
+
   return false;
 }
 
@@ -167,6 +170,15 @@ void OBD2_KLine::clearEcho() {
   } else {
     // debugPrintln("Not Received Echo Data");
   }
+}
+
+
+void OBD2_KLine::resetSerialLine() {
+  _serial.end();
+  pinMode(_rxPin, INPUT_PULLUP);
+  pinMode(_txPin, OUTPUT);
+  digitalWrite(_txPin, HIGH);
+  delay(3000);
 }
 
 byte OBD2_KLine::calculateChecksum(const byte data[], int length) {
