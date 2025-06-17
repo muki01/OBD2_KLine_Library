@@ -303,6 +303,19 @@ byte OBD2_KLine::calculateChecksum(const byte data[], int length) {
   return checksum % 256;
 }
 
+String OBD2_KLine::decodeDTC(byte input_byte1, byte input_byte2) {
+  String ErrorCode = "";
+  const char type_lookup[4] = {'P', 'C', 'B', 'U'};
+  const char digit_lookup[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+  ErrorCode += type_lookup[(input_byte1 >> 6) & 0x03];
+  ErrorCode += digit_lookup[(input_byte1 >> 4) & 0x03];
+  ErrorCode += digit_lookup[input_byte1 & 0x0F];
+  ErrorCode += digit_lookup[(input_byte2 >> 4) & 0x0F];
+  ErrorCode += digit_lookup[input_byte2 & 0x0F];
+
+  return ErrorCode;
+}
 void OBD2_KLine::setWriteDelay(uint16_t delay) {
   _writeDelay = delay;
 }
