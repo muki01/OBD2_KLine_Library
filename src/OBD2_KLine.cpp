@@ -83,7 +83,7 @@ bool OBD2_KLine::tryFastInit() {
 }
 
 void OBD2_KLine::writeData(const byte mode, const byte pid) {
-  // debugPrintln("Writing...");
+  debugPrintln("Writing...");
   byte message[7] = {0};
   size_t length = (mode == read_FreezeFrame) ? 7 : (mode == init_OBD || mode == read_DTCs || mode == clear_DTCs) ? 5 : 6;
 
@@ -111,7 +111,7 @@ void OBD2_KLine::writeData(const byte mode, const byte pid) {
 }
 
 int OBD2_KLine::readData() {
-  // debugPrintln("Reading...");
+  debugPrintln("Reading...");
   unsigned long startMillis = millis();
   int bytesRead = 0;
 
@@ -123,23 +123,23 @@ int OBD2_KLine::readData() {
       errors = 0;
 
       // İç döngü: bütün veriyi oku
-      // debugPrint("Received Data: ");
       while (millis() - lastByteTime < _dataRequestInterval) {  // 60ms boyunca yeni veri bekle
         if (_serial.available() > 0) {                          // Yeni veri varsa
           if (bytesRead >= sizeof(resultBuffer)) {              // Buffer dolarsa dur
             // debugPrintln("\nBuffer is full. Stopping data reception.");
+      debugPrint("Received Data: ");
             return bytesRead;
           }
 
           resultBuffer[bytesRead] = _serial.read();
-          // debugPrintHex(resultBuffer[bytesRead]);
-          // debugPrint(" ");
+          debugPrintHex(resultBuffer[bytesRead]);
+          debugPrint(" ");
           bytesRead++;
           lastByteTime = millis();  // Timer'ı resetle
         }
       }
 
-      // debugPrintln("\nData reception completed.");
+      debugPrintln("\nData reception completed.");
       return bytesRead;
     }
   }
@@ -160,15 +160,15 @@ int OBD2_KLine::readData() {
 void OBD2_KLine::clearEcho() {
   int result = _serial.available();
   if (result > 0) {
-    // debugPrint("Cleared Echo Data: ");
+    debugPrint("Cleared Echo Data: ");
     for (int i = 0; i < result; i++) {
       byte readedByte = _serial.read();
-      // debugPrintHex(readedByte);
-      // debugPrint(" ");
+      debugPrintHex(readedByte);
+      debugPrint(" ");
     }
-    // debugPrintln();
+    debugPrintln("");
   } else {
-    // debugPrintln("Not Received Echo Data");
+    debugPrintln("Not Received Echo Data");
   }
 }
 
@@ -199,7 +199,7 @@ void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
 
 void OBD2_KLine::setProtocol(const String &protocolName) {
   protocol = protocolName;
-  // debugPrintln(("Protocol set to: " + protocol).c_str());
+  debugPrintln(("Protocol set to: " + protocol).c_str());
 }
 
 void OBD2_KLine::send5baud(uint8_t data) {
@@ -217,39 +217,54 @@ void OBD2_KLine::send5baud(uint8_t data) {
 
   bits[8] = (even == 0) ? 1 : 0;  // parity biti
 
-  // debugPrint("5 Baud Init for Module 0x");
-  // debugPrintHex(data);
-  // debugPrint(": ");
+  debugPrint("5 Baud Init for Module 0x");
+  debugPrintHex(data);
+  debugPrint(": ");
 
   // Pin'i OUTPUT yapmayı unutma (özellikle custom pin kullanılıyorsa)
   pinMode(_txPin, OUTPUT);
 
   for (int i = 0; i < 10; i++) {
-    // debugPrint(bits[i] ? "1" : "0");
+    debugPrint(bits[i] ? "1" : "0");
     digitalWrite(_txPin, bits[i] ? HIGH : LOW);
     delay(200);
   }
 
-  // debugPrintln();
+  debugPrintln("");
 }
 
 int OBD2_KLine::getPID(const byte pid) {
   writeData(read_LiveData, pid);
+void OBD2_KLine::setDebug(Stream &serial) {
+  _debugSerial = &serial;
+}
 
   int len = readData();
   if (len <= 0) {
     return -1;  // Veri okunamadı
   }
+void OBD2_KLine::debugPrint(const char *msg) {
+  if (_debugSerial) _debugSerial->print(msg);
+}
 
   if (resultBuffer[4] != pid) {
     return -2;  // Beklenen PID değil
   }
+void OBD2_KLine::debugPrintln(const char *msg) {
+  if (_debugSerial) _debugSerial->println(msg);
+}
 
   int dataBytesLen = len - 6;
   byte A = (dataBytesLen >= 1) ? resultBuffer[5] : 0;
   byte B = (dataBytesLen >= 2) ? resultBuffer[6] : 0;
   byte C = (dataBytesLen >= 3) ? resultBuffer[7] : 0;
   byte D = (dataBytesLen >= 4) ? resultBuffer[8] : 0;
+void OBD2_KLine::debugPrintHex(byte val) {
+  if (_debugSerial) {
+    if (val < 0x10) _debugSerial->print("0");
+    _debugSerial->print(val, HEX);
+  }
+}
 
   switch (pid) {
     case 0x01:   // Monitor Status Since DTC Cleared (bit encoded)
@@ -347,5 +362,9 @@ int OBD2_KLine::getPID(const byte pid) {
       return (A * 256) + B - 40;
     default:
       return -4;  // Bilinmeyen PID
+void OBD2_KLine::debugPrintHexln(byte val) {
+  if (_debugSerial) {
+    debugPrintHex(val);
+    _debugSerial->println();
   }
 }

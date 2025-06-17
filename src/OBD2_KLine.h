@@ -14,6 +14,7 @@ class OBD2_KLine {
  public:
   OBD2_KLine(HardwareSerial &serialPort, long baudRate, uint8_t rxPin, uint8_t txPin);
 
+  void setDebug(Stream &serial);
   void beginSerial();
   bool initOBD2();
   bool trySlowInit();
@@ -34,6 +35,7 @@ class OBD2_KLine {
   bool _customPins;
   uint8_t _rxPin;
   uint8_t _txPin;
+  Stream *_debugSerial = nullptr;  // Debug serial port
 
   byte resultBuffer[64] = {0};
   int errors = 0;
@@ -44,6 +46,10 @@ class OBD2_KLine {
   uint16_t _dataRequestInterval = 60;
   byte calculateChecksum(const byte data[], int length);
   void clearEcho();
+  void debugPrint(const char *msg);
+  void debugPrintln(const char *msg);
+  void debugPrintHex(byte val);    // Hexadecimal output
+  void debugPrintHexln(byte val);  // Hexadecimal + newline
 };
 
 #endif  // OBD2_KLINE_H
