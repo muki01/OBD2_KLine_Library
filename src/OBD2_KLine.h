@@ -26,6 +26,7 @@ class OBD2_KLine {
   int getPID(byte pid);
   int readDTCs();
   String getDTC(int index);
+  bool clearDTC();
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);

@@ -310,6 +310,17 @@ int OBD2_KLine::readDTCs() {
   return dtcCount;
 }
 
+bool OBD2_KLine::clearDTC() {
+  writeData(clear_DTCs, 0x00);
+  int len = readData();
+  if (len >= 3) {
+    if (resultBuffer[3] == 0x44) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void OBD2_KLine::resetSerialLine() {
   _serial.end();
   pinMode(_rxPin, INPUT_PULLUP);
