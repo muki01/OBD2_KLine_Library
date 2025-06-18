@@ -115,19 +115,19 @@ int OBD2_KLine::readData() {
   unsigned long startMillis = millis();
   int bytesRead = 0;
 
-  // İlk byte için 1 saniye bekle
+  // Wait for data for 1 second
   while (millis() - startMillis < 1000) {
     if (_serial.available() > 0) {
       unsigned long lastByteTime = millis();
       memset(resultBuffer, 0, sizeof(resultBuffer));
       errors = 0;
 
-      // İç döngü: bütün veriyi oku
-      while (millis() - lastByteTime < _dataRequestInterval) {  // 60ms boyunca yeni veri bekle
-        if (_serial.available() > 0) {                          // Yeni veri varsa
-          if (bytesRead >= sizeof(resultBuffer)) {              // Buffer dolarsa dur
-            // debugPrintln("\nBuffer is full. Stopping data reception.");
+      // Read all data
       debugPrint("Received Data: ");
+      while (millis() - lastByteTime < _dataRequestInterval) {  // Wait for new data for 60ms
+        if (_serial.available() > 0) {                          // If new data is available
+          if (bytesRead >= sizeof(resultBuffer)) {              // Stop if buffer is full
+            debugPrintln("\nBuffer is full. Stopping data reception.");
             return bytesRead;
           }
 
@@ -135,7 +135,7 @@ int OBD2_KLine::readData() {
           debugPrintHex(resultBuffer[bytesRead]);
           debugPrint(" ");
           bytesRead++;
-          lastByteTime = millis();  // Timer'ı resetle
+          lastByteTime = millis();  // Reset last byte time
         }
       }
 
@@ -144,8 +144,8 @@ int OBD2_KLine::readData() {
     }
   }
 
-  // 1 saniyede veri gelmezse
-  // debugPrintln("Timeout: Not Received Data.");
+  // If no data is received within 1 second
+  debugPrintln("Timeout: Not Received Data.");
   errors++;
   if (errors > 2) {
     errors = 0;
@@ -370,25 +370,25 @@ void OBD2_KLine::setProtocol(const String &protocolName) {
 }
 
 void OBD2_KLine::send5baud(uint8_t data) {
-  byte even = 1;  // parity bit hesaplama için
+  byte even = 1;  // for calculating parity bit
   byte bits[10];
 
   bits[0] = 0;  // start bit
   bits[9] = 1;  // stop bit
 
-  // 7-bit data ve parity hesaplama
+  // 7-bit data and parity calculation
   for (int i = 1; i <= 7; i++) {
     bits[i] = (data >> (i - 1)) & 1;
     even ^= bits[i];
   }
 
-  bits[8] = (even == 0) ? 1 : 0;  // parity biti
+  bits[8] = (even == 0) ? 1 : 0;  // parity bit
 
   debugPrint("5 Baud Init for Module 0x");
   debugPrintHex(data);
   debugPrint(": ");
 
-  // Pin'i OUTPUT yapmayı unutma (özellikle custom pin kullanılıyorsa)
+  // Set txPin as output
   pinMode(_txPin, OUTPUT);
 
   for (int i = 0; i < 10; i++) {
