@@ -339,6 +339,12 @@ String OBD2_KLine::decodeDTC(byte input_byte1, byte input_byte2) {
 
   return ErrorCode;
 }
+
+String OBD2_KLine::getDTC(int index) {
+  if (index >= 0) return dtcBuffer[index];
+  return "";
+}
+
 void OBD2_KLine::setWriteDelay(uint16_t delay) {
   _writeDelay = delay;
 }
