@@ -2,8 +2,6 @@
 
 OBD2_KLine KLine(Serial1, 10400, 10, 11);
 
-bool connected = false;
-
 void setup() {
   Serial.begin(115200);
   Serial.println("OBD2 K-Line PID Reading Example");
@@ -17,9 +15,7 @@ void setup() {
 }
 
 void loop() {
-  if (!connected) {
-    connected = KLine.init_OBD2();
-  } else {
+  if (KLine.initOBD2()) {
     int dtcLength = KLine.readDTCs();
     if (dtcLength > 0) {
       for (int i = 0; i < dtcLength; i++) {
