@@ -44,7 +44,7 @@ class OBD2_KLine {
   int errors = 0;
   bool connectionStatus = false;
 
-  String protocol = "ISO9141";
+  String protocol = "Automatic";
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
   String dtcBuffer[32];
