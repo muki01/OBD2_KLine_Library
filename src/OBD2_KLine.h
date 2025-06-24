@@ -63,6 +63,7 @@ class OBD2_KLine {
 
   String decodeDTC(byte input_byte1, byte input_byte2);
   byte calculateChecksum(const byte data[], int length);
+  bool isInArray(byte arr[], int size, byte value);
   void clearEcho();
   void debugPrint(const char *msg);
   void debugPrintln(const char *msg);
