@@ -24,6 +24,7 @@ class OBD2_KLine {
   int readData();
   void send5baud(uint8_t data);
   float getLiveData(byte pid);
+  float getFreezeFrame(byte pid);
   float getPID(byte mode, byte pid);
   int readDTCs();
   String getDTC(int index);

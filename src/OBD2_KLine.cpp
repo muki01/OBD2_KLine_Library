@@ -176,6 +176,11 @@ float OBD2_KLine::getLiveData(const byte pid) {
   return getPID(read_LiveData, pid);
 }
 
+float OBD2_KLine::getFreezeFrame(const byte pid) {
+  return getPID(read_FreezeFrame, pid);
+}
+
+
 float OBD2_KLine::getPID(const byte mode, const byte pid) {
   writeData(mode, pid);
 
