@@ -445,3 +445,70 @@ void OBD2_KLine::debugPrintHexln(byte val) {
     _debugSerial->println();
   }
 }
+
+int OBD2_KLine::getSupportedData(byte mode) {
+  int supportedCount = 0;
+  int pidIndex = 0;
+  int startByte = 0;
+  int arraySize = 32;  // Size of supported data arrays
+  byte *targetArray = nullptr;
+
+  if (mode == read_LiveData) {
+    startByte = 5;
+    targetArray = supportedLiveData;
+  } else if (mode == read_FreezeFrame) {
+    startByte = 6;
+    targetArray = supportedFreezeFrame;
+  } else if (mode == read_VehicleInfo) {
+    startByte = 6;
+    targetArray = supportedVehicleInfo;
+  } else {
+    return -1;  // Invalid mode
+  }
+
+  writeData(mode, SUPPORTED_PIDS_1_20);
+  if (readData()) {
+    for (int i = 0; i < 4; i++) {
+      byte value = resultBuffer[i + startByte];
+      for (int bit = 7; bit >= 0; bit--) {
+        if ((value >> bit) & 1) {
+          targetArray[supportedCount++] = pidIndex + 1;
+        }
+        pidIndex++;
+      }
+    }
+  }
+
+  if (isInArray(targetArray, arraySize, 0x20)) {
+    writeData(mode, SUPPORTED_PIDS_21_40);
+    if (readData()) {
+      for (int i = 0; i < 4; i++) {
+        byte value = resultBuffer[i + startByte];
+        for (int bit = 7; bit >= 0; bit--) {
+          if ((value >> bit) & 1) {
+            targetArray[supportedCount++] = pidIndex + 1;
+          }
+          pidIndex++;
+        }
+      }
+    }
+  }
+
+  if (isInArray(targetArray, arraySize, 0x40)) {
+    writeData(mode, SUPPORTED_PIDS_41_60);
+    if (readData()) {
+      for (int i = 0; i < 4; i++) {
+        byte value = resultBuffer[i + startByte];
+        for (int bit = 7; bit >= 0; bit--) {
+          if ((value >> bit) & 1) {
+            targetArray[supportedCount++] = pidIndex + 1;
+          }
+          pidIndex++;
+        }
+      }
+    }
+  }
+
+  return supportedCount;
+}
+

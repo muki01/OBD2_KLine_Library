@@ -9,6 +9,9 @@ const byte read_FreezeFrame = 0x02;  // Read Freeze Frame Data
 const byte read_DTCs = 0x03;         // Read Troubleshoot Codes
 const byte clear_DTCs = 0x04;        // Clear Troubleshoot Codes
 const byte read_VehicleInfo = 0x09;  // Read Vehicle Info
+const byte SUPPORTED_PIDS_1_20 = 0x00;
+const byte SUPPORTED_PIDS_21_40 = 0x20;
+const byte SUPPORTED_PIDS_41_60 = 0x40;
 
 class OBD2_KLine {
  public:
@@ -23,12 +26,16 @@ class OBD2_KLine {
   void writeData(const byte mode, const byte pid);
   int readData();
   void send5baud(uint8_t data);
+
   float getLiveData(byte pid);
   float getFreezeFrame(byte pid);
   float getPID(byte mode, byte pid);
+
   int readDTCs();
   String getDTC(int index);
   bool clearDTC();
+
+  int getSupportedData(byte mode);
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
@@ -50,6 +57,9 @@ class OBD2_KLine {
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
   String dtcBuffer[32];
+  byte supportedLiveData[32];
+  byte supportedFreezeFrame[32];
+  byte supportedVehicleInfo[32];
 
   String decodeDTC(byte input_byte1, byte input_byte2);
   byte calculateChecksum(const byte data[], int length);
