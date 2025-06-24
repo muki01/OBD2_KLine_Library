@@ -446,6 +446,18 @@ void OBD2_KLine::debugPrintHexln(byte val) {
   }
 }
 
+int OBD2_KLine::getSupportedLiveData() {
+  return getSupportedData(read_LiveData);
+}
+
+int OBD2_KLine::getSupportedFreezeFrame() {
+  return getSupportedData(read_FreezeFrame);
+}
+
+int OBD2_KLine::getSupportedVehicleInfo() {
+  return getSupportedData(read_VehicleInfo);
+}
+
 int OBD2_KLine::getSupportedData(byte mode) {
   int supportedCount = 0;
   int pidIndex = 0;

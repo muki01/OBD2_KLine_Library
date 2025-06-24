@@ -35,6 +35,9 @@ class OBD2_KLine {
   String getDTC(int index);
   bool clearDTC();
 
+  int getSupportedLiveData();
+  int getSupportedFreezeFrame();
+  int getSupportedVehicleInfo();
   int getSupportedData(byte mode);
 
   void setWriteDelay(uint16_t delay);
