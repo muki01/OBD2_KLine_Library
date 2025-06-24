@@ -172,8 +172,8 @@ void OBD2_KLine::clearEcho() {
   }
 }
 
-int OBD2_KLine::getPID(const byte pid) {
-  writeData(read_LiveData, pid);
+float OBD2_KLine::getPID(const byte mode, const byte pid) {
+  writeData(mode, pid);
 
   int len = readData();
   if (len <= 0) {
@@ -184,11 +184,22 @@ int OBD2_KLine::getPID(const byte pid) {
     return -2;  // Unexpected PID
   }
 
-  int dataBytesLen = len - 6;
-  byte A = (dataBytesLen >= 1) ? resultBuffer[5] : 0;
-  byte B = (dataBytesLen >= 2) ? resultBuffer[6] : 0;
-  byte C = (dataBytesLen >= 3) ? resultBuffer[7] : 0;
-  byte D = (dataBytesLen >= 4) ? resultBuffer[8] : 0;
+  byte A = 0, B = 0, C = 0, D = 0;
+
+  if (mode == read_LiveData) {
+    int dataBytesLen = len - 6;
+    A = (dataBytesLen >= 1) ? resultBuffer[5] : 0;
+    B = (dataBytesLen >= 2) ? resultBuffer[6] : 0;
+    C = (dataBytesLen >= 3) ? resultBuffer[7] : 0;
+    D = (dataBytesLen >= 4) ? resultBuffer[8] : 0;
+  }
+  else if(mode == read_FreezeFrame){
+    int dataBytesLen = len - 7;
+    A = (dataBytesLen >= 1) ? resultBuffer[6] : 0;
+    B = (dataBytesLen >= 2) ? resultBuffer[7] : 0;
+    C = (dataBytesLen >= 3) ? resultBuffer[8] : 0;
+    D = (dataBytesLen >= 4) ? resultBuffer[9] : 0;
+  }
 
   switch (pid) {
     case 0x01:                                        // Monitor Status Since DTC Cleared (bit encoded)
