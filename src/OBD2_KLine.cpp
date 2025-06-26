@@ -542,3 +542,15 @@ String OBD2_KLine::convertHexToAscii(byte *dataArray, int length) {
   }
   return asciiString;
 }
+
+String OBD2_KLine::convertBytesToHexString(byte *dataArray, int length) {
+  String hexString = "";
+  for (int i = 0; i < length; i++) {
+    if (dataArray[i] < 0x10) {
+      hexString += "0";
+    }
+    hexString += String(dataArray[i], HEX);
+  }
+  hexString.toUpperCase();
+  return hexString;
+}
