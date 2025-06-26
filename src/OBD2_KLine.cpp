@@ -532,6 +532,59 @@ bool OBD2_KLine::isInArray(byte arr[], int size, byte value) {
   }
   return false;
 }
+
+String OBD2_KLine::getVehicleInfo(byte pid) {
+  // Request: C2 33 F1 09 02 F1
+  // example Response: 87 F1 11 49 02 01 00 00 00 31 06
+  //                   87 F1 11 49 02 02 41 31 4A 43 D5
+  //                   87 F1 11 49 02 03 35 34 34 34 A8
+  //                   87 F1 11 49 02 04 52 37 32 35 C8
+  //                   87 F1 11 49 02 05 32 33 36 37 E6
+
+  byte dataArray[64];
+  int messageCount;
+  int arrayNum = 0;
+
+  if (pid == 0x02) {
+    messageCount = 5;
+  } else if (pid == 0x04 || pid == 0x06) {
+    if (pid == 0x04) {
+      writeData(read_VehicleInfo, read_ID_Length);
+    } else if (pid == 0x06) {
+      writeData(read_VehicleInfo, read_ID_Num_Length);
+    } else {
+      return "";
+    }
+
+    if (readData()) {
+      messageCount = resultBuffer[5];
+    } else {
+      return "";
+    }
+  }
+
+  writeData(read_VehicleInfo, pid);
+
+  if (readData()) {
+    for (int j = 0; j < messageCount; j++) {
+      if (pid == 0x02 && j == 0) {
+        dataArray[arrayNum++] = resultBuffer[9];
+        continue;
+      }
+      for (int i = 1; i <= 4; i++) {
+        dataArray[arrayNum++] = resultBuffer[i + 5 + j * 11];
+      }
+    }
+  }
+
+  if (pid == 0x02 || pid == 0x04) {
+    return convertHexToAscii(dataArray, arrayNum);
+  } else if (pid == 0x06) {
+    return convertBytesToHexString(dataArray, arrayNum);
+  }
+  return "";
+}
+
 String OBD2_KLine::convertHexToAscii(byte *dataArray, int length) {
   String asciiString = "";
   for (int i = 0; i < length; i++) {

@@ -13,6 +13,14 @@ const byte SUPPORTED_PIDS_1_20 = 0x00;
 const byte SUPPORTED_PIDS_21_40 = 0x20;
 const byte SUPPORTED_PIDS_41_60 = 0x40;
 
+const byte supported_VehicleInfo = 0x00;  // Read Supported Vehicle Info
+const byte read_VIN_Count = 0x01;         // Read VIN Count
+const byte read_VIN = 0x02;               // Read VIN
+const byte read_ID_Length = 0x03;         // Read Calibration ID Length
+const byte read_ID = 0x04;                // Read Calibration ID
+const byte read_ID_Num_Length = 0x05;     // Read Calibration ID Number Length
+const byte read_ID_Num = 0x06;            // Read Calibration ID Number
+
 class OBD2_KLine {
  public:
   OBD2_KLine(HardwareSerial &serialPort, long baudRate, uint8_t rxPin, uint8_t txPin);
@@ -40,8 +48,10 @@ class OBD2_KLine {
   int getSupportedVehicleInfo();
   int getSupportedData(byte mode);
 
+  String getVehicleInfo(byte pid);
   String convertBytesToHexString(byte *dataArray, int length);
   String convertHexToAscii(byte *dataArray, int length);
+
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
   void setProtocol(const String &protocolName);
