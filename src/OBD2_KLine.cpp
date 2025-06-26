@@ -180,7 +180,6 @@ float OBD2_KLine::getFreezeFrame(const byte pid) {
   return getPID(read_FreezeFrame, pid);
 }
 
-
 float OBD2_KLine::getPID(const byte mode, const byte pid) {
   writeData(mode, pid);
 
@@ -201,8 +200,7 @@ float OBD2_KLine::getPID(const byte mode, const byte pid) {
     B = (dataBytesLen >= 2) ? resultBuffer[6] : 0;
     C = (dataBytesLen >= 3) ? resultBuffer[7] : 0;
     D = (dataBytesLen >= 4) ? resultBuffer[8] : 0;
-  }
-  else if(mode == read_FreezeFrame){
+  } else if (mode == read_FreezeFrame) {
     int dataBytesLen = len - 7;
     A = (dataBytesLen >= 1) ? resultBuffer[6] : 0;
     B = (dataBytesLen >= 2) ? resultBuffer[7] : 0;
@@ -588,9 +586,9 @@ String OBD2_KLine::getVehicleInfo(byte pid) {
 String OBD2_KLine::convertHexToAscii(byte *dataArray, int length) {
   String asciiString = "";
   for (int i = 0; i < length; i++) {
-    if (dataArray[i] >= 0x20 && dataArray[i] <= 0x7E) {
-      char asciiChar = (char)dataArray[i];
-      asciiString += asciiChar;
+    byte b = dataArray[i];
+    if (b >= 0x20 && b <= 0x7E) {  // Printable ASCII range
+      asciiString += (char)b;
     }
   }
   return asciiString;
@@ -599,9 +597,7 @@ String OBD2_KLine::convertHexToAscii(byte *dataArray, int length) {
 String OBD2_KLine::convertBytesToHexString(byte *dataArray, int length) {
   String hexString = "";
   for (int i = 0; i < length; i++) {
-    if (dataArray[i] < 0x10) {
-      hexString += "0";
-    }
+    if (dataArray[i] < 0x10) hexString += "0";  // Pad leading zero
     hexString += String(dataArray[i], HEX);
   }
   hexString.toUpperCase();
