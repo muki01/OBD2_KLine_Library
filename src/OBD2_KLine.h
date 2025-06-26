@@ -40,6 +40,7 @@ class OBD2_KLine {
   int getSupportedVehicleInfo();
   int getSupportedData(byte mode);
 
+  String convertHexToAscii(byte *dataArray, int length);
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
   void setProtocol(const String &protocolName);

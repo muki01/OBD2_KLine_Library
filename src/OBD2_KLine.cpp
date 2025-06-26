@@ -532,3 +532,13 @@ bool OBD2_KLine::isInArray(byte arr[], int size, byte value) {
   }
   return false;
 }
+String OBD2_KLine::convertHexToAscii(byte *dataArray, int length) {
+  String asciiString = "";
+  for (int i = 0; i < length; i++) {
+    if (dataArray[i] >= 0x20 && dataArray[i] <= 0x7E) {
+      char asciiChar = (char)dataArray[i];
+      asciiString += asciiChar;
+    }
+  }
+  return asciiString;
+}
