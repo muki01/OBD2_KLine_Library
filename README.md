@@ -1,5 +1,11 @@
 # OBD2 KLine Library
 
+![GitHub forks](https://img.shields.io/github/forks/muki01/OBD2_KLine_Library?style=flat)
+![GitHub Repo stars](https://img.shields.io/github/stars/muki01/OBD2_KLine_Library?style=flat)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/muki01/OBD2_KLine_Library?style=flat)
+![GitHub License](https://img.shields.io/github/license/muki01/OBD2_KLine_Library?style=flat)
+![GitHub last commit](https://img.shields.io/github/last-commit/muki01/OBD2_KLine_Library)
+
 This is Arduino library for communicating with vehicles over the **OBD2 K-Line** interface, using **ISO 9141** and **ISO 14230 (KWP2000)** protocols.
 
 It allows you to connect your Arduino and ESP boards to your car's ECU (Engine Control Unit) and read diagnostic data like DTCs (Diagnostic Trouble Codes), live sensor data, and more.
