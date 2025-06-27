@@ -17,6 +17,15 @@ It allows you to connect your Arduino and ESP boards to your car's ECU (Engine C
 
 ---
 
-## 🔌 Wiring
+## 🛠️Schematics for communication
+#### This is the schematic with Transistors
+<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Transistor%20Schematic.png" width=70%>
 
-Connect the K-Line pin (usually pin 7 on the OBD2 port) through a suitable transceiver (like L9637 or similar) to your Arduino or ESP device's RX and TX pins.
+The **R6** resistor in this schematic is designed for **3.3V** microcontrollers. If you are using a **5V** microcontroller, you need to change the **R6** value to **5.3kΩ**.
+
+Additionally, I have observed that many test devices use a **1kΩ** value for **R4**. However, according to the K-Line documentation, the recommended value for **R4** is **510Ω**. It is advisable to follow this value. That being said, using **1kΩ** for **R4** will not cause any issues in the circuit. However, if you prefer to adhere to the documentation, **510Ω** is the recommended value.
+
+<br>
+
+#### This is the schematic with L9637D
+<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/L9637D.png" width=70%>
