@@ -32,6 +32,7 @@ class OBD2_KLine {
   bool tryFastInit();
   void resetSerialLine();
   void writeData(const byte mode, const byte pid);
+  void writeRawData(const byte *dataArray, int length);
   int readData();
   void send5baud(uint8_t data);
 

@@ -82,6 +82,19 @@ bool OBD2_KLine::tryFastInit() {
   return false;
 }
 
+void OBD2_KLine::writeRawData(const byte *dataArray, int length) {
+  debugPrint("\nSending Raw Data: ");
+  for (size_t i = 0; i < length; i++) {
+    _serial.write(dataArray[i]);
+    debugPrintHex(dataArray[i]);
+    debugPrint(" ");
+    delay(_writeDelay);
+  }
+  debugPrintln("");
+
+  clearEcho();
+}
+
 void OBD2_KLine::writeData(const byte mode, const byte pid) {
   debugPrintln("Writing...");
   byte message[7] = {0};
