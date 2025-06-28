@@ -96,7 +96,6 @@ void OBD2_KLine::writeRawData(const byte *dataArray, int length) {
 }
 
 void OBD2_KLine::writeData(const byte mode, const byte pid) {
-  debugPrintln("Writing...");
   byte message[7] = {0};
   size_t length = (mode == read_FreezeFrame) ? 7 : (mode == init_OBD || mode == read_DTCs || mode == clear_DTCs) ? 5 : 6;
 
@@ -115,10 +114,14 @@ void OBD2_KLine::writeData(const byte mode, const byte pid) {
 
   message[length - 1] = calculateChecksum(message, length - 1);
 
+  debugPrint("\nSending Data: ");
   for (size_t i = 0; i < length; i++) {
     _serial.write(message[i]);
+    debugPrintHex(message[i]);
+    debugPrint(" ");
     delay(_writeDelay);
   }
+  debugPrintln("");
 
   clearEcho();
 }
@@ -173,13 +176,10 @@ int OBD2_KLine::readData() {
 void OBD2_KLine::clearEcho() {
   int result = _serial.available();
   if (result > 0) {
-    debugPrint("Cleared Echo Data: ");
     for (int i = 0; i < result; i++) {
       byte readedByte = _serial.read();
-      debugPrintHex(readedByte);
-      debugPrint(" ");
     }
-    debugPrintln("");
+    debugPrintln("Echo Data Cleared");
   } else {
     debugPrintln("Not Received Echo Data");
   }
