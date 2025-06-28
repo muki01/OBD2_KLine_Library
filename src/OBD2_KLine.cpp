@@ -83,10 +83,14 @@ bool OBD2_KLine::tryFastInit() {
 }
 
 void OBD2_KLine::writeRawData(const byte *dataArray, int length) {
+  byte sendData[length + 1];
+  memcpy(sendData, dataArray, length);
+  sendData[length] = calculateChecksum(dataArray, length);
+
   debugPrint("\nSending Raw Data: ");
-  for (size_t i = 0; i < length; i++) {
-    _serial.write(dataArray[i]);
-    debugPrintHex(dataArray[i]);
+  for (size_t i = 0; i < length + 1; i++) {
+    _serial.write(sendData[i]);
+    debugPrintHex(sendData[i]);
     debugPrint(" ");
     delay(_writeDelay);
   }
