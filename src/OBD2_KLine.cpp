@@ -360,10 +360,10 @@ void OBD2_KLine::resetSerialLine() {
   delay(3000);
 }
 
-byte OBD2_KLine::calculateChecksum(const byte data[], int length) {
+byte OBD2_KLine::calculateChecksum(const byte *dataArray, int length) {
   byte checksum = 0;
   for (int i = 0; i < length; i++) {
-    checksum += data[i];
+    checksum += dataArray[i];
   }
   return checksum % 256;
 }
@@ -535,9 +535,9 @@ int OBD2_KLine::getSupportedData(byte mode) {
   return supportedCount;
 }
 
-bool OBD2_KLine::isInArray(byte arr[], int size, byte value) {
-  for (int i = 0; i < size; i++) {
-    if (arr[i] == value) {
+bool OBD2_KLine::isInArray(const byte *dataArray, int length, byte value) {
+  for (int i = 0; i < length; i++) {
+    if (dataArray[i] == value) {
       return true;
     }
   }
@@ -596,7 +596,7 @@ String OBD2_KLine::getVehicleInfo(byte pid) {
   return "";
 }
 
-String OBD2_KLine::convertHexToAscii(byte *dataArray, int length) {
+String OBD2_KLine::convertHexToAscii(const byte *dataArray, int length) {
   String asciiString = "";
   for (int i = 0; i < length; i++) {
     byte b = dataArray[i];
@@ -607,7 +607,7 @@ String OBD2_KLine::convertHexToAscii(byte *dataArray, int length) {
   return asciiString;
 }
 
-String OBD2_KLine::convertBytesToHexString(byte *dataArray, int length) {
+String OBD2_KLine::convertBytesToHexString(const byte *dataArray, int length) {
   String hexString = "";
   for (int i = 0; i < length; i++) {
     if (dataArray[i] < 0x10) hexString += "0";  // Pad leading zero

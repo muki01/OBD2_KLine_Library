@@ -76,8 +76,8 @@ class OBD2_KLine {
   byte supportedVehicleInfo[32];
 
   String decodeDTC(byte input_byte1, byte input_byte2);
-  byte calculateChecksum(const byte data[], int length);
-  bool isInArray(byte arr[], int size, byte value);
+  byte calculateChecksum(const byte *dataArray, int length);
+  bool isInArray(const byte *dataArray, int length, byte value);
   String convertBytesToHexString(const byte *dataArray, int length);
   String convertHexToAscii(const byte *dataArray, int length);
   void clearEcho();
