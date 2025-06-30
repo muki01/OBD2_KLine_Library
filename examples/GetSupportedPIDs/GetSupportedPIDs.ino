@@ -16,13 +16,42 @@ void setup() {
 
 void loop() {
   if (KLine.initOBD2()) {
-    KLine.getSupportedLiveData();
+    int liveDataLength = KLine.readSupportedLiveData();
+    if (liveDataLength > 0) {
+      Serial.print("LiveData: ");
+      for (int i = 0; i < liveDataLength; i++) {
+        byte supported = KLine.getSupportedData(0x01, i);
+        Serial.print(supported, HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
     delay(1000);
-    KLine.getSupportedFreezeFrame();
+
+    int freezeFrameLength = KLine.readSupportedFreezeFrame();
+    if (freezeFrameLength > 0) {
+      Serial.print("FreezeFrame: ");
+      for (int i = 0; i < freezeFrameLength; i++) {
+        byte supported = KLine.getSupportedData(0x02, i);
+        Serial.print(supported, HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
     delay(1000);
-    KLine.getSupportedVehicleInfo();
+
+    int vehicleInfoLength = KLine.readSupportedVehicleInfo();
+    if (vehicleInfoLength > 0) {
+      Serial.print("VehicleInfo: ");
+      for (int i = 0; i < vehicleInfoLength; i++) {
+        byte supported = KLine.getSupportedData(0x09, i);
+        Serial.print(supported, HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
     delay(1000);
-    KLine.getSupportedData(0x01);
-    delay(1000);
+    // KLine.readSupportedData(0x01);
+    // delay(1000);
   }
 }
