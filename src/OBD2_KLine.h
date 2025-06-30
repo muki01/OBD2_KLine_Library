@@ -42,8 +42,10 @@ class OBD2_KLine {
   float getLiveData(byte pid);
   float getFreezeFrame(byte pid);
 
-  String getDTC(int index);
   int readDTCs(byte mode);
+  String getStoredDTC(int index);
+  String getPendingDTC(int index);
+
   bool clearDTC();
 
   String getVehicleInfo(byte pid);
@@ -73,6 +75,8 @@ class OBD2_KLine {
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
   String storedDTCBuffer[32];
+  String pendingDTCBuffer[32];
+
   byte supportedLiveData[32];
   byte supportedFreezeFrame[32];
   byte supportedVehicleInfo[32];

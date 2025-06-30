@@ -395,8 +395,13 @@ String OBD2_KLine::decodeDTC(byte input_byte1, byte input_byte2) {
   return ErrorCode;
 }
 
-String OBD2_KLine::getDTC(int index) {
-  if (index >= 0) return dtcBuffer[index];
+String OBD2_KLine::getStoredDTC(int index) {
+  if (index >= 0) return storedDTCBuffer[index];
+  return "";
+}
+
+String OBD2_KLine::getPendingDTC(int index) {
+  if (index >= 0) return pendingDTCBuffer[index];
   return "";
 }
 
