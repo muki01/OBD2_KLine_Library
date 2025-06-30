@@ -52,10 +52,10 @@ class OBD2_KLine {
 
   String getVehicleInfo(byte pid);
 
-  int getSupportedLiveData();
-  int getSupportedFreezeFrame();
-  int getSupportedVehicleInfo();
-  int getSupportedData(byte mode);
+  int readSupportedLiveData();
+  int readSupportedFreezeFrame();
+  int readSupportedVehicleInfo();
+  int readSupportedData(byte mode);
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
