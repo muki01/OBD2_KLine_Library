@@ -354,6 +354,14 @@ int OBD2_KLine::readDTCs(byte mode) {
   return dtcCount;
 }
 
+int OBD2_KLine::readStoredDTCs() {
+  return readDTCs(0x03);
+}
+
+int OBD2_KLine::readPendingDTCs() {
+  return readDTCs(0x07);
+}
+
 bool OBD2_KLine::clearDTC() {
   writeData(clear_DTCs, 0x00);
   int len = readData();

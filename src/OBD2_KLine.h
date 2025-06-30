@@ -43,6 +43,8 @@ class OBD2_KLine {
   float getFreezeFrame(byte pid);
 
   int readDTCs(byte mode);
+  int readStoredDTCs();
+  int readPendingDTCs();
   String getStoredDTC(int index);
   String getPendingDTC(int index);
 
