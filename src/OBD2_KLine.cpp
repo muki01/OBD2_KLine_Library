@@ -561,6 +561,17 @@ int OBD2_KLine::readSupportedData(byte mode) {
   return supportedCount;
 }
 
+byte OBD2_KLine::getSupportedData(byte mode, int index) {
+  if (mode == 0x01) {
+    if (index >= 0) return supportedLiveData[index];
+  } else if (mode == 0x02) {
+    if (index >= 0) return supportedFreezeFrame[index];
+  } else if (mode == 0x09) {
+    if (index >= 0) return supportedVehicleInfo[index];
+  }
+  return 0;
+}
+
 bool OBD2_KLine::isInArray(const byte *dataArray, int length, byte value) {
   for (int i = 0; i < length; i++) {
     if (dataArray[i] == value) {

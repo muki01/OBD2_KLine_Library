@@ -56,6 +56,7 @@ class OBD2_KLine {
   int readSupportedFreezeFrame();
   int readSupportedVehicleInfo();
   int readSupportedData(byte mode);
+  byte getSupportedData(byte mode, int index);
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
