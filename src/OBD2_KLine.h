@@ -6,8 +6,10 @@
 const byte init_OBD = 0x81;          // Init ISO14230
 const byte read_LiveData = 0x01;     // Read Live Data
 const byte read_FreezeFrame = 0x02;  // Read Freeze Frame Data
-const byte read_DTCs = 0x03;         // Read Troubleshoot Codes
+const byte read_storedDTCs = 0x03;   // Read Stored Troubleshoot Codes
 const byte clear_DTCs = 0x04;        // Clear Troubleshoot Codes
+const byte test_Sensors = 0x05;      // Test Sensors
+const byte read_pendingDTCs = 0x07;  // Read Pending Troubleshoot Codes
 const byte read_VehicleInfo = 0x09;  // Read Vehicle Info
 const byte SUPPORTED_PIDS_1_20 = 0x00;
 const byte SUPPORTED_PIDS_21_40 = 0x20;
@@ -40,8 +42,8 @@ class OBD2_KLine {
   float getLiveData(byte pid);
   float getFreezeFrame(byte pid);
 
-  int readDTCs();
   String getDTC(int index);
+  int readDTCs(byte mode);
   bool clearDTC();
 
   String getVehicleInfo(byte pid);
@@ -70,7 +72,7 @@ class OBD2_KLine {
   String protocol = "Automatic";
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
-  String dtcBuffer[32];
+  String storedDTCBuffer[32];
   byte supportedLiveData[32];
   byte supportedFreezeFrame[32];
   byte supportedVehicleInfo[32];

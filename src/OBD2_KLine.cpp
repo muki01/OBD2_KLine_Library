@@ -101,13 +101,13 @@ void OBD2_KLine::writeRawData(const byte *dataArray, int length) {
 
 void OBD2_KLine::writeData(byte mode, byte pid) {
   byte message[7] = {0};
-  size_t length = (mode == read_FreezeFrame) ? 7 : (mode == init_OBD || mode == read_DTCs || mode == clear_DTCs) ? 5 : 6;
+  size_t length = (mode == read_FreezeFrame || mode == test_Sensors) ? 7 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 : 6;
 
   if (protocol == "ISO9141") {
     message[0] = (mode == read_FreezeFrame) ? 0x69 : 0x68;
     message[1] = 0x6A;
   } else if (protocol == "ISO14230_Fast" || protocol == "ISO14230_Slow") {
-    message[0] = (mode == read_FreezeFrame) ? 0xC3 : (mode == init_OBD || mode == read_DTCs || mode == clear_DTCs) ? 0xC1 : 0xC2;
+    message[0] = (mode == read_FreezeFrame) ? 0xC3 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 0xC1 : 0xC2;
     message[1] = 0x33;
   }
 
@@ -322,13 +322,22 @@ float OBD2_KLine::getPID(byte mode, byte pid) {
   }
 }
 
-int OBD2_KLine::readDTCs() {
+int OBD2_KLine::readDTCs(byte mode) {
   // Request: C2 33 F1 03 F3
   // example Response: 87 F1 11 43 01 70 01 34 00 00 72
   // example Response: 87 F1 11 43 00 00 72
   int dtcCount = 0;
+  String *targetArray = nullptr;
 
-  writeData(read_DTCs, 0x00);
+  if (mode == read_storedDTCs) {
+    targetArray = storedDTCBuffer;
+  } else if (mode == read_pendingDTCs) {
+    targetArray = pendingDTCBuffer;
+  } else {
+    return -1;  // Invalid mode
+  }
+
+  writeData(mode, 0x00);
 
   int len = readData();
   if (len >= 3) {
@@ -338,7 +347,7 @@ int OBD2_KLine::readDTCs() {
 
       if (b1 == 0 && b2 == 0) break;
 
-      dtcBuffer[dtcCount++] = decodeDTC(b1, b2);
+      targetArray[dtcCount++] = decodeDTC(b1, b2);
     }
   }
 
