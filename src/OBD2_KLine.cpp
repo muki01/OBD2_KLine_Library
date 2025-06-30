@@ -99,7 +99,7 @@ void OBD2_KLine::writeRawData(const byte *dataArray, int length) {
   clearEcho();
 }
 
-void OBD2_KLine::writeData(const byte mode, const byte pid) {
+void OBD2_KLine::writeData(byte mode, byte pid) {
   byte message[7] = {0};
   size_t length = (mode == read_FreezeFrame) ? 7 : (mode == init_OBD || mode == read_DTCs || mode == clear_DTCs) ? 5 : 6;
 
@@ -189,15 +189,15 @@ void OBD2_KLine::clearEcho() {
   }
 }
 
-float OBD2_KLine::getLiveData(const byte pid) {
+float OBD2_KLine::getLiveData(byte pid) {
   return getPID(read_LiveData, pid);
 }
 
-float OBD2_KLine::getFreezeFrame(const byte pid) {
+float OBD2_KLine::getFreezeFrame(byte pid) {
   return getPID(read_FreezeFrame, pid);
 }
 
-float OBD2_KLine::getPID(const byte mode, const byte pid) {
+float OBD2_KLine::getPID(byte mode, byte pid) {
   writeData(mode, pid);
 
   int len = readData();

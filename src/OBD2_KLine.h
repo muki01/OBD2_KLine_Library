@@ -31,25 +31,25 @@ class OBD2_KLine {
   bool trySlowInit();
   bool tryFastInit();
   void resetSerialLine();
-  void writeData(const byte mode, const byte pid);
+  void writeData(byte mode, byte pid);
   void writeRawData(const byte *dataArray, int length);
   int readData();
   void send5baud(uint8_t data);
 
+  float getPID(byte mode, byte pid);
   float getLiveData(byte pid);
   float getFreezeFrame(byte pid);
-  float getPID(byte mode, byte pid);
 
   int readDTCs();
   String getDTC(int index);
   bool clearDTC();
 
+  String getVehicleInfo(byte pid);
+
   int getSupportedLiveData();
   int getSupportedFreezeFrame();
   int getSupportedVehicleInfo();
   int getSupportedData(byte mode);
-
-  String getVehicleInfo(byte pid);
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
