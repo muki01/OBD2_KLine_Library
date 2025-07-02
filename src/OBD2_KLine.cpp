@@ -34,13 +34,13 @@ bool OBD2_KLine::initOBD2() {
     if (tryFastInit()) return true;
   }
 
-  debugPrintln("❌ No Protocol Matched. Initialization Failed.");
-  debugPrintln("");
+  debugPrintln(F("❌ No Protocol Matched. Initialization Failed."));
+  debugPrintln(F(""));
   return false;
 }
 
 bool OBD2_KLine::trySlowInit() {
-  debugPrintln("🔁 Trying ISO9141 / ISO14230_Slow");
+  debugPrintln(F("🔁 Trying ISO9141 / ISO14230_Slow"));
 
   setSerial(false);
   send5baud(0x33);
@@ -51,7 +51,7 @@ bool OBD2_KLine::trySlowInit() {
   if (resultBuffer[0] != 0x55) return false;
 
   protocol = (resultBuffer[1] == resultBuffer[2]) ? "ISO9141" : "ISO14230_Slow";
-  debugPrint("✅ Protocol Detected: ");
+  debugPrint(F("✅ Protocol Detected: "));
   debugPrintln(protocol.c_str());
 
   _serial->write(~resultBuffer[2]);
@@ -59,17 +59,17 @@ bool OBD2_KLine::trySlowInit() {
   if (!readData()) return false;
 
   if (resultBuffer[0]) {
-    debugPrintln("✅ Connection established with car (Slow Init)");
+    debugPrintln(F("✅ Connection established with car (Slow Init)"));
     connectionStatus = true;
     return true;
   }
 
-  debugPrintln("❌ No response after KW2 write");
+  debugPrintln(F("❌ No response after KW2 write"));
   return false;
 }
 
 bool OBD2_KLine::tryFastInit() {
-  debugPrintln("🔁 Trying ISO14230_Fast");
+  debugPrintln(F("🔁 Trying ISO14230_Fast"));
 
   setSerial(false);
 
@@ -84,7 +84,7 @@ bool OBD2_KLine::tryFastInit() {
   if (!readData()) return false;
 
   if (resultBuffer[3] == 0xC1) {
-    debugPrintln("✅ Protocol Detected: ISO14230_Fast");
+    debugPrintln(F("✅ Protocol Detected: ISO14230_Fast"));
     connectionStatus = true;
     protocol = "ISO14230_Fast";
     return true;
@@ -98,14 +98,14 @@ void OBD2_KLine::writeRawData(const byte *dataArray, int length) {
   memcpy(sendData, dataArray, length);
   sendData[length] = calculateChecksum(dataArray, length);
 
-  debugPrint("\nSending Raw Data: ");
+  debugPrint(F("\nSending Raw Data: "));
   for (size_t i = 0; i < length + 1; i++) {
     _serial->write(sendData[i]);
     debugPrintHex(sendData[i]);
     debugPrint(" ");
     delay(_writeDelay);
   }
-  debugPrintln("");
+  debugPrintln(F(""));
 
   clearEcho();
 }
@@ -129,20 +129,20 @@ void OBD2_KLine::writeData(byte mode, byte pid) {
 
   message[length - 1] = calculateChecksum(message, length - 1);
 
-  debugPrint("\nSending Data: ");
+  debugPrint(F("\nSending Data: "));
   for (size_t i = 0; i < length; i++) {
     _serial->write(message[i]);
     debugPrintHex(message[i]);
-    debugPrint(" ");
+    debugPrint(F(" "));
     delay(_writeDelay);
   }
-  debugPrintln("");
+  debugPrintln(F(""));
 
   clearEcho();
 }
 
 int OBD2_KLine::readData() {
-  debugPrintln("Reading...");
+  debugPrintln(F("Reading..."));
   unsigned long startMillis = millis();
   int bytesRead = 0;
 
@@ -154,29 +154,29 @@ int OBD2_KLine::readData() {
       errors = 0;
 
       // Read all data
-      debugPrint("Received Data: ");
+      debugPrint(F("Received Data: "));
       while (millis() - lastByteTime < _dataRequestInterval) {  // Wait for new data for 60ms
         if (_serial->available() > 0) {                         // If new data is available
           if (bytesRead >= sizeof(resultBuffer)) {              // Stop if buffer is full
-            debugPrintln("\nBuffer is full. Stopping data reception.");
+            debugPrintln(F("\nBuffer is full. Stopping data reception."));
             return bytesRead;
           }
 
           resultBuffer[bytesRead] = _serial->read();
           debugPrintHex(resultBuffer[bytesRead]);
-          debugPrint(" ");
+          debugPrint(F(" "));
           bytesRead++;
           lastByteTime = millis();  // Reset last byte time
         }
       }
 
-      debugPrintln("\nData reception completed.");
+      debugPrintln(F("\nData reception completed."));
       return bytesRead;
     }
   }
 
   // If no data is received within 1 second
-  debugPrintln("Timeout: Not Received Data.");
+  debugPrintln(F("Timeout: Not Received Data."));
   errors++;
   if (errors > 2) {
     errors = 0;
@@ -194,9 +194,9 @@ void OBD2_KLine::clearEcho() {
     for (int i = 0; i < result; i++) {
       byte readedByte = _serial->read();
     }
-    debugPrintln("Echo Data Cleared");
+    debugPrintln(F("Echo Data Cleared"));
   } else {
-    debugPrintln("Not Received Echo Data");
+    debugPrintln(F("Not Received Echo Data"));
   }
 }
 
@@ -444,9 +444,9 @@ void OBD2_KLine::send5baud(uint8_t data) {
 
   bits[8] = (even == 0) ? 1 : 0;  // parity bit
 
-  debugPrint("5 Baud Init for Module 0x");
+  debugPrint(F("5 Baud Init for Module 0x"));
   debugPrintHex(data);
-  debugPrint(": ");
+  debugPrint(F(": "));
 
   // Set txPin as output
   pinMode(_txPin, OUTPUT);
@@ -457,7 +457,7 @@ void OBD2_KLine::send5baud(uint8_t data) {
     delay(200);
   }
 
-  debugPrintln("");
+  debugPrintln(F(""));
 }
 
 void OBD2_KLine::setDebug(Stream &serial) {
@@ -468,7 +468,15 @@ void OBD2_KLine::debugPrint(const char *msg) {
   if (_debugSerial) _debugSerial->print(msg);
 }
 
+void OBD2_KLine::debugPrint(const __FlashStringHelper *msg) {
+  if (_debugSerial) _debugSerial->print(msg);
+}
+
 void OBD2_KLine::debugPrintln(const char *msg) {
+  if (_debugSerial) _debugSerial->println(msg);
+}
+
+void OBD2_KLine::debugPrintln(const __FlashStringHelper *msg) {
   if (_debugSerial) _debugSerial->println(msg);
 }
 

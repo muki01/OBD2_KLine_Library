@@ -103,7 +103,9 @@ class OBD2_KLine {
   String convertHexToAscii(const byte *dataArray, int length);
   void clearEcho();
   void debugPrint(const char *msg);
+  void debugPrint(const __FlashStringHelper *msg);
   void debugPrintln(const char *msg);
+  void debugPrintln(const __FlashStringHelper *msg);
   void debugPrintHex(byte val);    // Hexadecimal output
   void debugPrintHexln(byte val);  // Hexadecimal + newline
 };
