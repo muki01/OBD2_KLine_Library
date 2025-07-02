@@ -55,6 +55,7 @@ class OBD2_KLine {
 
   int readSupportedLiveData();
   int readSupportedFreezeFrame();
+  int readSupportedComponentMonitoring();
   int readSupportedVehicleInfo();
   int readSupportedData(byte mode);
   byte getSupportedData(byte mode, int index);
@@ -83,6 +84,7 @@ class OBD2_KLine {
 
   byte supportedLiveData[32];
   byte supportedFreezeFrame[32];
+  byte supportedComponentMonitoring[32];
   byte supportedVehicleInfo[32];
 
   String decodeDTC(byte input_byte1, byte input_byte2);
