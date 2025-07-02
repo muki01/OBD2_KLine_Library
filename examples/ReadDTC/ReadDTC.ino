@@ -10,7 +10,7 @@ void setup() {
   KLine.setProtocol("ISO14230_Fast");
   KLine.setWriteDelay(5);
   KLine.setDataRequestInterval(60);
-  KLine.beginSerial();
+
   Serial.println("OBD2 Starting.");
 }
 
