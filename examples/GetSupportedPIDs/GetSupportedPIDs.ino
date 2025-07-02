@@ -40,6 +40,18 @@ void loop() {
     }
     delay(1000);
 
+    int componentMonitoringLength = KLine.readSupportedComponentMonitoring();
+    if (componentMonitoringLength > 0) {
+      Serial.print("Component Monitoring: ");
+      for (int i = 0; i < componentMonitoringLength; i++) {
+        byte supported = KLine.getSupportedData(0x06, i);
+        Serial.print(supported, HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
+    delay(1000);
+
     int vehicleInfoLength = KLine.readSupportedVehicleInfo();
     if (vehicleInfoLength > 0) {
       Serial.print("VehicleInfo: ");
