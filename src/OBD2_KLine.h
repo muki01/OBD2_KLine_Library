@@ -2,6 +2,16 @@
 #define OBD2_KLINE_H
 
 #include <Arduino.h>
+
+//#include "VehicleData.h"
+
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
+#include <AltSoftSerial.h>
+#define SerialType AltSoftSerial
+#else
+#define SerialType HardwareSerial
+#endif
+
 // ==== OBD2 Mods ====
 const byte init_OBD = 0x81;              // Init ISO14230
 const byte read_LiveData = 0x01;         // Read Live Data
@@ -26,14 +36,14 @@ const byte read_ID_Num = 0x06;            // Read Calibration ID Number
 
 class OBD2_KLine {
  public:
-  OBD2_KLine(HardwareSerial &serialPort, long baudRate, uint8_t rxPin, uint8_t txPin);
+  //VehicleData car;
+  OBD2_KLine(SerialType &serialStream, long baudRate, uint8_t rxPin, uint8_t txPin);
 
   void setDebug(Stream &serial);
   void setSerial(bool enabled);
   bool initOBD2();
   bool trySlowInit();
   bool tryFastInit();
-  void resetSerialLine();
   void writeData(byte mode, byte pid);
   void writeRawData(const byte *dataArray, int length);
   int readData();
@@ -65,9 +75,8 @@ class OBD2_KLine {
   void setProtocol(const String &protocolName);
 
  private:
-  HardwareSerial &_serial;
+  SerialType *_serial;
   long _baudRate;
-  bool _customPins;
   uint8_t _rxPin;
   uint8_t _txPin;
   Stream *_debugSerial = nullptr;  // Debug serial port
