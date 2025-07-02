@@ -3,14 +3,15 @@
 
 #include <Arduino.h>
 // ==== OBD2 Mods ====
-const byte init_OBD = 0x81;          // Init ISO14230
-const byte read_LiveData = 0x01;     // Read Live Data
-const byte read_FreezeFrame = 0x02;  // Read Freeze Frame Data
-const byte read_storedDTCs = 0x03;   // Read Stored Troubleshoot Codes
-const byte clear_DTCs = 0x04;        // Clear Troubleshoot Codes
-const byte test_Sensors = 0x05;      // Test Sensors
-const byte read_pendingDTCs = 0x07;  // Read Pending Troubleshoot Codes
-const byte read_VehicleInfo = 0x09;  // Read Vehicle Info
+const byte init_OBD = 0x81;              // Init ISO14230
+const byte read_LiveData = 0x01;         // Read Live Data
+const byte read_FreezeFrame = 0x02;      // Read Freeze Frame Data
+const byte read_storedDTCs = 0x03;       // Read Stored Troubleshoot Codes
+const byte clear_DTCs = 0x04;            // Clear Troubleshoot Codes
+const byte test_OxygenSensors = 0x05;    // Test Oxygen Sensors
+const byte component_Monitoring = 0x06;  // Component Monitoring
+const byte read_pendingDTCs = 0x07;      // Read Pending Troubleshoot Codes
+const byte read_VehicleInfo = 0x09;      // Read Vehicle Info
 const byte SUPPORTED_PIDS_1_20 = 0x00;
 const byte SUPPORTED_PIDS_21_40 = 0x20;
 const byte SUPPORTED_PIDS_41_60 = 0x40;

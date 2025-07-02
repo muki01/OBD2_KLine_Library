@@ -101,7 +101,7 @@ void OBD2_KLine::writeRawData(const byte *dataArray, int length) {
 
 void OBD2_KLine::writeData(byte mode, byte pid) {
   byte message[7] = {0};
-  size_t length = (mode == read_FreezeFrame || mode == test_Sensors) ? 7 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 : 6;
+  size_t length = (mode == read_FreezeFrame || mode == test_OxygenSensors) ? 7 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 : 6;
 
   if (protocol == "ISO9141") {
     message[0] = (mode == read_FreezeFrame) ? 0x69 : 0x68;
