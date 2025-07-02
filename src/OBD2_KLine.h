@@ -29,7 +29,7 @@ class OBD2_KLine {
   OBD2_KLine(HardwareSerial &serialPort, long baudRate, uint8_t rxPin, uint8_t txPin);
 
   void setDebug(Stream &serial);
-  void beginSerial();
+  void setSerial(bool enabled);
   bool initOBD2();
   bool trySlowInit();
   bool tryFastInit();
