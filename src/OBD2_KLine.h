@@ -85,7 +85,8 @@ class OBD2_KLine {
   int errors = 0;
   bool connectionStatus = false;
 
-  String protocol = "Automatic";
+  String selectedProtocol = "Automatic";
+  String connectedProtocol = "";
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
   String storedDTCBuffer[32];

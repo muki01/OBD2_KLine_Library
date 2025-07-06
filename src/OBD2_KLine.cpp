@@ -25,12 +25,14 @@ void OBD2_KLine::setSerial(bool enabled) {
 
 bool OBD2_KLine::initOBD2() {
   if (connectionStatus) return true;
+  
+  debugPrintln(F("Initializing OBD2..."));
 
-  if (protocol == "Automatic" || protocol == "ISO14230_Slow" || protocol == "ISO9141") {
+  if (selectedProtocol == "Automatic" || selectedProtocol == "ISO14230_Slow" || selectedProtocol == "ISO9141") {
     if (trySlowInit()) return true;
   }
 
-  if (protocol == "Automatic" || protocol == "ISO14230_Fast") {
+  if (selectedProtocol == "Automatic" || selectedProtocol == "ISO14230_Fast") {
     if (tryFastInit()) return true;
   }
 
@@ -50,17 +52,18 @@ bool OBD2_KLine::trySlowInit() {
 
   if (resultBuffer[0] != 0x55) return false;
 
-  protocol = (resultBuffer[1] == resultBuffer[2]) ? "ISO9141" : "ISO14230_Slow";
+  String detectedProtocol = (resultBuffer[1] == resultBuffer[2]) ? "ISO9141" : "ISO14230_Slow";
   debugPrint(F("✅ Protocol Detected: "));
-  debugPrintln(protocol.c_str());
+  debugPrintln(detectedProtocol.c_str());
 
   _serial->write(~resultBuffer[2]);
 
   if (!readData()) return false;
 
   if (resultBuffer[0]) {
-    debugPrintln(F("✅ Connection established with car (Slow Init)"));
     connectionStatus = true;
+    connectedProtocol = detectedProtocol;
+    debugPrintln(F("✅ Connection established with car"));
     return true;
   }
 
@@ -85,8 +88,9 @@ bool OBD2_KLine::tryFastInit() {
 
   if (resultBuffer[3] == 0xC1) {
     debugPrintln(F("✅ Protocol Detected: ISO14230_Fast"));
+    debugPrintn(F("✅ Connection established with car"));
     connectionStatus = true;
-    protocol = "ISO14230_Fast";
+    connectedProtocol = "ISO14230_Fast";
     return true;
   }
 
