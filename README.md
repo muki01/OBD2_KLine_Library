@@ -27,7 +27,11 @@ If your vehicle’s OBD-II connector has **Pins 6 and 14 connected**, it uses th
 ❌ **Pin 6 and 14 (CAN bus)**: Your vehicle uses CAN — consider a different library.
 
 ### Example photos of OBD2 Connector
-*(add images or links if available)*
+<img src="https://github.com/user-attachments/assets/12958266-43fc-4c69-9f73-6e7ad105f0df" width=40%>
+<img src="https://github.com/user-attachments/assets/ad60c18e-993b-4151-afb5-1ee8b90c4b35" width=40%>
+
+In the first image, the OBD2 socket includes pin 7, which indicates it operates using the K-Line protocol.
+In the second image, pins 6 and 14 are present, meaning it uses the CAN Bus protocol.
 
 ---
 
