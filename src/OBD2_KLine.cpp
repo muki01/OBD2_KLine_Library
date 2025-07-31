@@ -114,14 +114,14 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
   clearEcho();
 }
 
-  size_t length = (mode == read_FreezeFrame || mode == test_OxygenSensors) ? 7 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 : 6;
 void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
   uint8_t message[7] = {0};
+  size_t length = (mode == read_FreezeFrame || mode == test_OxygenSensors) ? 7 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 : 6;
 
   if (selectedProtocol == "ISO9141") {
     message[0] = (mode == read_FreezeFrame) ? 0x69 : 0x68;
     message[1] = 0x6A;
-  } else if (protocol == "ISO14230_Fast" || protocol == "ISO14230_Slow") {
+  } else if (selectedProtocol == "ISO14230_Fast" || selectedProtocol == "ISO14230_Slow") {
     message[0] = (mode == read_FreezeFrame) ? 0xC3 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 0xC1 : 0xC2;
     message[1] = 0x33;
   }
