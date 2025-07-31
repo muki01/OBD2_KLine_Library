@@ -81,8 +81,8 @@ class OBD2_KLine {
   uint8_t _txPin;
   Stream *_debugSerial = nullptr;  // Debug serial port
 
-  byte resultBuffer[64] = {0};
-  int errors = 0;
+  uint8_t resultBuffer[64] = {0};
+  uint8_t errors = 0;
   bool connectionStatus = false;
 
   String selectedProtocol = "Automatic";
@@ -92,23 +92,23 @@ class OBD2_KLine {
   String storedDTCBuffer[32];
   String pendingDTCBuffer[32];
 
-  byte supportedLiveData[32];
-  byte supportedFreezeFrame[32];
-  byte supportedComponentMonitoring[32];
-  byte supportedVehicleInfo[32];
+  uint8_t supportedLiveData[32];
+  uint8_t supportedFreezeFrame[32];
+  uint8_t supportedComponentMonitoring[32];
+  uint8_t supportedVehicleInfo[32];
 
-  String decodeDTC(byte input_byte1, byte input_byte2);
-  byte calculateChecksum(const byte *dataArray, int length);
-  bool isInArray(const byte *dataArray, int length, byte value);
-  String convertBytesToHexString(const byte *dataArray, int length);
-  String convertHexToAscii(const byte *dataArray, int length);
+  String decodeDTC(uint8_t input_byte1, uint8_t input_byte2);
+  uint8_t calculateChecksum(const uint8_t *dataArray, uint8_t length);
+  bool isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value);
+  String convertBytesToHexString(const uint8_t *dataArray, uint8_t length);
+  String convertHexToAscii(const uint8_t *dataArray, uint8_t length);
   void clearEcho();
   void debugPrint(const char *msg);
   void debugPrint(const __FlashStringHelper *msg);
   void debugPrintln(const char *msg);
   void debugPrintln(const __FlashStringHelper *msg);
-  void debugPrintHex(byte val);    // Hexadecimal output
-  void debugPrintHexln(byte val);  // Hexadecimal + newline
+  void debugPrintHex(uint8_t val);    // Hexadecimal output
+  void debugPrintHexln(uint8_t val);  // Hexadecimal + newline
 };
 
 #endif  // OBD2_KLINE_H
