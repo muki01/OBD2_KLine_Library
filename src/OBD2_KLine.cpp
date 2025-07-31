@@ -25,7 +25,7 @@ void OBD2_KLine::setSerial(bool enabled) {
 
 bool OBD2_KLine::initOBD2() {
   if (connectionStatus) return true;
-  
+
   debugPrintln(F("Initializing OBD2..."));
 
   if (selectedProtocol == "Automatic" || selectedProtocol == "ISO14230_Slow" || selectedProtocol == "ISO9141") {
@@ -102,7 +102,7 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
   memcpy(sendData, dataArray, length);
   sendData[length] = calculateChecksum(dataArray, length);
 
-  debugPrint(F("\nSending Raw Data: "));
+  debugPrint(F("Sending Raw Data: "));
   for (size_t i = 0; i < length + 1; i++) {
     _serial->write(sendData[i]);
     debugPrintHex(sendData[i]);
@@ -133,7 +133,7 @@ void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
 
   message[length - 1] = calculateChecksum(message, length - 1);
 
-  debugPrint(F("\nSending Data: "));
+  debugPrint(F("Sending Data: "));
   for (size_t i = 0; i < length; i++) {
     _serial->write(message[i]);
     debugPrintHex(message[i]);
@@ -158,11 +158,11 @@ uint8_t OBD2_KLine::readData() {
       updateConnectionStatus(true);
 
       // Read all data
-      debugPrint(F("Received Data: "));
+      debugPrint(F("✅ Received Data: "));
       while (millis() - lastByteTime < _dataRequestInterval) {  // Wait for new data for 60ms
         if (_serial->available() > 0) {                         // If new data is available
           if (bytesRead >= sizeof(resultBuffer)) {              // Stop if buffer is full
-            debugPrintln(F("\nBuffer is full. Stopping data reception."));
+            debugPrintln(F("⚠️ Buffer is full. Stopping data reception."));
             return bytesRead;
           }
 
@@ -170,17 +170,17 @@ uint8_t OBD2_KLine::readData() {
           debugPrintHex(resultBuffer[bytesRead]);
           debugPrint(F(" "));
           bytesRead++;
-          lastByteTime = millis();  // Reset last byte time
+          lastByteTime = millis();  // Reset last byte_time
         }
       }
 
-      debugPrintln(F("\nData reception completed."));
+      debugPrintln(F("✅ Data reception completed."));
       return bytesRead;
     }
   }
 
   // If no data is received within 1 second
-  debugPrintln(F("Timeout: Not Received Data."));
+  debugPrintln(F("❌ OBD2 Timeout!"));
   updateConnectionStatus(false);
   return 0;
 }
