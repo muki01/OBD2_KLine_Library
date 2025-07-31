@@ -88,7 +88,7 @@ bool OBD2_KLine::tryFastInit() {
 
   if (resultBuffer[3] == 0xC1) {
     debugPrintln(F("✅ Protocol Detected: ISO14230_Fast"));
-    debugPrintn(F("✅ Connection established with car"));
+    debugPrintln(F("✅ Connection established with car"));
     connectionStatus = true;
     connectedProtocol = "ISO14230_Fast";
     return true;
@@ -118,7 +118,7 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
 void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
   uint8_t message[7] = {0};
 
-  if (protocol == "ISO9141") {
+  if (selectedProtocol == "ISO9141") {
     message[0] = (mode == read_FreezeFrame) ? 0x69 : 0x68;
     message[1] = 0x6A;
   } else if (protocol == "ISO14230_Fast" || protocol == "ISO14230_Slow") {
@@ -429,8 +429,8 @@ void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
 }
 
 void OBD2_KLine::setProtocol(const String &protocolName) {
-  protocol = protocolName;
-  debugPrintln(("Protocol set to: " + protocol).c_str());
+  selectedProtocol = protocolName;
+  debugPrintln(("Protocol set to: " + selectedProtocol).c_str());
 }
 
 void OBD2_KLine::send5baud(uint8_t data) {
