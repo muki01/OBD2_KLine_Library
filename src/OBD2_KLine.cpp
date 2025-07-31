@@ -155,7 +155,7 @@ uint8_t OBD2_KLine::readData() {
     if (_serial->available() > 0) {
       unsigned long lastByteTime = millis();
       memset(resultBuffer, 0, sizeof(resultBuffer));
-      errors = 0;
+      updateConnectionStatus(true);
 
       // Read all data
       debugPrint(F("Received Data: "));
@@ -181,14 +181,7 @@ uint8_t OBD2_KLine::readData() {
 
   // If no data is received within 1 second
   debugPrintln(F("Timeout: Not Received Data."));
-  errors++;
-  if (errors > 2) {
-    errors = 0;
-    if (connectionStatus) {
-      connectionStatus = false;
-    }
-  }
-
+  updateConnectionStatus(false);
   return 0;
 }
 
@@ -655,6 +648,27 @@ String OBD2_KLine::getVehicleInfo(uint8_t pid) {
     return convertBytesToHexString(dataArray, arrayNum);
   }
   return "";
+}
+
+void OBD2_KLine::updateConnectionStatus(bool messageReceived) {
+  if (messageReceived) {
+    errors = 0;
+    // if (!connectionStatus) {
+    //   connectionStatus = true;
+    //   debugPrintln(F("✅ Connection established."));
+    // }
+  } else {
+    if (!connectionStatus) return;  // No need to update if not connected
+
+    errors++;
+    debugPrint(F("⚠️ Not received data, error count: "));
+    debugPrintln(String(errors).c_str());
+    if (errors > 2 && connectionStatus) {
+      connectionStatus = false;
+      errors = 0;
+      debugPrintln(F("⛔ Connection lost."));
+    }
+  }
 }
 
 String OBD2_KLine::convertHexToAscii(const uint8_t *dataArray, uint8_t length) {

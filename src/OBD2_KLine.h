@@ -73,6 +73,7 @@ class OBD2_KLine {
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
   void setProtocol(const String &protocolName);
+  void updateConnectionStatus(bool messageReceived);
 
  private:
   SerialType *_serial;
