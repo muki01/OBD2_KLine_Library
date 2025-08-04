@@ -11,7 +11,7 @@ void setup() {
   Serial.println("OBD2 K-Line Clear DTC Example");
 
   KLine.setDebug(Serial);              // Optional: enable debug output on your chosen serial port
-  KLine.setProtocol("ISO14230_Fast");  // Set communication protocol to ISO14230 (also known as KWP2000 Fast Init). Default protocol: Automatic
+  KLine.setProtocol("ISO14230_Fast");  // Optional: Default protocol: Automatic. All protocols: ISO9141. ISO14230_Slow, ISO14230_Fast
   KLine.setWriteDelay(5);              // Optional: delay between bytes when writing to OBD (in milliseconds)
   KLine.setDataRequestInterval(60);    // Optional: delay between data reading (in milliseconds)
 

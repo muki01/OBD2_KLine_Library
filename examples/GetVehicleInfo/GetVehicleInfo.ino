@@ -8,10 +8,10 @@ OBD2_KLine KLine(Serial1, 10400, 10, 11);  // Uses Hardware Serial (Serial1) at 
 
 void setup() {
   Serial.begin(115200);  // Start the default serial (for logging/debugging)
-  Serial.println("OBD2 K-Line get Vehicle Info Example");
+  Serial.println("OBD2 K-Line Get Vehicle Info Example");
 
   KLine.setDebug(Serial);              // Optional: enable debug output on your chosen serial port
-  KLine.setProtocol("ISO14230_Fast");  // Set communication protocol to ISO14230 (also known as KWP2000 Fast Init). Default protocol: Automatic
+  KLine.setProtocol("ISO14230_Fast");  // Optional: Default protocol: Automatic. All protocols: ISO9141. ISO14230_Slow, ISO14230_Fast
   KLine.setWriteDelay(5);              // Optional: delay between bytes when writing to OBD (in milliseconds)
   KLine.setDataRequestInterval(60);    // Optional: delay between data reading (in milliseconds)
 
