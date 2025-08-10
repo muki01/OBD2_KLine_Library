@@ -423,6 +423,8 @@ void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
 
 void OBD2_KLine::setProtocol(const String &protocolName) {
   selectedProtocol = protocolName;
+  connectionStatus = false;  // Reset connection status
+  connectedProtocol = "";    // Reset connected protocol
   debugPrintln(("Protocol set to: " + selectedProtocol).c_str());
 }
 
