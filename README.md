@@ -15,7 +15,6 @@ K-Line is a legacy protocol used in many **European and Japanese vehicles manufa
 This makes the library ideal for working with older cars that still rely on ISO9141 or KWP2000 communication standards.
 
 You can also see my other car projects:
-You can also see my other car projects:
 1. [Тhis](https://github.com/muki01/I-K_Bus) project is for BMW with I/K bus system. 
 2. [Тhis](https://github.com/muki01/OBD2_CAN_Bus_Reader) project is for Cars with CAN Bus.
 3. [Тhis](https://github.com/muki01/OBD2_K-line_Reader) project is for Cars with ISO9141 and ISO14230 protocols.
