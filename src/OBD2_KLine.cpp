@@ -239,30 +239,30 @@ float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
     case 0x03:                                      // Fuel System Status (bit encoded)
       return A;                                     //
     case 0x04:                                      // Engine Load (%)
-      return A * 100 / 255;                         //
+      return A * 100.0f / 255.0f;                   //
     case 0x05:                                      // Coolant Temperature (°C)
-      return A - 40;                                //
+      return A - 40.0f;                             //
     case 0x06:                                      // Short Term Fuel Trim Bank 1 (%)
     case 0x07:                                      // Long Term Fuel Trim Bank 1 (%)
     case 0x08:                                      // Short Term Fuel Trim Bank 2 (%)
     case 0x09:                                      // Long Term Fuel Trim Bank 2 (%)
-      return A * 100 / 128 - 100;                   //
+      return A * 100.0f / 128.0f - 100.0f;          //
     case 0x0A:                                      // Fuel Pressure (kPa)
-      return A * 3;                                 //
+      return A * 3.0f;                              //
     case 0x0B:                                      // Intake Manifold Absolute Pressure (kPa)
       return A;                                     //
     case 0x0C:                                      // RPM
-      return ((A * 256) + B) / 4;                   //
+      return ((A * 256.0f) + B) / 4.0f;             //
     case 0x0D:                                      // Speed (km/h)
       return A;                                     //
     case 0x0E:                                      // Timing Advance (°)
-      return A / 2 - 64;                            //
+      return A / 2.0f - 64.0f;                      //
     case 0x0F:                                      // Intake Air Temperature (°C)
-      return A - 40;                                //
+      return A - 40.0f;                             //
     case 0x10:                                      // MAF Flow Rate (grams/sec)
-      return ((A * 256) + B) / 100;                 //
+      return ((A * 256.0f) + B) / 100.0f;           //
     case 0x11:                                      // Throttle Position (%)
-      return A * 100 / 255;                         //
+      return A * 100.0f / 255.0f;                   //
     case 0x12:                                      // Commanded Secondary Air Status (bit encoded)
     case 0x13:                                      // Oxygen Sensors Present 2 Banks (bit encoded)
       return A;                                     //
@@ -274,18 +274,18 @@ float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
     case 0x19:                                      // Oxygen Sensor 6A Voltage (V, %)
     case 0x1A:                                      // Oxygen Sensor 7A Voltage (V, %)
     case 0x1B:                                      // Oxygen Sensor 8A Voltage (V, %)
-      return A / 200;                               // Voltage
+      return A / 200.0f;                            // Voltage
     case 0x1C:                                      // OBD Standards This Vehicle Conforms To (bit encoded)
     case 0x1D:                                      // Oxygen Sensors Present 4 Banks (bit encoded)
     case 0x1E:                                      // Auxiliary Input Status (bit encoded)
       return A;                                     //
     case 0x1F:                                      // Run Time Since Engine Start (seconds)
     case 0x21:                                      // Distance Traveled With MIL On (km)
-      return (A * 256) + B;                         //
+      return (A * 256.0f) + B;                      //
     case 0x22:                                      // Fuel Rail Pressure (kPa)
-      return ((A * 256) + B) * 0.079;               //
+      return ((A * 256.0f) + B) * 0.079f;           //
     case 0x23:                                      // Fuel Rail Gauge Pressure (kPa)
-      return ((A * 256) + B) / 10;                  //
+      return ((A * 256.0f) + B) / 10.0f;            //
     case 0x24:                                      // Oxygen Sensor 1B (ratio, voltage)
     case 0x25:                                      // Oxygen Sensor 2B (ratio, voltage)
     case 0x26:                                      // Oxygen Sensor 3B (ratio, voltage)
@@ -294,20 +294,20 @@ float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
     case 0x29:                                      // Oxygen Sensor 6B (ratio, voltage)
     case 0x2A:                                      // Oxygen Sensor 7B (ratio, voltage)
     case 0x2B:                                      // Oxygen Sensor 8B (ratio, voltage)
-      return ((A * 256) + B) / 32768.0;             // ratio
+      return ((A * 256.0f) + B) / 32768.0f;         // ratio
     case 0x2C:                                      // Commanded EGR (%)
-      return A * 100 / 255;                         //
+      return A * 100.0f / 255.0f;                   //
     case 0x2D:                                      // EGR Error (%)
-      return A * 100 / 128 - 100;                   //
+      return A * 100.0f / 128.0f - 100.0f;          //
     case 0x2E:                                      // Commanded Evaporative Purge (%)
     case 0x2F:                                      // Fuel Tank Level Input (%)
-      return A * 100 / 255;                         //
+      return A * 100.0f / 255.0f;                   //
     case 0x30:                                      // Warm-ups Since Codes Cleared (count)
       return A;                                     //
     case 0x31:                                      // Distance Traveled Since Codes Cleared (km)
-      return (A * 256) + B;                         //
+      return (A * 256.0f) + B;                      //
     case 0x32:                                      // Evap System Vapor Pressure (Pa)
-      return ((A * 256) + B) / 4;                   //
+      return ((A * 256.0f) + B) / 4.0f;             //
     case 0x33:                                      // Absolute Barometric Pressure (kPa)
       return A;                                     //
     case 0x34:                                      // Oxygen Sensor 1C (current)
@@ -318,12 +318,12 @@ float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
     case 0x39:                                      // Oxygen Sensor 6C
     case 0x3A:                                      // Oxygen Sensor 7C
     case 0x3B:                                      // Oxygen Sensor 8C
-      return ((A * 256) + B) / 32768.0;             // ratio
+      return ((A * 256.0f) + B) / 32768.0f;         // ratio
     case 0x3C:                                      // Catalyst Temperature Bank 1 Sensor 1 (°C)
     case 0x3D:                                      // Catalyst Temperature Bank 2 Sensor 1 (°C)
     case 0x3E:                                      // Catalyst Temperature Bank 1 Sensor 2 (°C)
     case 0x3F:                                      // Catalyst Temperature Bank 2 Sensor 2 (°C)
-      return ((A * 256) + B) / 10 - 40;             //
+      return ((A * 256.0f) + B) / 10.0f - 40.0f;    //
     case 0x41:                                      // Monitor status this drive cycle (bit encoded)
       return A;                                     //
     case 0x42:                                      // Control module voltage (V)
@@ -331,7 +331,7 @@ float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
     case 0x43:                                      // Absolute load value (%)
       return ((A * 256.0f) + B) * 100.0f / 255.0f;  //
     case 0x44:                                      // Fuel/Air commanded equivalence ratio (lambda)
-      return ((A * 256.0f) + B) / 32768.0;          // ratio
+      return ((A * 256.0f) + B) / 32768.0f;         // ratio
     case 0x45:                                      // Relative throttle position (%)
       return A * 100.0f / 255.0f;                   //
     case 0x46:                                      // Ambient air temp (°C)
