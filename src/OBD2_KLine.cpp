@@ -558,7 +558,7 @@ uint8_t OBD2_KLine::readSupportedFreezeFrame() {
 }
 
 uint8_t OBD2_KLine::readSupportedComponentMonitoring() {
-  return readSupportedData(component_Monitoring);
+  return readSupportedData(test_OtherComponents);
 }
 
 uint8_t OBD2_KLine::readSupportedVehicleInfo() {
@@ -581,9 +581,9 @@ uint8_t OBD2_KLine::readSupportedData(uint8_t mode) {
   } else if (mode == read_VehicleInfo) {
     startByte = 6;
     targetArray = supportedVehicleInfo;
-  } else if (mode == component_Monitoring) {
+  } else if (mode == test_OtherComponents) {
     startByte = 6;
-    targetArray = supportedComponentMonitoring;
+    targetArray = supportedOtherComponents;
   } else {
     return -1;  // Invalid mode
   }
@@ -640,7 +640,7 @@ uint8_t OBD2_KLine::getSupportedData(uint8_t mode, uint8_t index) {
   } else if (mode == 0x02) {
     if (index >= 0) return supportedFreezeFrame[index];
   } else if (mode == 0x06) {
-    if (index >= 0) return supportedComponentMonitoring[index];
+    if (index >= 0) return supportedOtherComponents[index];
   } else if (mode == 0x09) {
     if (index >= 0) return supportedVehicleInfo[index];
   }

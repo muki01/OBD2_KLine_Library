@@ -13,15 +13,18 @@
 #endif
 
 // ==== OBD2 Mods ====
-const uint8_t init_OBD = 0x81;              // Init ISO14230
-const uint8_t read_LiveData = 0x01;         // Read Live Data
-const uint8_t read_FreezeFrame = 0x02;      // Read Freeze Frame Data
-const uint8_t read_storedDTCs = 0x03;       // Read Stored Troubleshoot Codes
-const uint8_t clear_DTCs = 0x04;            // Clear Troubleshoot Codes
-const uint8_t test_OxygenSensors = 0x05;    // Test Oxygen Sensors
-const uint8_t component_Monitoring = 0x06;  // Component Monitoring
-const uint8_t read_pendingDTCs = 0x07;      // Read Pending Troubleshoot Codes
-const uint8_t read_VehicleInfo = 0x09;      // Read Vehicle Info
+const uint8_t init_OBD = 0x81;                   // Init ISO14230
+const uint8_t read_LiveData = 0x01;              // Show current live data
+const uint8_t read_FreezeFrame = 0x02;           // Show freeze frame data
+const uint8_t read_storedDTCs = 0x03;            // Show stored Diagnostic Trouble Codes (DTCs)
+const uint8_t clear_DTCs = 0x04;                 // Clear Diagnostic Trouble Codes and stored values
+const uint8_t test_OxygenSensors = 0x05;         // Test results, oxygen sensor monitoring (non-CAN only)
+const uint8_t test_OtherComponents = 0x06;       // Test results, other component/system monitoring (for CAN)
+const uint8_t read_pendingDTCs = 0x07;           // Show pending Diagnostic Trouble Codes
+const uint8_t control_OnBoardComponents = 0x08;  // Control operation of on-board component/system
+const uint8_t read_VehicleInfo = 0x09;           // Request vehicle information
+const uint8_t read_PermanentDTCs = 0x0A;         // Show permanent Diagnostic Trouble Codes
+
 const uint8_t SUPPORTED_PIDS_1_20 = 0x00;
 const uint8_t SUPPORTED_PIDS_21_40 = 0x20;
 const uint8_t SUPPORTED_PIDS_41_60 = 0x40;
@@ -95,7 +98,7 @@ class OBD2_KLine {
 
   uint8_t supportedLiveData[32];
   uint8_t supportedFreezeFrame[32];
-  uint8_t supportedComponentMonitoring[32];
+  uint8_t supportedOtherComponents[32];
   uint8_t supportedVehicleInfo[32];
 
   String decodeDTC(uint8_t input_byte1, uint8_t input_byte2);
