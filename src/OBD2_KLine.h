@@ -98,7 +98,9 @@ class OBD2_KLine {
 
   uint8_t supportedLiveData[32];
   uint8_t supportedFreezeFrame[32];
+  uint8_t supportedOxygenSensor[32];
   uint8_t supportedOtherComponents[32];
+  uint8_t supportedControlComponents[32];
   uint8_t supportedVehicleInfo[32];
 
   String decodeDTC(uint8_t input_byte1, uint8_t input_byte2);

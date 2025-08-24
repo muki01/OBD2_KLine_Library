@@ -572,18 +572,24 @@ uint8_t OBD2_KLine::readSupportedData(uint8_t mode) {
   int arraySize = 32;  // Size of supported data arrays
   uint8_t *targetArray = nullptr;
 
-  if (mode == read_LiveData) {
+  if (mode == read_LiveData) {  // Mode 01
     startByte = 5;
     targetArray = supportedLiveData;
-  } else if (mode == read_FreezeFrame) {
+  } else if (mode == read_FreezeFrame) {  // Mode 02
     startByte = 6;
     targetArray = supportedFreezeFrame;
-  } else if (mode == read_VehicleInfo) {
+  } else if (mode == test_OxygenSensors) {  // Mode 05
     startByte = 6;
-    targetArray = supportedVehicleInfo;
-  } else if (mode == test_OtherComponents) {
+    targetArray = supportedOxygenSensor;
+  } else if (mode == test_OtherComponents) {  // Mode 06
     startByte = 6;
     targetArray = supportedOtherComponents;
+  } else if (mode == control_OnBoardComponents) {  // Mode 08
+    startByte = 5;
+    targetArray = supportedControlComponents;
+  } else if (mode == read_VehicleInfo) {  // Mode 09
+    startByte = 6;
+    targetArray = supportedVehicleInfo;
   } else {
     return -1;  // Invalid mode
   }
