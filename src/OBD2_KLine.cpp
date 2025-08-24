@@ -384,6 +384,14 @@ float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
   }
 }
 
+uint8_t OBD2_KLine::readStoredDTCs() {
+  return readDTCs(0x03);
+}
+
+uint8_t OBD2_KLine::readPendingDTCs() {
+  return readDTCs(0x07);
+}
+
 uint8_t OBD2_KLine::readDTCs(uint8_t mode) {
   // Request: C2 33 F1 03 F3
   // example Response: 87 F1 11 43 01 70 01 34 00 00 72
@@ -416,12 +424,14 @@ uint8_t OBD2_KLine::readDTCs(uint8_t mode) {
   return dtcCount;
 }
 
-uint8_t OBD2_KLine::readStoredDTCs() {
-  return readDTCs(0x03);
+String OBD2_KLine::getStoredDTC(uint8_t index) {
+  if (index >= 0) return storedDTCBuffer[index];
+  return "";
 }
 
-uint8_t OBD2_KLine::readPendingDTCs() {
-  return readDTCs(0x07);
+String OBD2_KLine::getPendingDTC(uint8_t index) {
+  if (index >= 0) return pendingDTCBuffer[index];
+  return "";
 }
 
 bool OBD2_KLine::clearDTC() {
@@ -437,116 +447,56 @@ bool OBD2_KLine::clearDTC() {
   return false;
 }
 
-uint8_t OBD2_KLine::calculateChecksum(const uint8_t *dataArray, uint8_t length) {
-  uint8_t checksum = 0;
-  for (int i = 0; i < length; i++) {
-    checksum += dataArray[i];
+String OBD2_KLine::getVehicleInfo(uint8_t pid) {
+  // Request: C2 33 F1 09 02 F1
+  // example Response: 87 F1 11 49 02 01 00 00 00 31 06
+  //                   87 F1 11 49 02 02 41 31 4A 43 D5
+  //                   87 F1 11 49 02 03 35 34 34 34 A8
+  //                   87 F1 11 49 02 04 52 37 32 35 C8
+  //                   87 F1 11 49 02 05 32 33 36 37 E6
+
+  uint8_t dataArray[64];
+  int messageCount;
+  int arrayNum = 0;
+
+  if (pid == 0x02) {
+    messageCount = 5;
+  } else if (pid == 0x04 || pid == 0x06) {
+    if (pid == 0x04) {
+      writeData(read_VehicleInfo, read_ID_Length);
+    } else if (pid == 0x06) {
+      writeData(read_VehicleInfo, read_ID_Num_Length);
+    } else {
+      return "";
+    }
+
+    if (readData()) {
+      messageCount = resultBuffer[5];
+    } else {
+      return "";
+    }
   }
-  return checksum % 256;
-}
 
-String OBD2_KLine::decodeDTC(uint8_t input_byte1, uint8_t input_byte2) {
-  String ErrorCode = "";
-  const char type_lookup[4] = {'P', 'C', 'B', 'U'};
-  const char digit_lookup[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+  writeData(read_VehicleInfo, pid);
 
-  ErrorCode += type_lookup[(input_byte1 >> 6) & 0x03];
-  ErrorCode += digit_lookup[(input_byte1 >> 4) & 0x03];
-  ErrorCode += digit_lookup[input_byte1 & 0x0F];
-  ErrorCode += digit_lookup[(input_byte2 >> 4) & 0x0F];
-  ErrorCode += digit_lookup[input_byte2 & 0x0F];
+  if (readData()) {
+    for (int j = 0; j < messageCount; j++) {
+      if (pid == 0x02 && j == 0) {
+        dataArray[arrayNum++] = resultBuffer[9];
+        continue;
+      }
+      for (int i = 1; i <= 4; i++) {
+        dataArray[arrayNum++] = resultBuffer[i + 5 + j * 11];
+      }
+    }
+  }
 
-  return ErrorCode;
-}
-
-String OBD2_KLine::getStoredDTC(uint8_t index) {
-  if (index >= 0) return storedDTCBuffer[index];
+  if (pid == 0x02 || pid == 0x04) {
+    return convertHexToAscii(dataArray, arrayNum);
+  } else if (pid == 0x06) {
+    return convertBytesToHexString(dataArray, arrayNum);
+  }
   return "";
-}
-
-String OBD2_KLine::getPendingDTC(uint8_t index) {
-  if (index >= 0) return pendingDTCBuffer[index];
-  return "";
-}
-
-void OBD2_KLine::setWriteDelay(uint16_t delay) {
-  _writeDelay = delay;
-}
-
-void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
-  _dataRequestInterval = interval;
-}
-
-void OBD2_KLine::setProtocol(const String &protocolName) {
-  selectedProtocol = protocolName;
-  connectionStatus = false;  // Reset connection status
-  connectedProtocol = "";    // Reset connected protocol
-  debugPrintln(("Protocol set to: " + selectedProtocol).c_str());
-}
-
-void OBD2_KLine::send5baud(uint8_t data) {
-  uint8_t even = 1;  // for calculating parity bit
-  uint8_t bits[10];
-
-  bits[0] = 0;  // start bit
-  bits[9] = 1;  // stop bit
-
-  // 7-bit data and parity calculation
-  for (int i = 1; i <= 7; i++) {
-    bits[i] = (data >> (i - 1)) & 1;
-    even ^= bits[i];
-  }
-
-  bits[8] = (even == 0) ? 1 : 0;  // parity bit
-
-  debugPrint(F("5 Baud Init for Module 0x"));
-  debugPrintHex(data);
-  debugPrint(F(": "));
-
-  // Set txPin as output
-  pinMode(_txPin, OUTPUT);
-
-  for (int i = 0; i < 10; i++) {
-    debugPrint(bits[i] ? "1" : "0");
-    digitalWrite(_txPin, bits[i] ? HIGH : LOW);
-    delay(200);
-  }
-
-  debugPrintln(F(""));
-}
-
-void OBD2_KLine::setDebug(Stream &serial) {
-  _debugSerial = &serial;
-}
-
-void OBD2_KLine::debugPrint(const char *msg) {
-  if (_debugSerial) _debugSerial->print(msg);
-}
-
-void OBD2_KLine::debugPrint(const __FlashStringHelper *msg) {
-  if (_debugSerial) _debugSerial->print(msg);
-}
-
-void OBD2_KLine::debugPrintln(const char *msg) {
-  if (_debugSerial) _debugSerial->println(msg);
-}
-
-void OBD2_KLine::debugPrintln(const __FlashStringHelper *msg) {
-  if (_debugSerial) _debugSerial->println(msg);
-}
-
-void OBD2_KLine::debugPrintHex(uint8_t val) {
-  if (_debugSerial) {
-    if (val < 0x10) _debugSerial->print("0");
-    _debugSerial->print(val, HEX);
-  }
-}
-
-void OBD2_KLine::debugPrintHexln(uint8_t val) {
-  if (_debugSerial) {
-    debugPrintHex(val);
-    _debugSerial->println();
-  }
 }
 
 uint8_t OBD2_KLine::readSupportedLiveData() {
@@ -640,67 +590,6 @@ uint8_t OBD2_KLine::getSupportedData(uint8_t mode, uint8_t index) {
   return 0;
 }
 
-bool OBD2_KLine::isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value) {
-  for (int i = 0; i < length; i++) {
-    if (dataArray[i] == value) {
-      return true;
-    }
-  }
-  return false;
-}
-
-String OBD2_KLine::getVehicleInfo(uint8_t pid) {
-  // Request: C2 33 F1 09 02 F1
-  // example Response: 87 F1 11 49 02 01 00 00 00 31 06
-  //                   87 F1 11 49 02 02 41 31 4A 43 D5
-  //                   87 F1 11 49 02 03 35 34 34 34 A8
-  //                   87 F1 11 49 02 04 52 37 32 35 C8
-  //                   87 F1 11 49 02 05 32 33 36 37 E6
-
-  uint8_t dataArray[64];
-  int messageCount;
-  int arrayNum = 0;
-
-  if (pid == 0x02) {
-    messageCount = 5;
-  } else if (pid == 0x04 || pid == 0x06) {
-    if (pid == 0x04) {
-      writeData(read_VehicleInfo, read_ID_Length);
-    } else if (pid == 0x06) {
-      writeData(read_VehicleInfo, read_ID_Num_Length);
-    } else {
-      return "";
-    }
-
-    if (readData()) {
-      messageCount = resultBuffer[5];
-    } else {
-      return "";
-    }
-  }
-
-  writeData(read_VehicleInfo, pid);
-
-  if (readData()) {
-    for (int j = 0; j < messageCount; j++) {
-      if (pid == 0x02 && j == 0) {
-        dataArray[arrayNum++] = resultBuffer[9];
-        continue;
-      }
-      for (int i = 1; i <= 4; i++) {
-        dataArray[arrayNum++] = resultBuffer[i + 5 + j * 11];
-      }
-    }
-  }
-
-  if (pid == 0x02 || pid == 0x04) {
-    return convertHexToAscii(dataArray, arrayNum);
-  } else if (pid == 0x06) {
-    return convertBytesToHexString(dataArray, arrayNum);
-  }
-  return "";
-}
-
 void OBD2_KLine::updateConnectionStatus(bool messageReceived) {
   if (messageReceived) {
     errors = 0;
@@ -722,6 +611,83 @@ void OBD2_KLine::updateConnectionStatus(bool messageReceived) {
   }
 }
 
+void OBD2_KLine::setWriteDelay(uint16_t delay) {
+  _writeDelay = delay;
+}
+
+void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
+  _dataRequestInterval = interval;
+}
+
+void OBD2_KLine::setProtocol(const String &protocolName) {
+  selectedProtocol = protocolName;
+  connectionStatus = false;  // Reset connection status
+  connectedProtocol = "";    // Reset connected protocol
+  debugPrintln(("Protocol set to: " + selectedProtocol).c_str());
+}
+
+void OBD2_KLine::send5baud(uint8_t data) {
+  uint8_t even = 1;  // for calculating parity bit
+  uint8_t bits[10];
+
+  bits[0] = 0;  // start bit
+  bits[9] = 1;  // stop bit
+
+  // 7-bit data and parity calculation
+  for (int i = 1; i <= 7; i++) {
+    bits[i] = (data >> (i - 1)) & 1;
+    even ^= bits[i];
+  }
+
+  bits[8] = (even == 0) ? 1 : 0;  // parity bit
+
+  debugPrint(F("5 Baud Init for Module 0x"));
+  debugPrintHex(data);
+  debugPrint(F(": "));
+
+  // Set txPin as output
+  pinMode(_txPin, OUTPUT);
+
+  for (int i = 0; i < 10; i++) {
+    debugPrint(bits[i] ? "1" : "0");
+    digitalWrite(_txPin, bits[i] ? HIGH : LOW);
+    delay(200);
+  }
+
+  debugPrintln(F(""));
+}
+
+uint8_t OBD2_KLine::calculateChecksum(const uint8_t *dataArray, uint8_t length) {
+  uint8_t checksum = 0;
+  for (int i = 0; i < length; i++) {
+    checksum += dataArray[i];
+  }
+  return checksum % 256;
+}
+
+String OBD2_KLine::decodeDTC(uint8_t input_byte1, uint8_t input_byte2) {
+  String ErrorCode = "";
+  const char type_lookup[4] = {'P', 'C', 'B', 'U'};
+  const char digit_lookup[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+  ErrorCode += type_lookup[(input_byte1 >> 6) & 0x03];
+  ErrorCode += digit_lookup[(input_byte1 >> 4) & 0x03];
+  ErrorCode += digit_lookup[input_byte1 & 0x0F];
+  ErrorCode += digit_lookup[(input_byte2 >> 4) & 0x0F];
+  ErrorCode += digit_lookup[input_byte2 & 0x0F];
+
+  return ErrorCode;
+}
+
+bool OBD2_KLine::isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value) {
+  for (int i = 0; i < length; i++) {
+    if (dataArray[i] == value) {
+      return true;
+    }
+  }
+  return false;
+}
+
 String OBD2_KLine::convertHexToAscii(const uint8_t *dataArray, uint8_t length) {
   String asciiString = "";
   for (int i = 0; i < length; i++) {
@@ -741,4 +707,38 @@ String OBD2_KLine::convertBytesToHexString(const uint8_t *dataArray, uint8_t len
   }
   hexString.toUpperCase();
   return hexString;
+}
+
+void OBD2_KLine::setDebug(Stream &serial) {
+  _debugSerial = &serial;
+}
+
+void OBD2_KLine::debugPrint(const char *msg) {
+  if (_debugSerial) _debugSerial->print(msg);
+}
+
+void OBD2_KLine::debugPrint(const __FlashStringHelper *msg) {
+  if (_debugSerial) _debugSerial->print(msg);
+}
+
+void OBD2_KLine::debugPrintln(const char *msg) {
+  if (_debugSerial) _debugSerial->println(msg);
+}
+
+void OBD2_KLine::debugPrintln(const __FlashStringHelper *msg) {
+  if (_debugSerial) _debugSerial->println(msg);
+}
+
+void OBD2_KLine::debugPrintHex(uint8_t val) {
+  if (_debugSerial) {
+    if (val < 0x10) _debugSerial->print("0");
+    _debugSerial->print(val, HEX);
+  }
+}
+
+void OBD2_KLine::debugPrintHexln(uint8_t val) {
+  if (_debugSerial) {
+    debugPrintHex(val);
+    _debugSerial->println();
+  }
 }
