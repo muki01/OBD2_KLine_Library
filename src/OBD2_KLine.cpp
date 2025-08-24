@@ -557,8 +557,16 @@ uint8_t OBD2_KLine::readSupportedFreezeFrame() {
   return readSupportedData(read_FreezeFrame);
 }
 
-uint8_t OBD2_KLine::readSupportedComponentMonitoring() {
+uint8_t OBD2_KLine::readSupportedOxygenSensors() {
+  return readSupportedData(test_OxygenSensors);
+}
+
+uint8_t OBD2_KLine::readSupportedOtherComponents() {
   return readSupportedData(test_OtherComponents);
+}
+
+uint8_t OBD2_KLine::readSupportedOnBoardComponents() {
+  return readSupportedData(control_OnBoardComponents);
 }
 
 uint8_t OBD2_KLine::readSupportedVehicleInfo() {
@@ -620,8 +628,12 @@ uint8_t OBD2_KLine::getSupportedData(uint8_t mode, uint8_t index) {
     if (index >= 0) return supportedLiveData[index];
   } else if (mode == 0x02) {
     if (index >= 0) return supportedFreezeFrame[index];
+  } else if (mode == 0x05) {
+    if (index >= 0) return supportedOxygenSensor[index];
   } else if (mode == 0x06) {
     if (index >= 0) return supportedOtherComponents[index];
+  } else if (mode == 0x08) {
+    if (index >= 0) return supportedControlComponents[index];
   } else if (mode == 0x09) {
     if (index >= 0) return supportedVehicleInfo[index];
   }

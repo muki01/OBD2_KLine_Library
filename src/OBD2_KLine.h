@@ -70,7 +70,9 @@ class OBD2_KLine {
 
   uint8_t readSupportedLiveData();
   uint8_t readSupportedFreezeFrame();
-  uint8_t readSupportedComponentMonitoring();
+  uint8_t readSupportedOxygenSensors();
+  uint8_t readSupportedOtherComponents();
+  uint8_t readSupportedOnBoardComponents();
   uint8_t readSupportedVehicleInfo();
   uint8_t readSupportedData(uint8_t mode);
   uint8_t getSupportedData(uint8_t mode, uint8_t index);
