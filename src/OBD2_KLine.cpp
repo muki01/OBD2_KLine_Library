@@ -588,43 +588,18 @@ uint8_t OBD2_KLine::readSupportedData(uint8_t mode) {
     return -1;  // Invalid mode
   }
 
-  writeData(mode, SUPPORTED_PIDS_1_20);
-  if (readData()) {
-    for (int i = 0; i < 4; i++) {
-      uint8_t value = resultBuffer[i + startByte];
-      for (int bit = 7; bit >= 0; bit--) {
-        if ((value >> bit) & 1) {
-          targetArray[supportedCount++] = pidIndex + 1;
-        }
-        pidIndex++;
-      }
-    }
-  }
+  uint8_t pidCmds[] = {SUPPORTED_PIDS_1_20, SUPPORTED_PIDS_21_40, SUPPORTED_PIDS_41_60};
 
-  if (isInArray(targetArray, arraySize, 0x20)) {
-    writeData(mode, SUPPORTED_PIDS_21_40);
-    if (readData()) {
+  for (int n = 0; n < 3; n++) {
+    // Group 0 is always processed, others must be checked
+    if (n != 0 && !isInArray(targetArray, 32, pidCmds[n])) break;
+
+    writeData(mode, pidCmds[n]);
+    if (readData() && resultBuffer[3] == 0x40 + mode) {
       for (int i = 0; i < 4; i++) {
         uint8_t value = resultBuffer[i + startByte];
         for (int bit = 7; bit >= 0; bit--) {
-          if ((value >> bit) & 1) {
-            targetArray[supportedCount++] = pidIndex + 1;
-          }
-          pidIndex++;
-        }
-      }
-    }
-  }
-
-  if (isInArray(targetArray, arraySize, 0x40)) {
-    writeData(mode, SUPPORTED_PIDS_41_60);
-    if (readData()) {
-      for (int i = 0; i < 4; i++) {
-        uint8_t value = resultBuffer[i + startByte];
-        for (int bit = 7; bit >= 0; bit--) {
-          if ((value >> bit) & 1) {
-            targetArray[supportedCount++] = pidIndex + 1;
-          }
+          if ((value >> bit) & 1) targetArray[supportedCount++] = pidIndex + 1;
           pidIndex++;
         }
       }
