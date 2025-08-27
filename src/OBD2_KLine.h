@@ -90,7 +90,7 @@ class OBD2_KLine {
   Stream *_debugSerial = nullptr;  // Debug serial port
 
   uint8_t resultBuffer[64] = {0};
-  uint8_t errors = 0;
+  uint8_t unreceivedDataCount = 0;
   bool connectionStatus = false;
 
   String selectedProtocol = "Automatic";

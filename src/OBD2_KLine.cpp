@@ -592,7 +592,7 @@ uint8_t OBD2_KLine::getSupportedData(uint8_t mode, uint8_t index) {
 
 void OBD2_KLine::updateConnectionStatus(bool messageReceived) {
   if (messageReceived) {
-    errors = 0;
+    unreceivedDataCount = 0;
     // if (!connectionStatus) {
     //   connectionStatus = true;
     //   debugPrintln(F("✅ Connection established."));
@@ -600,12 +600,12 @@ void OBD2_KLine::updateConnectionStatus(bool messageReceived) {
   } else {
     if (!connectionStatus) return;  // No need to update if not connected
 
-    errors++;
-    debugPrint(F("⚠️ Not received data, error count: "));
-    debugPrintln(String(errors).c_str());
-    if (errors > 2 && connectionStatus) {
+    unreceivedDataCount++;
+    debugPrint(F("⚠️ Not received data: "));
+    debugPrintln(String(unreceivedDataCount).c_str());
+    if (unreceivedDataCount > 2 && connectionStatus) {
       connectionStatus = false;
-      errors = 0;
+      unreceivedDataCount = 0;
       debugPrintln(F("⛔ Connection lost."));
     }
   }
