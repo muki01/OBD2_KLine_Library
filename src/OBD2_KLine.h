@@ -79,6 +79,7 @@ class OBD2_KLine {
 
   void setWriteDelay(uint16_t delay);
   void setDataRequestInterval(uint16_t interval);
+  void setReadTimeout(uint16_t timeoutMs);
   void setProtocol(const String &protocolName);
   void updateConnectionStatus(bool messageReceived);
 
@@ -97,6 +98,7 @@ class OBD2_KLine {
   String connectedProtocol = "";
   uint16_t _writeDelay = 5;
   uint16_t _dataRequestInterval = 60;
+  uint16_t _readTimeout = 1000;
   String storedDTCBuffer[32];
   String pendingDTCBuffer[32];
 

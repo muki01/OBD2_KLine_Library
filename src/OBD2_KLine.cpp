@@ -150,8 +150,8 @@ uint8_t OBD2_KLine::readData() {
   unsigned long startMillis = millis();
   int bytesRead = 0;
 
-  // Wait for data for 1 second
-  while (millis() - startMillis < 1000) {
+  // Wait for data for the specified timeout
+  while (millis() - startMillis < _readTimeout) {
     if (_serial->available() > 0) {
       unsigned long lastByteTime = millis();
       memset(resultBuffer, 0, sizeof(resultBuffer));
@@ -612,6 +612,10 @@ void OBD2_KLine::setWriteDelay(uint16_t delay) {
 
 void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
   _dataRequestInterval = interval;
+}
+
+void OBD2_KLine::setReadTimeout(uint16_t timeoutMs) {
+  _readTimeout = timeoutMs;
 }
 
 void OBD2_KLine::setProtocol(const String &protocolName) {
