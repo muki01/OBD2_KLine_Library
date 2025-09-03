@@ -10,7 +10,7 @@ void setup() {
   Serial.begin(115200);  // Start the default serial (for logging/debugging)
   Serial.println("OBD2 K-Line Get Supported PIDs Example");
 
-  Line.setDebug(Serial);               // Optional: enable debug output on your chosen serial port
+  KLine.setDebug(Serial);              // Optional: enable debug output on your chosen serial port
   KLine.setProtocol("ISO14230_Fast");  // Optional: Default protocol: Automatic. All protocols: ISO9141. ISO14230_Slow, ISO14230_Fast
   KLine.setWriteDelay(5);              // Optional: delay between bytes when writing to OBD (in milliseconds)
   KLine.setDataRequestInterval(60);    // Optional: delay between data reading (in milliseconds)
@@ -21,7 +21,7 @@ void setup() {
 void loop() {
   // Attempt to initialize OBD2 communication
   if (KLine.initOBD2()) {
-    int liveDataLength = KLine.readSupportedLiveData();  // Read supported live data PIDs
+    int liveDataLength = KLine.readSupportedLiveData();  // Read supported live data PIDs. Mode: 01
     if (liveDataLength > 0) {
       Serial.print("LiveData: ");
       for (int i = 0; i < liveDataLength; i++) {
@@ -30,10 +30,12 @@ void loop() {
         Serial.print(" ");
       }
       Serial.println();
+    } else {
+      Serial.print("LiveData not supported!");
     }
     delay(1000);
 
-    int freezeFrameLength = KLine.readSupportedFreezeFrame();  // Read supported freeze frame PIDs
+    int freezeFrameLength = KLine.readSupportedFreezeFrame();  // Read supported freeze frame PIDs. Mode: 02
     if (freezeFrameLength > 0) {
       Serial.print("FreezeFrame: ");
       for (int i = 0; i < freezeFrameLength; i++) {
@@ -42,22 +44,54 @@ void loop() {
         Serial.print(" ");
       }
       Serial.println();
+    } else {
+      Serial.print("FreezeFrame not supported!");
     }
     delay(1000);
 
-    int componentMonitoringLength = KLine.readSupportedComponentMonitoring();  // Read supported component monitoring PIDs
-    if (componentMonitoringLength > 0) {
-      Serial.print("Component Monitoring: ");
-      for (int i = 0; i < componentMonitoringLength; i++) {
-        byte supported = KLine.getSupportedData(0x06, i);  // Get supported component monitoring PID
+    int oxygenSensorsLength = KLine.readSupportedOxygenSensors();  // Read supported Oxygen Sensors PIDs. Mode: 05
+    if (oxygenSensorsLength > 0) {
+      Serial.print("Oxygen Sensors: ");
+      for (int i = 0; i < oxygenSensorsLength; i++) {
+        byte supported = KLine.getSupportedData(0x05, i);  // Get supported components PID
         Serial.print(supported, HEX);                      // Print the PID in hexadecimal format
         Serial.print(" ");
       }
       Serial.println();
+    } else {
+      Serial.print("Oxygen Sensors not supported!");
     }
     delay(1000);
 
-    int vehicleInfoLength = KLine.readSupportedVehicleInfo();  // Read supported vehicle information PIDs
+    int otherComponentsLength = KLine.readSupportedOtherComponents();  // Read supported components PIDs. Mode: 06
+    if (otherComponentsLength > 0) {
+      Serial.print("Other Components: ");
+      for (int i = 0; i < otherComponentsLength; i++) {
+        byte supported = KLine.getSupportedData(0x06, i);  // Get supported components PID
+        Serial.print(supported, HEX);                      // Print the PID in hexadecimal format
+        Serial.print(" ");
+      }
+      Serial.println();
+    } else {
+      Serial.print("Other Components not supported!");
+    }
+    delay(1000);
+
+    int onBoardComponentsLength = KLine.readSupportedOnBoardComponents();  // Read supported On-Board Components PIDs. Mode: 08
+    if (onBoardComponentsLength > 0) {
+      Serial.print("On-Board Components: ");
+      for (int i = 0; i < onBoardComponentsLength; i++) {
+        byte supported = KLine.getSupportedData(0x08, i);  // Get supported components PID
+        Serial.print(supported, HEX);                      // Print the PID in hexadecimal format
+        Serial.print(" ");
+      }
+      Serial.println();
+    } else {
+      Serial.print("On-Board Components not supported!");
+    }
+    delay(1000);
+
+    int vehicleInfoLength = KLine.readSupportedVehicleInfo();  // Read supported vehicle information PIDs. Mode: 09
     if (vehicleInfoLength > 0) {
       Serial.print("VehicleInfo: ");
       for (int i = 0; i < vehicleInfoLength; i++) {
@@ -66,6 +100,8 @@ void loop() {
         Serial.print(" ");
       }
       Serial.println();
+    } else {
+      Serial.print("VehicleInfo not supported!");
     }
     delay(1000);
     // KLine.readSupportedData(0x01);
