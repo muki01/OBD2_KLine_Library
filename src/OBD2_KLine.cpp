@@ -729,10 +729,7 @@ void OBD2_KLine::debugPrintln(const __FlashStringHelper *msg) {
 }
 
 void OBD2_KLine::debugPrintHex(uint8_t val) {
-  if (_debugSerial) {
-    if (val < 0x10) _debugSerial->print("0");
-    _debugSerial->print(val, HEX);
-  }
+  if (_debugSerial) _debugSerial->printf("%02X", val);
 }
 
 void OBD2_KLine::debugPrintHexln(uint8_t val) {
