@@ -31,7 +31,6 @@ const uint8_t SUPPORTED_PIDS_41_60 = 0x40;
 const uint8_t SUPPORTED_PIDS_61_80 = 0x60;
 const uint8_t SUPPORTED_PIDS_81_100 = 0x80;
 
-const uint8_t supported_VehicleInfo = 0x00;  // Read Supported Vehicle Info
 const uint8_t read_VIN_Count = 0x01;         // Read VIN Count
 const uint8_t read_VIN = 0x02;               // Read VIN
 const uint8_t read_ID_Length = 0x03;         // Read Calibration ID Length

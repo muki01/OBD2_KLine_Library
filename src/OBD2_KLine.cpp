@@ -6,6 +6,8 @@ OBD2_KLine::OBD2_KLine(SerialType &serialPort, uint32_t baudRate, uint8_t rxPin,
   setSerial(true);
 }
 
+// ----------------------------------- Initialization functions -----------------------------------
+
 void OBD2_KLine::setSerial(bool enabled) {
   if (enabled) {
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
@@ -96,6 +98,8 @@ bool OBD2_KLine::tryFastInit() {
 
   return false;
 }
+
+// ----------------------------------- Basic Read/Write functions -----------------------------------
 
 void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
   uint8_t sendData[length + 1];
@@ -196,6 +200,8 @@ void OBD2_KLine::clearEcho() {
     debugPrintln(F("Not Received Echo Data"));
   }
 }
+
+// ----------------------------------- Live Data -----------------------------------
 
 float OBD2_KLine::getLiveData(uint8_t pid) {
   return getPID(read_LiveData, pid);
@@ -379,6 +385,8 @@ float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
   }
 }
 
+// ----------------------------------- DTCs -----------------------------------
+
 uint8_t OBD2_KLine::readStoredDTCs() {
   return readDTCs(0x03);
 }
@@ -390,7 +398,7 @@ uint8_t OBD2_KLine::readPendingDTCs() {
 uint8_t OBD2_KLine::readDTCs(uint8_t mode) {
   // Request: C2 33 F1 03 F3
   // example Response: 87 F1 11 43 01 70 01 34 00 00 72
-  // example Response: 87 F1 11 43 00 00 72
+  // example Response: 87 F1 11 43 00 00 CC
   int dtcCount = 0;
   String *targetArray = nullptr;
 
@@ -441,6 +449,8 @@ bool OBD2_KLine::clearDTC() {
   }
   return false;
 }
+
+// ----------------------------------- Vehicle Information -----------------------------------
 
 String OBD2_KLine::getVehicleInfo(uint8_t pid) {
   // Request: C2 33 F1 09 02 F1
@@ -493,6 +503,8 @@ String OBD2_KLine::getVehicleInfo(uint8_t pid) {
   }
   return "";
 }
+
+// ----------------------------------- Supported PIDs -----------------------------------
 
 uint8_t OBD2_KLine::readSupportedLiveData() {
   return readSupportedData(read_LiveData);
@@ -584,6 +596,8 @@ uint8_t OBD2_KLine::getSupportedData(uint8_t mode, uint8_t index) {
   }
   return 0;
 }
+
+// ----------------------------------- Helper Functions -----------------------------------
 
 void OBD2_KLine::updateConnectionStatus(bool messageReceived) {
   if (messageReceived) {
@@ -707,6 +721,8 @@ String OBD2_KLine::convertBytesToHexString(const uint8_t *dataArray, uint8_t len
   hexString.toUpperCase();
   return hexString;
 }
+
+// ----------------------------------- Debug Functions -----------------------------------
 
 void OBD2_KLine::setDebug(Stream &serial) {
   _debugSerial = &serial;
