@@ -58,6 +58,7 @@ bool OBD2_KLine::trySlowInit() {
   debugPrint(F("✅ Protocol Detected: "));
   debugPrintln(detectedProtocol.c_str());
 
+  debugPrintln(F("Writing inverted KW2"));
   _serial->write(~resultBuffer[2]);
 
   if (!readData()) return false;
@@ -108,12 +109,15 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
 
   debugPrint(F("Sending Raw Data: "));
   for (size_t i = 0; i < length + 1; i++) {
-    _serial->write(sendData[i]);
     debugPrintHex(sendData[i]);
-    debugPrint(" ");
-    delay(_writeDelay);
+    debugPrint(F(" "));
   }
   debugPrintln(F(""));
+
+  for (size_t i = 0; i < length + 1; i++) {
+    _serial->write(sendData[i]);
+    delay(_writeDelay);
+  }
 
   clearEcho();
 }
@@ -143,12 +147,15 @@ void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
 
   debugPrint(F("Sending Data: "));
   for (size_t i = 0; i < length; i++) {
-    _serial->write(message[i]);
     debugPrintHex(message[i]);
     debugPrint(F(" "));
-    delay(_writeDelay);
   }
   debugPrintln(F(""));
+
+  for (size_t i = 0; i < length; i++) {
+    _serial->write(message[i]);
+    delay(_writeDelay);
+  }
 
   clearEcho();
 }
@@ -170,7 +177,7 @@ uint8_t OBD2_KLine::readData() {
       while (millis() - lastByteTime < _dataRequestInterval) {  // Wait for new data for 60ms
         if (_serial->available() > 0) {                         // If new data is available
           if (bytesRead >= sizeof(resultBuffer)) {              // Stop if buffer is full
-            debugPrintln(F("⚠️ Buffer is full. Stopping data reception."));
+            debugPrintln(F("\n⚠️ Buffer is full. Stopping data reception."));
             return bytesRead;
           }
 
@@ -182,7 +189,7 @@ uint8_t OBD2_KLine::readData() {
         }
       }
 
-      debugPrintln(F("✅ Data reception completed."));
+      debugPrintln(F("\n✅ Data reception completed."));
       return bytesRead;
     }
   }
