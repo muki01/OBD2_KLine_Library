@@ -21,7 +21,7 @@ void OBD2_KLine::setSerial(bool enabled) {
     pinMode(_rxPin, INPUT_PULLUP);
     pinMode(_txPin, OUTPUT);
     digitalWrite(_txPin, HIGH);
-    delay(3000);
+    delay(5500);
   }
 }
 
@@ -84,7 +84,7 @@ bool OBD2_KLine::tryFastInit() {
   delay(25);
 
   setSerial(true);
-  writeData(init_OBD, 0x00);
+  writeRawData(initMsg, sizeof(initMsg));
 
   if (!readData()) return false;
 
@@ -120,13 +120,17 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
 
 void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
   uint8_t message[7] = {0};
-  size_t length = (mode == read_FreezeFrame || mode == test_OxygenSensors) ? 7 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 : 6;
+  size_t length = (mode == read_FreezeFrame || mode == test_OxygenSensors)                    ? 7 :
+                  (mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 :
+                                                                                                6;
 
-  if (selectedProtocol == "ISO9141") {
-    message[0] = (mode == read_FreezeFrame) ? 0x69 : 0x68;
+  if (connectedProtocol == "ISO9141") {
+    message[0] = (mode == read_FreezeFrame || mode == test_OxygenSensors) ? 0x69 : 0x68;
     message[1] = 0x6A;
-  } else if (selectedProtocol == "ISO14230_Fast" || selectedProtocol == "ISO14230_Slow") {
-    message[0] = (mode == read_FreezeFrame) ? 0xC3 : (mode == init_OBD || mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 0xC1 : 0xC2;
+  } else if (connectedProtocol == "ISO14230_Fast" || connectedProtocol == "ISO14230_Slow") {
+    message[0] = (mode == read_FreezeFrame || mode == test_OxygenSensors)                    ? 0xC3 :
+                 (mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 0xC1 :
+                                                                                               0xC2;
     message[1] = 0x33;
   }
 

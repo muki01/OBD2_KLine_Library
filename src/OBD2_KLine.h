@@ -13,7 +13,6 @@
 #endif
 
 // ==== OBD2 Mods ====
-const uint8_t init_OBD = 0x81;                   // Init ISO14230
 const uint8_t read_LiveData = 0x01;              // Show current live data
 const uint8_t read_FreezeFrame = 0x02;           // Show freeze frame data
 const uint8_t read_storedDTCs = 0x03;            // Show stored Diagnostic Trouble Codes (DTCs)
@@ -37,6 +36,9 @@ const uint8_t read_ID_Length = 0x03;         // Read Calibration ID Length
 const uint8_t read_ID = 0x04;                // Read Calibration ID
 const uint8_t read_ID_Num_Length = 0x05;     // Read Calibration ID Number Length
 const uint8_t read_ID_Num = 0x06;            // Read Calibration ID Number
+
+// ISO14230-Fast init message
+const uint8_t initMsg[4] = {0xC1, 0x33, 0xF1, 0x81};
 
 class OBD2_KLine {
  public:
