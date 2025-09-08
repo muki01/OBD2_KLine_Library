@@ -10,10 +10,11 @@ void setup() {
   Serial.begin(115200);  // Start the default serial (for logging/debugging)
   Serial.println("OBD2 K-Line Read DTCs Example");
 
-  KLine.setDebug(Serial);              // Optional: enable debug output on your chosen serial port
-  KLine.setProtocol("ISO14230_Fast");  // Optional: Default protocol: Automatic. All protocols: ISO9141. ISO14230_Slow, ISO14230_Fast
-  KLine.setWriteDelay(5);              // Optional: delay between bytes when writing to OBD (in milliseconds)
-  KLine.setDataRequestInterval(60);    // Optional: delay between data reading (in milliseconds)
+  KLine.setDebug(Serial);          // Optional: outputs debug messages to the selected serial port
+  KLine.setProtocol("Automatic");  // Optional: communication protocol (default: Automatic; supported: ISO9141, ISO14230_Slow, ISO14230_Fast, Automatic)
+  KLine.setByteWriteInterval(5);   // Optional: delay (ms) between bytes when writing
+  KLine.setInterByteTimeout(60);   // Optional: sets the maximum inter-byte timeout (ms) while receiving data
+  KLine.setReadTimeout(1000);      // Optional: maximum time (ms) to wait for a response after sending a request
 
   Serial.println("OBD2 Starting.");
 }
