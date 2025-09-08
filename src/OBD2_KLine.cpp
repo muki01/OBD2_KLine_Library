@@ -116,7 +116,7 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
 
   for (size_t i = 0; i < length + 1; i++) {
     _serial->write(sendData[i]);
-    delay(_writeDelay);
+    delay(_byteWriteInterval);
   }
 
   clearEcho();
@@ -154,7 +154,7 @@ void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
 
   for (size_t i = 0; i < length; i++) {
     _serial->write(message[i]);
-    delay(_writeDelay);
+    delay(_byteWriteInterval);
   }
 
   clearEcho();
@@ -174,9 +174,9 @@ uint8_t OBD2_KLine::readData() {
 
       // Read all data
       debugPrint(F("✅ Received Data: "));
-      while (millis() - lastByteTime < _dataRequestInterval) {  // Wait for new data for 60ms
-        if (_serial->available() > 0) {                         // If new data is available
-          if (bytesRead >= sizeof(resultBuffer)) {              // Stop if buffer is full
+      while (millis() - lastByteTime < _interByteTimeout) {  // Wait for new data for 60ms
+        if (_serial->available() > 0) {                      // If new data is available
+          if (bytesRead >= sizeof(resultBuffer)) {           // Stop if buffer is full
             debugPrintln(F("\n⚠️ Buffer is full. Stopping data reception."));
             return bytesRead;
           }
@@ -631,12 +631,12 @@ void OBD2_KLine::updateConnectionStatus(bool messageReceived) {
   }
 }
 
-void OBD2_KLine::setWriteDelay(uint16_t delay) {
-  _writeDelay = delay;
+void OBD2_KLine::setByteWriteInterval(uint16_t interval) {
+  _byteWriteInterval = interval;
 }
 
-void OBD2_KLine::setDataRequestInterval(uint16_t interval) {
-  _dataRequestInterval = interval;
+void OBD2_KLine::setInterByteTimeout(uint16_t interval) {
+  _interByteTimeout = interval;
 }
 
 void OBD2_KLine::setReadTimeout(uint16_t timeoutMs) {
