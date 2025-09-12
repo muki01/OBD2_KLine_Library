@@ -22,7 +22,7 @@ void setup() {
 void loop() {
   // Attempt to initialize OBD2 communication
   if (KLine.initOBD2()) {
-    KLine.clearDTC(); // Clear Diagnostic Trouble Codes (DTCs)
+    KLine.clearDTCs(); // Clear Diagnostic Trouble Codes (DTCs)
     delay(1000);
   }
 }

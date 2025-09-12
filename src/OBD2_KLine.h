@@ -62,7 +62,7 @@ class OBD2_KLine {
   String getStoredDTC(uint8_t index);
   String getPendingDTC(uint8_t index);
 
-  bool clearDTC();
+  bool clearDTCs();
 
   String getVehicleInfo(uint8_t pid);
 

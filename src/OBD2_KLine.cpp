@@ -448,7 +448,7 @@ String OBD2_KLine::getPendingDTC(uint8_t index) {
   return "";
 }
 
-bool OBD2_KLine::clearDTC() {
+bool OBD2_KLine::clearDTCs() {
   writeData(clear_DTCs, 0x00);
   int len = readData();
   if (len >= 3) {
