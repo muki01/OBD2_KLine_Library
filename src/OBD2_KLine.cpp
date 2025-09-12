@@ -50,8 +50,12 @@ bool OBD2_KLine::trySlowInit() {
   send5baud(0x33);
   setSerial(true);
 
-  if (!readData()) return false;
+  setInterByteTimeout(30);
 
+  if (!readData()) {
+    setInterByteTimeout(60);
+    return false;
+  }
   if (resultBuffer[0] != 0x55) return false;
 
   String detectedProtocol = (resultBuffer[1] == resultBuffer[2]) ? "ISO9141" : "ISO14230_Slow";
@@ -60,10 +64,14 @@ bool OBD2_KLine::trySlowInit() {
 
   debugPrintln(F("Writing inverted KW2"));
   _serial->write(~resultBuffer[2]);
+  delay(_byteWriteInterval);
+  clearEcho();
+
+  setInterByteTimeout(60);
 
   if (!readData()) return false;
 
-  if (resultBuffer[0]) {
+  if (resultBuffer[0] == 0xCC) {
     connectionStatus = true;
     connectedProtocol = detectedProtocol;
     debugPrintln(F("✅ Connection established with car"));
