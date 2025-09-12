@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 
-//#include "VehicleData.h"
-
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
 #include <AltSoftSerial.h>
 #define SerialType AltSoftSerial
@@ -30,19 +28,18 @@ const uint8_t SUPPORTED_PIDS_41_60 = 0x40;
 const uint8_t SUPPORTED_PIDS_61_80 = 0x60;
 const uint8_t SUPPORTED_PIDS_81_100 = 0x80;
 
-const uint8_t read_VIN_Count = 0x01;         // Read VIN Count
-const uint8_t read_VIN = 0x02;               // Read VIN
-const uint8_t read_ID_Length = 0x03;         // Read Calibration ID Length
-const uint8_t read_ID = 0x04;                // Read Calibration ID
-const uint8_t read_ID_Num_Length = 0x05;     // Read Calibration ID Number Length
-const uint8_t read_ID_Num = 0x06;            // Read Calibration ID Number
+const uint8_t read_VIN_Count = 0x01;      // Read VIN Count
+const uint8_t read_VIN = 0x02;            // Read VIN
+const uint8_t read_ID_Length = 0x03;      // Read Calibration ID Length
+const uint8_t read_ID = 0x04;             // Read Calibration ID
+const uint8_t read_ID_Num_Length = 0x05;  // Read Calibration ID Number Length
+const uint8_t read_ID_Num = 0x06;         // Read Calibration ID Number
 
 // ISO14230-Fast init message
 const uint8_t initMsg[4] = {0xC1, 0x33, 0xF1, 0x81};
 
 class OBD2_KLine {
  public:
-  //VehicleData car;
   OBD2_KLine(SerialType &serialStream, uint32_t baudRate, uint8_t rxPin, uint8_t txPin);
 
   void setDebug(Stream &serial);
