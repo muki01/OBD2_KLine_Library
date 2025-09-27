@@ -211,10 +211,14 @@ uint8_t OBD2_KLine::readData() {
 void OBD2_KLine::clearEcho() {
   int result = _serial->available();
   if (result > 0) {
+    debugPrint(F("Cleared Echo Data: "));
     for (int i = 0; i < result; i++) {
       uint8_t readedByte = _serial->read();
+      debugPrintHex(readedByte);
+      debugPrint(F(" "));
     }
-    debugPrintln(F("Echo Data Cleared"));
+    debugPrintln(F(""));
+    //debugPrintln(F("Echo Data Cleared"));
   } else {
     debugPrintln(F("Not Received Echo Data"));
   }
