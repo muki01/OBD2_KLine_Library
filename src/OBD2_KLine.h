@@ -88,7 +88,7 @@ class OBD2_KLine {
   uint8_t _txPin;
   Stream *_debugSerial = nullptr;  // Debug serial port
 
-  uint8_t resultBuffer[64] = {0};
+  uint8_t resultBuffer[160] = {0};
   uint8_t unreceivedDataCount = 0;
   bool connectionStatus = false;
 
