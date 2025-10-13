@@ -93,7 +93,7 @@ bool OBD2_KLine::tryFastInit() {
   delay(25);
 
   setSerial(true);
-  writeRawData(initMsg, sizeof(initMsg));
+  writeRawData(initMsg, sizeof(initMsg), 0);
 
   if (!readData()) return false;
 
@@ -110,19 +110,45 @@ bool OBD2_KLine::tryFastInit() {
 
 // ----------------------------------- Basic Read/Write functions -----------------------------------
 
-void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length) {
-  uint8_t sendData[length + 1];
+void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t checksumType) {
+  uint8_t totalLength = length;  // default no checksum
+  uint8_t checksum = 0;
+
+  switch (checksumType) {
+    case 0:
+      totalLength = length;
+      break;
+    case 1:
+      checksum = checksum8_XOR(dataArray, length);
+      totalLength = length + 1;
+      break;
+    case 2:
+      checksum = checksum8_Modulo256(dataArray, length);
+      totalLength = length + 1;
+      break;
+    case 3:
+      checksum = checksum8_TwosComplement(dataArray, length);
+      totalLength = length + 1;
+      break;
+    default:
+      totalLength = length;
+      break;
+  }
+
+  uint8_t sendData[totalLength];
   memcpy(sendData, dataArray, length);
-  sendData[length] = calculateChecksum(dataArray, length);
+  if (checksumType != 0) {
+    sendData[totalLength - 1] = checksum;
+  }
 
   debugPrint(F("Sending Raw Data: "));
-  for (size_t i = 0; i < length + 1; i++) {
+  for (size_t i = 0; i < totalLength; i++) {
     debugPrintHex(sendData[i]);
     debugPrint(F(" "));
   }
   debugPrintln(F(""));
 
-  for (size_t i = 0; i < length + 1; i++) {
+  for (size_t i = 0; i < totalLength; i++) {
     _serial->write(sendData[i]);
     delay(_byteWriteInterval);
   }

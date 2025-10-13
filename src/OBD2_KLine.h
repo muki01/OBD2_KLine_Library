@@ -48,7 +48,7 @@ class OBD2_KLine {
   bool trySlowInit();
   bool tryFastInit();
   void writeData(uint8_t mode, uint8_t pid);
-  void writeRawData(const uint8_t *dataArray, uint8_t length);
+  void writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t checksumType);
   uint8_t readData();
   void send5baud(uint8_t data);
 
