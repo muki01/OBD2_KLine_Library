@@ -688,6 +688,43 @@ void OBD2_KLine::setProtocol(const String &protocolName) {
   debugPrintln(("Protocol set to: " + selectedProtocol).c_str());
 }
 
+// 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
+uint8_t OBD2_KLine::read5baud() {
+  unsigned long t0 = millis();
+  while (digitalRead(_rxPin) == HIGH) {
+    if (millis() - t0 > 2000) return -1;
+  }
+
+  uint8_t bits[10];
+  uint8_t data = 0;
+  int ones = 0;
+  delayMicroseconds(100000);
+
+  for (int i = 0; i < 10; i++) {  // bits: 0=start, 1..7=data, 8=parity, 9=stop
+    bits[i] = digitalRead(_rxPin) ? 1 : 0;
+
+    if (i >= 1 && i <= 7) {
+      data |= (bits[i] << (i - 1));  // save data bits
+      if (bits[i]) ones++;
+    } else if (i == 8) {  // parity bit
+      if (bits[i]) ones++;
+    } else if (i == 9) {  // stop bit
+      break;
+    }
+
+    delayMicroseconds(200000);
+  }
+
+  // Parity control (Odd)
+  if (ones % 2 == 0) {
+    Serial.println("Parity error!");
+    return -2;
+  }
+
+  return data;
+}
+
+// 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
 void OBD2_KLine::send5baud(uint8_t data) {
   uint8_t even = 1;  // for calculating parity bit
   uint8_t bits[10];
