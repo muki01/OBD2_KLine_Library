@@ -151,7 +151,7 @@ void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
   if (length > 5) message[4] = pid;
   if (length == 7) message[5] = 0x00;
 
-  message[length - 1] = calculateChecksum(message, length - 1);
+  message[length - 1] = checksum8_Modulo256(message, length - 1);
 
   debugPrint(F("Sending Data: "));
   for (size_t i = 0; i < length; i++) {
@@ -693,12 +693,29 @@ void OBD2_KLine::send5baud(uint8_t data) {
   debugPrintln(F(""));
 }
 
-uint8_t OBD2_KLine::calculateChecksum(const uint8_t *dataArray, uint8_t length) {
+uint8_t OBD2_KLine::checksum8_XOR(const uint8_t *dataArray, int length) {
   uint8_t checksum = 0;
   for (int i = 0; i < length; i++) {
-    checksum += dataArray[i];
+    checksum ^= dataArray[i];  // XOR operation
   }
-  return checksum % 256;
+  return checksum;
+}
+
+uint8_t OBD2_KLine::checksum8_Modulo256(const uint8_t *dataArray, int length) {
+  unsigned int sum = 0;
+  for (int i = 0; i < length; i++) {
+    sum += dataArray[i];
+  }
+  return (byte)(sum % 256);  // veya (byte)sum; çünkü uint8_t overflow da mod 256 etkisi verir
+}
+
+uint8_t OBD2_KLine::checksum8_TwosComplement(const uint8_t *dataArray, int length) {
+  unsigned int sum = 0;
+  for (int i = 0; i < length; i++) {
+    sum += dataArray[i];
+  }
+  byte checksum = (byte)((0x100 - (sum & 0xFF)) & 0xFF);
+  return checksum;
 }
 
 String OBD2_KLine::decodeDTC(uint8_t input_byte1, uint8_t input_byte2) {

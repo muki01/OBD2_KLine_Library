@@ -107,8 +107,11 @@ class OBD2_KLine {
   uint8_t supportedControlComponents[32];
   uint8_t supportedVehicleInfo[32];
 
+  uint8_t checksum8_XOR(const uint8_t *dataArray, int length);
+  uint8_t checksum8_Modulo256(const uint8_t *dataArray, int length);
+  uint8_t checksum8_TwosComplement(const uint8_t *dataArray, int length);
+
   String decodeDTC(uint8_t input_byte1, uint8_t input_byte2);
-  uint8_t calculateChecksum(const uint8_t *dataArray, uint8_t length);
   bool isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value);
   String convertBytesToHexString(const uint8_t *dataArray, uint8_t length);
   String convertHexToAscii(const uint8_t *dataArray, uint8_t length);
