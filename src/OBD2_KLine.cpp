@@ -65,7 +65,7 @@ bool OBD2_KLine::trySlowInit() {
   debugPrintln(F("Writing inverted KW2"));
   _serial->write(~resultBuffer[2]);
   delay(_byteWriteInterval);
-  clearEcho();
+  clearEcho(1);
 
   setInterByteTimeout(60);
 
@@ -153,7 +153,7 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t 
     delay(_byteWriteInterval);
   }
 
-  clearEcho();
+  clearEcho(totalLength);
 }
 
 void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
@@ -191,7 +191,7 @@ void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
     delay(_byteWriteInterval);
   }
 
-  clearEcho();
+  clearEcho(length);
 }
 
 uint8_t OBD2_KLine::readData() {
@@ -234,17 +234,17 @@ uint8_t OBD2_KLine::readData() {
   return 0;
 }
 
-void OBD2_KLine::clearEcho() {
+void OBD2_KLine::clearEcho(int length) {
   int result = _serial->available();
   if (result > 0) {
     debugPrint(F("Cleared Echo Data: "));
-    for (int i = 0; i < result; i++) {
+    for (int i = 0; i < length; i++) {
       uint8_t readedByte = _serial->read();
       debugPrintHex(readedByte);
       debugPrint(F(" "));
     }
     debugPrintln(F(""));
-    //debugPrintln(F("Echo Data Cleared"));
+    // debugPrintln(F("Echo Data Cleared"));
   } else {
     debugPrintln(F("Not Received Echo Data"));
   }

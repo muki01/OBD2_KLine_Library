@@ -115,7 +115,7 @@ class OBD2_KLine {
   bool isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value);
   String convertBytesToHexString(const uint8_t *dataArray, uint8_t length);
   String convertHexToAscii(const uint8_t *dataArray, uint8_t length);
-  void clearEcho();
+  void clearEcho(int length);
   void debugPrint(const char *msg);
   void debugPrint(const __FlashStringHelper *msg);
   void debugPrintln(const char *msg);
