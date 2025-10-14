@@ -717,9 +717,12 @@ uint8_t OBD2_KLine::read5baud() {
 
   // Parity control (Odd)
   if (ones % 2 == 0) {
-    Serial.println("Parity error!");
+    debugPrintln(F("Parity error!"));
     return -2;
   }
+
+  debugPrint(F("Received 5 Baud Data: "));
+  debugPrintln(String(data, HEX).c_str());
 
   return data;
 }
