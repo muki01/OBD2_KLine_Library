@@ -250,6 +250,15 @@ void OBD2_KLine::clearEcho(int length) {
   }
 }
 
+bool OBD2_KLine::compareData(const uint8_t *dataArray, uint8_t length) {
+  for (size_t i = 0; i < length; i++) {
+    if (dataArray[i] != resultBuffer[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // ----------------------------------- Live Data -----------------------------------
 
 float OBD2_KLine::getLiveData(uint8_t pid) {
