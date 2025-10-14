@@ -21,7 +21,6 @@ void OBD2_KLine::setSerial(bool enabled) {
     pinMode(_rxPin, INPUT_PULLUP);
     pinMode(_txPin, OUTPUT);
     digitalWrite(_txPin, HIGH);
-    delay(5500);
   }
 }
 
@@ -47,6 +46,7 @@ bool OBD2_KLine::trySlowInit() {
   debugPrintln(F("🔁 Trying ISO9141 / ISO14230_Slow"));
 
   setSerial(false);
+  delay(5500);
   send5baud(0x33);
   setSerial(true);
 
@@ -86,6 +86,7 @@ bool OBD2_KLine::tryFastInit() {
   debugPrintln(F("🔁 Trying ISO14230_Fast"));
 
   setSerial(false);
+  delay(5500);
 
   digitalWrite(_txPin, LOW);
   delay(25);
@@ -704,6 +705,8 @@ uint8_t OBD2_KLine::read5baud() {
     if (millis() - t0 > 2000) return -1;
   }
 
+  setSerial(false);  // Disable serial to read 5 baud data
+
   uint8_t bits[10];
   uint8_t data = 0;
   int ones = 0;
@@ -733,6 +736,7 @@ uint8_t OBD2_KLine::read5baud() {
   debugPrint(F("Received 5 Baud Data: "));
   debugPrintln(String(data, HEX).c_str());
 
+  setSerial(true);  // Re-enable serial after reading 5 baud data
   return data;
 }
 
