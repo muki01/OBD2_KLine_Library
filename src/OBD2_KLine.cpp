@@ -94,7 +94,7 @@ bool OBD2_KLine::tryFastInit() {
   delay(25);
 
   setSerial(true);
-  writeRawData(initMsg, sizeof(initMsg), 0);
+  writeRawData(initMsg, sizeof(initMsg), 2);
 
   if (!readData()) return false;
 
