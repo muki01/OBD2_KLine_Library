@@ -142,7 +142,7 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t 
     sendData[totalLength - 1] = checksum;
   }
 
-  debugPrint(F("Sending Raw Data: "));
+  debugPrint(F("\n➡️ Sending Raw Data: "));
   for (size_t i = 0; i < totalLength; i++) {
     debugPrintHex(sendData[i]);
     debugPrint(F(" "));
@@ -180,7 +180,7 @@ void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
 
   message[length - 1] = checksum8_Modulo256(message, length - 1);
 
-  debugPrint(F("Sending Data: "));
+  debugPrint(F("\n➡️ Sending Data: "));
   for (size_t i = 0; i < length; i++) {
     debugPrintHex(message[i]);
     debugPrint(F(" "));
@@ -238,7 +238,7 @@ uint8_t OBD2_KLine::readData() {
 void OBD2_KLine::clearEcho(int length) {
   int result = _serial->available();
   if (result > 0) {
-    debugPrint(F("Cleared Echo Data: "));
+    debugPrint(F("🗑️ Cleared Echo Data: "));
     for (int i = 0; i < length; i++) {
       uint8_t readedByte = _serial->read();
       debugPrintHex(readedByte);
@@ -247,7 +247,7 @@ void OBD2_KLine::clearEcho(int length) {
     debugPrintln(F(""));
     // debugPrintln(F("Echo Data Cleared"));
   } else {
-    debugPrintln(F("Not Received Echo Data"));
+    debugPrintln(F("❌ Not Received Echo Data"));
   }
 }
 
@@ -756,7 +756,7 @@ void OBD2_KLine::send5baud(uint8_t data) {
 
   bits[8] = (even == 0) ? 1 : 0;  // parity bit
 
-  debugPrint(F("5 Baud Init for Module 0x"));
+  debugPrint(F("➡️ 5 Baud Init for Module 0x"));
   debugPrintHex(data);
   debugPrint(F(": "));
 
