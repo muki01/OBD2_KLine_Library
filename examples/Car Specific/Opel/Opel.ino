@@ -22,13 +22,36 @@ void setup() {
 }
 
 void loop() {
-  Opel_Vectra_Simulator();
+  //Opel_Vectra_Test1();
+  //Opel_Vectra_Test2();
 
-  //Opel_Vectra_Simulator2();  //Instrument Cluster Simulator (Select 4800 Baud)
-  //if (connectionStatus) KLine.writeRawData(instumentClusterKeepalive_Response, sizeof(instumentClusterKeepalive_Response), 0);
+  Opel_Vectra_Simulator1();
+
+  // Opel_Vectra_Simulator2();  //Instrument Cluster Simulator (Select 4800 Baud)
+  // if (connectionStatus) KLine.writeRawData(instumentClusterKeepalive_Response, sizeof(instumentClusterKeepalive_Response), 0);
 }
 
-void Opel_Vectra_Simulator() {
+void Opel_Vectra_Test1() {
+  if (KLine.initOBD2()) {
+    KLine.writeRawData(imoKeepalive, sizeof(imoKeepalive), 2), KLine.readData();
+    KLine.writeRawData(imoReadLiveData, sizeof(imoReadLiveData), 2), KLine.readData();
+
+    KLine.writeRawData(imoKeepalive, sizeof(imoKeepalive), 2), KLine.readData();
+    KLine.writeRawData(imoReadDTCs, sizeof(imoReadDTCs), 2), KLine.readData();
+
+    KLine.writeRawData(imoKeepalive, sizeof(imoKeepalive), 2), KLine.readData();
+    KLine.writeRawData(imoClearDTCs, sizeof(imoClearDTCs), 2), KLine.readData();
+  }
+}
+
+void Opel_Vectra_Test2() {
+  if (KLine.initOBD2()) {
+    KLine.readData();
+  }
+}
+
+
+void Opel_Vectra_Simulator1() {
   if (KLine.readData()) {
     if (KLine.compareData(engineInit0, sizeof(engineInit0)) || KLine.compareData(engineInit, sizeof(engineInit))) KLine.writeRawData(engineInit_Response, sizeof(engineInit_Response), 2);
     else if (KLine.compareData(engineCheckConnection, sizeof(engineCheckConnection))) KLine.writeRawData(engineCheckConnection_Response, sizeof(engineCheckConnection_Response), 2);
@@ -40,6 +63,7 @@ void Opel_Vectra_Simulator() {
     else if (KLine.compareData(imoKeepalive, sizeof(imoKeepalive))) KLine.writeRawData(imoKeepalive_Response, sizeof(imoKeepalive_Response), 2);
     else if (KLine.compareData(imoReadLiveData, sizeof(imoReadLiveData))) KLine.writeRawData(imoReadLiveData_Response, sizeof(imoReadLiveData_Response), 2);
     else if (KLine.compareData(imoReadDTCs, sizeof(imoReadDTCs))) KLine.writeRawData(imoReadDTCs_Response, sizeof(imoReadDTCs_Response), 2);
+    else if (KLine.compareData(imoClearDTCs, sizeof(imoClearDTCs))) KLine.writeRawData(imoClearDTCs_Response2, sizeof(imoClearDTCs_Response2), 2);
   }
 }
 
