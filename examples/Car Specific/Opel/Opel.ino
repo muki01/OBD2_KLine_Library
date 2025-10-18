@@ -8,6 +8,7 @@ OBD2_KLine KLine(Serial1, 10400, 10, 11);  // Uses Hardware Serial (Serial1) at 
 //OBD2_KLine KLine(Alt_Serial, 10400, 8, 9); // Uses AltSoftSerial at 10400 baud, with RX on pin 8 and TX on pin 9.
 
 bool connectionStatus = false;
+int kw81_Stage = 0;
 
 void setup() {
   Serial.begin(115200);  // Start the default serial (for logging/debugging)
@@ -26,9 +27,7 @@ void loop() {
   //Opel_Vectra_Test2();
 
   Opel_Vectra_Simulator1();
-
-  // Opel_Vectra_Simulator2();  //Instrument Cluster Simulator (Select 4800 Baud)
-  // if (connectionStatus) KLine.writeRawData(instumentClusterKeepalive_Response, sizeof(instumentClusterKeepalive_Response), 0);
+  //Opel_Vectra_Simulator2();  //Instrument Cluster Simulator (Select 4800 Baud)
 }
 
 void Opel_Vectra_Test1() {
@@ -75,9 +74,13 @@ void Opel_Vectra_Simulator2() {
     }
   }
   if (connectionStatus == true) {
+    if (kw81_Stage == 0) KLine.writeRawData(instumentClusterECUID_Response, sizeof(instumentClusterECUID_Response), 0);
+    else if (kw81_Stage == 1) KLine.writeRawData(instumentClusterLiveData_Response, sizeof(instumentClusterLiveData_Response), 0);
+    else if (kw81_Stage == 2) {}
+
     if (KLine.readData()) {
-      if (KLine.compareData(instumentClusterLiveData, sizeof(instumentClusterLiveData))) KLine.writeRawData(instumentClusterLiveData_Response, sizeof(instumentClusterLiveData_Response), 0);
-      if (KLine.resultBuffer[0] == 0x7F) {}
+      if (KLine.compareData(instumentClusterLiveData, sizeof(instumentClusterLiveData))) kw81_Stage = 1;
+      else if (KLine.compareData(instumentClusterClearDTC, sizeof(instumentClusterClearDTC))) kw81_Stage = 2;
     }
   }
 }
