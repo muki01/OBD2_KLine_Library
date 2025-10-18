@@ -35,8 +35,6 @@ const uint8_t read_ID = 0x04;             // Read Calibration ID
 const uint8_t read_ID_Num_Length = 0x05;  // Read Calibration ID Number Length
 const uint8_t read_ID_Num = 0x06;         // Read Calibration ID Number
 
-// ISO14230-Fast init message
-const uint8_t initMsg[4] = {0xC1, 0x33, 0xF1, 0x81};
 
 class OBD2_KLine {
  public:
@@ -82,6 +80,9 @@ class OBD2_KLine {
   void setReadTimeout(uint16_t timeoutMs);
   void setProtocol(const String &protocolName);
   void updateConnectionStatus(bool messageReceived);
+
+  uint8_t initMsg[4] = {0xC1, 0x33, 0xF1, 0x81};  // ISO14230-Fast init message
+  uint8_t slowInitByte = 0x33;                    // ISO9141/ISO14230-Slow init byte
 
  private:
   SerialType *_serial;

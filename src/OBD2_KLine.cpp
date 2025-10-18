@@ -47,7 +47,7 @@ bool OBD2_KLine::trySlowInit() {
 
   setSerial(false);
   delay(5500);
-  send5baud(0x33);
+  send5baud(slowInitByte);
   setSerial(true);
 
   setInterByteTimeout(30);
