@@ -69,17 +69,15 @@ bool OBD2_KLine::trySlowInit() {
 
   setInterByteTimeout(60);
 
-  if (!readData()) return false;
-
-  if (resultBuffer[0] == 0xCC) {
+  if (!readData()) {
+    debugPrintln(F("❌ No response after KW2 write"));
+    return false;
+  } else {
     connectionStatus = true;
     connectedProtocol = detectedProtocol;
     debugPrintln(F("✅ Connection established with car"));
     return true;
   }
-
-  debugPrintln(F("❌ No response after KW2 write"));
-  return false;
 }
 
 bool OBD2_KLine::tryFastInit() {
