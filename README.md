@@ -107,6 +107,12 @@ You can choose one of the following approaches depending on your project:
 The **L9637D** is a dedicated K-Line transceiver chip that simplifies the interface circuit, reducing part count and improving signal reliability.
 
 ---
+## 📷 Below is a photos of the PCB manufactured for K-Line:
+
+<img width=36% src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" />
+<img width=39% src="https://github.com/user-attachments/assets/1a794aea-b9b8-4cdd-bebb-17b25fe7fd7b" />
+
+---
 
 ## ☕ Support My Work
 
