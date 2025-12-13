@@ -51,9 +51,12 @@ In the second image, pins 6 and 14 are present, meaning it uses the CAN Bus prot
 - **5-baud initialization (slow init)** and **Fast init** support
 - **Automatic protocol detection**
 - Read real-time sensor values
-- Read and clear **stored and pending DTCs**
-- Retrieve vehicle info (VIN, calibration IDs, etc.)
-- **Mode 06** support (on-board test results)
+- Read Freeze Frame values
+- Read **stored and pending DTCs**
+- Clear **stored and pending DTCs**
+- Read Oxygen Sensors test results
+- Read on-board test results
+- Read vehicle info (VIN, calibration IDs, etc.)
 - Debug output for easier development
 - Customizable delays and request intervals
 - Works with Arduino, ESP32 and similar platforms
