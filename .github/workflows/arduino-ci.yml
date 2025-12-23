@@ -1,0 +1,67 @@
+name: Arduino Examples CI
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+  pull_request:
+
+jobs:
+  compile-examples:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        board:
+          - name: "Arduino Uno"
+            fqbn: "arduino:avr:uno"
+            platform: "arduino:avr"
+          - name: "ESP32 Dev Module"
+            fqbn: "esp32:esp32:esp32"
+            platform: "esp32:esp32"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+
+      - name: Configure ESP32 Board Manager
+        if: matrix.board.platform == 'esp32:esp32'
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+
+      - name: Install Board Platform
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install ${{ matrix.board.platform }}
+
+      - name: Install AVR Dependencies
+        if: matrix.board.platform == 'arduino:avr'
+        run: |
+          arduino-cli lib install "AltSoftSerial"
+
+      - name: Compile Library Examples
+        run: |
+          # Setup local library link
+          mkdir -p $HOME/Arduino/libraries
+          ln -s $GITHUB_WORKSPACE $HOME/Arduino/libraries/OBD2_KLine
+
+          # Find and compile each .ino file
+          find examples -name "*.ino" -print0 | while IFS= read -r -d '' ino_file; do
+            sketch_dir=$(dirname "$ino_file")
+            echo "------------------------------------------------"
+            echo "Processing: $sketch_dir"
+            echo "Board: ${{ matrix.board.name }}"
+            arduino-cli compile --fqbn ${{ matrix.board.fqbn }} --library . "$sketch_dir"
+            if [ $? -ne 0 ]; then
+              echo "Compilation failed for $sketch_dir"
+              exit 1
+            fi
+          done
+
+      - name: Summary
+        run: echo "All examples compiled successfully for ${{ matrix.board.name }}."
