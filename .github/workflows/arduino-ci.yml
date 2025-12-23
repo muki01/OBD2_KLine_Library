@@ -2,9 +2,15 @@ name: Arduino Examples CI
 
 on:
   push:
-    paths-ignore:
-      - '**.md'
+    paths:
+      - 'src/**'
+      - 'examples/**'
+      - '!**.md'
   pull_request:
+    paths:
+      - 'src/**'
+      - 'examples/**'
+      - '!**.md'
 
 jobs:
   compile-examples:
