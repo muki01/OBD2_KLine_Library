@@ -697,44 +697,56 @@ void OBD2_KLine::setProtocol(const String &protocolName) {
 }
 
 // 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
-uint8_t OBD2_KLine::read5baud() {
-  unsigned long t0 = millis();
-  while (digitalRead(_rxPin) == HIGH) {
-    if (millis() - t0 > 2000) return -1;
+int OBD2_KLine::read5baud() {
+  // debugPrintln(F("Waiting for 5-baud init..."));
+
+  // HIGH -> LOW (start bit decrease)
+  while (digitalRead(_rxPin) == HIGH);
+  unsigned long tStart = micros();
+
+  // Measure the start-bit LOW duration
+  while (digitalRead(_rxPin) == LOW);
+  unsigned long lowDuration = micros() - tStart;
+
+  // debugPrint(F("Bit duration: "));
+  // debugPrintln(lowDuration / 1000.00);
+
+  if (lowDuration < 150000 || lowDuration > 300000) {
+    // debugPrintln(F("Not 5-baud, ignored"));
+    return -1;
   }
 
-  setSerial(false);  // Disable serial to read 5 baud data
-
+  debugPrint(F("✅ Received 5 Baud data - "));
   uint8_t bits[10];
+
+  delay(100);
+  for (int i = 1; i < 10; i++) {
+    bits[i] = digitalRead(_rxPin);
+    delay(200);
+  }
+
+  debugPrint(F("Bits: "));
+  for (int i = 0; i < 10; i++) {
+    debugPrint(bits[i] ? "1" : "0");
+  }
+
   uint8_t data = 0;
   int ones = 0;
-  delayMicroseconds(100000);
-
-  for (int i = 0; i < 10; i++) {  // bits: 0=start, 1..7=data, 8=parity, 9=stop
-    bits[i] = digitalRead(_rxPin) ? 1 : 0;
-
-    if (i >= 1 && i <= 7) {
-      data |= (bits[i] << (i - 1));  // save data bits
-      if (bits[i]) ones++;
-    } else if (i == 8) {  // parity bit
-      if (bits[i]) ones++;
-    } else if (i == 9) {  // stop bit
-      break;
-    }
-
-    delayMicroseconds(200000);
+  for (int i = 1; i <= 7; i++) {
+    data |= (bits[i] << (i - 1));
+    if (bits[i]) ones++;
   }
+  if (bits[8]) ones++;
 
-  // Parity control (Odd)
-  if (ones % 2 == 0) {
-    debugPrintln(F("Parity error!"));
-    return -2;
-  }
+  debugPrint(F(", DATA: 0x"));
+  debugPrintHex(data);
 
-  debugPrint(F("Received 5 Baud Data: "));
-  debugPrintln(String(data, HEX).c_str());
+  if ((ones & 1) == 0)
+    debugPrintln(F(", Parity ERROR (odd expected)"));
+  else
+    debugPrintln(F(", Parity OK"));
+  // debugPrintln();
 
-  setSerial(true);  // Re-enable serial after reading 5 baud data
   return data;
 }
 

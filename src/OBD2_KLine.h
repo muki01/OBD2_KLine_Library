@@ -50,7 +50,7 @@ class OBD2_KLine {
   uint8_t readData();
   bool compareData(const uint8_t *dataArray, uint8_t length);
   void send5baud(uint8_t data);
-  uint8_t read5baud();
+  int read5baud();
 
   float getPID(uint8_t mode, uint8_t pid);
   float getLiveData(uint8_t pid);
