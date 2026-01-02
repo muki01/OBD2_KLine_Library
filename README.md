@@ -37,8 +37,8 @@ If your vehicle’s OBD-II connector has **Pins 6 and 14 connected**, it uses th
 
 ### Example photos of OBD2 Connector
 <p>
-<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20KLine.jpg" width=40%>
-<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20CanBus.jpg" width=40%>
+<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20KLine.jpg" width=40% alt="OBD2 Connector Pin 7 K-Line">
+<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20CanBus.jpg" width=40% alt="OBD2 Connector Pin 6 and 14 CAN Bus">
 </p>
 
 In the first image, the OBD2 socket includes pin 7, which indicates it operates using the K-Line protocol.
@@ -46,25 +46,22 @@ In the second image, pins 6 and 14 are present, meaning it uses the CAN Bus prot
 
 ---
 
-## ✨ Features
+## 🚀 Key Features
 
-- Supports **ISO 9141-2** and **ISO 14230-4 (KWP2000)**
-- **5-baud initialization (slow init)** and **Fast init** support
-- **Automatic protocol detection**
-- Read real-time sensor values
-- Read Freeze Frame values
-- Read **stored and pending DTCs**
-- Clear **stored and pending DTCs**
-- Read Oxygen Sensors test results
-- Read on-board test results
-- Read vehicle info (VIN, calibration IDs, etc.)
-- Debug output for easier development
-- Customizable delays and request intervals
-- Works with Arduino, ESP32 and similar platforms
+- **Universal Compatibility:** Works with Arduino (Uno, Nano, Mega), ESP32, and other popular microcontrollers.
+- **Protocol Mastery:** Supports both **ISO 9141-2** and **ISO 14230-4 (KWP2000)**.
+- **Advanced Initialization:** Features both **5-Baud (Slow Init)** and **Fast Init** methods.
+- **Smart Detection:** Automatic protocol detection logic.
+- **Full Diagnostics:** - Read real-time sensor data (PIDs).
+  - Retrieve and Clear Stored/Pending DTCs (Diagnostic Trouble Codes).
+  - Access Vehicle Info (VIN, Calibration IDs).
+  - Monitor Oxygen Sensor and On-board test results.
+- **Developer Friendly:** Integrated debug output for real-time monitoring.
 
 ---
 
 ## 📡 Supported OBD-II Modes
+The table below lists the **standard OBD-II modes** supported by this library. These are universal for most vehicles.
 
 | Mode | Description                                      |
 |------|--------------------------------------------------|
@@ -76,6 +73,8 @@ In the second image, pins 6 and 14 are present, meaning it uses the CAN Bus prot
 | 06   | On-board monitoring test results                 |
 | 07   | Read pending Diagnostic Trouble Codes            |
 | 09   | Retrieve vehicle information (VIN, calibration)  |
+
+> 💡 **Advanced Users:** These modes are standard for OBD2. However, if you have documentation for **manufacturer-specific PIDs** or custom communication commands for your specific vehicle, you can use the library's core functions to send those custom requests as well.
 
 ---
 
@@ -92,29 +91,113 @@ Each protocol has its own timing characteristics, which affect how many response
 
 ---
 
-## 🛠️ Schematics for Communication
+## 🛠️Schematics for communication
 
-These schematics are essential because K-Line communication operates at different voltage and signal levels than microcontroller pins.  
+These schematics are essential because K-Line communication operates at different voltage and signal levels than microcontroller pins.
 The circuits ensure proper level shifting and protection for safe, stable operation.
 
 You can choose one of the following approaches depending on your project:
 
-### 🔹 Schematic with Transistors
+### 🔹 Transistor-Based Schematic
 <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Transistor%20Schematic.png" width=70%>
 
-- **R6 3kΩ** is for **3.3V MCUs**. Use **5.3kΩ** for **5V** systems.
-- **R4** is often used as **1kΩ**, but the K-Line standard recommends **510Ω**. Either option will work, but **510Ω** is more compliant with the standard.
+This schematic uses a discrete transistor-based approach to interface the K-Line with a microcontroller.
+It is a simple and low-cost solution suitable for basic implementations and prototyping.
 
-### 🔹 Schematic with L9637D
-<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/L9637D.png" width=70%>
+The **R6** resistor in this schematic is designed for **3.3V** microcontrollers. If you are using a **5V** microcontroller, you need to change the **R6** value to **5.3kΩ**.
 
-The **L9637D** is a dedicated K-Line transceiver chip that simplifies the interface circuit, reducing part count and improving signal reliability.
+### 🔹 Comparator-Based Schematic
+<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Comparator.png" width=70%>
+
+This design uses a low-cost comparator IC to process the K-Line signal and convert it into a clean digital level for the microcontroller.
+It offers a good balance between cost, simplicity, and signal reliability.
+
+- Can be implemented using cheap and widely available comparators such as LM393
+- Better noise immunity than discrete transistor-based designs
+- Provides well-defined logic thresholds
+- Suitable for low-budget projects that require improved signal stability
+- Slightly higher component count compared to the transistor solution, but still cost-effective
+
+### 🔹 Dedicated Automotive IC Schematic
+<p align="start">
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/L9637D.png" width="45%" alt="L9637D"/>
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/MC33290.png" width="42%" alt="MC33290"/>
+</p>
+
+<p align="start">
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Si9241.png" width="43%" alt="SI9241"/>
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/SN65HVDA195.png" width="45%" alt="SN65HVDA195"/>
+</p>
+
+
+This schematic category uses dedicated automotive communication ICs (e.g. L9637D, MCZ33290, Si9241, SN65HVDA195 etc.) specifically designed for K-Line / ISO 9141 applications.
+
+- Built-in voltage level shifting and protection
+- Fully compliant with automotive communication standards
+- Highest reliability and signal stability
+- Recommended for production-grade and long-term use designs
 
 ---
-## 📷 Below are photos of the PCBs manufactured for K-Line:
 
-<img width=36% src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" />
-<img width=39% src="https://github.com/user-attachments/assets/1a794aea-b9b8-4cdd-bebb-17b25fe7fd7b" />
+## 📦 Installation
+
+### Arduino Library Manager (Recommended)
+1. Open the **Arduino IDE**.
+2. Go to **Sketch** -> **Include Library** -> **Manage Libraries...**
+3. Search for **"OBD2 K-Line"**.
+4. Click **Install**.
+
+### Manual Installation
+Alternatively, download this repo as a `.zip` file and include it via **Sketch** -> **Include Library** -> **Add .ZIP Library...**
+
+---
+
+## ⚡ Basic Usage: Get Live Data
+
+This example demonstrates how to read Engine RPM, Coolant Temperature, and Vehicle Speed. The library automatically handles different board architectures (AVR/ESP32).
+
+```cpp
+#include "OBD2_KLine.h"
+
+// Check for board compatibility and define Serial interface
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega2560__)
+  #include <AltSoftSerial.h>
+  AltSoftSerial Alt_Serial;
+  OBD2_KLine KLine(Alt_Serial, 10400, 8, 9); // AVR: RX 8, TX 9
+#elif defined(ESP32)
+  OBD2_KLine KLine(Serial1, 10400, 10, 11); // ESP32: RX 10, TX 11
+#endif
+
+void setup() {
+  Serial.begin(115200);
+  
+  KLine.setDebug(Serial);           // View communication logs
+  KLine.setProtocol("Automatic");  // Supports ISO9141, ISO14230_Slow, ISO14230_Fast
+  
+  Serial.println("OBD2 System Starting...");
+}
+
+void loop() {
+  if (KLine.initOBD2()) {
+    int rpm = KLine.getLiveData(0x0C);        // PID 0x0C: Engine RPM
+    int coolant = KLine.getLiveData(0x05);    // PID 0x05: Coolant Temp
+    int speed = KLine.getLiveData(0x0D);      // PID 0x0D: Vehicle Speed
+
+    Serial.print("RPM: "); Serial.println(rpm);
+    Serial.print("Temp: "); Serial.print(coolant); Serial.println(" C");
+    Serial.print("Speed: "); Serial.print(speed); Serial.println(" km/h");
+  }
+}
+
+```
+
+## 📷 Gallery
+Custom PCBs designed for this library:
+
+<img width=36% src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" alt="OBD2 K-Line PCB 1"/>
+<img width=39% src="https://github.com/user-attachments/assets/1a794aea-b9b8-4cdd-bebb-17b25fe7fd7b" alt="OBD2 K-Line PCB 2"/>
+
+> 🛠️ **Custom Hardware & PCBs:** If you are looking for ready-to-use devices or custom-made PCBs based on this project, feel free to reach out to me via email in the **Contact** section below.
 
 ---
 
