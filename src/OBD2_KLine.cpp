@@ -271,6 +271,8 @@ float OBD2_KLine::getFreezeFrame(uint8_t pid) {
 }
 
 float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
+  // example Request: C2 33 F1 01 0C F3
+  // example Response: 84 F1 11 41 0C 0D 58 38
   writeData(mode, pid);
   int len = readData();
 
