@@ -701,27 +701,32 @@ void OBD2_KLine::setProtocol(const String &protocolName) {
 // 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
 int OBD2_KLine::read5baud() {
   // debugPrintln(F("Waiting for 5-baud init..."));
+  setSerial(false);
+  const unsigned long THRESHOLD = 100000;
 
   // HIGH -> LOW (start bit decrease)
   while (digitalRead(_rxPin) == HIGH);
+
+  // debugPrintln(F("Transition detected. Measuring start bit... "));
   unsigned long tStart = micros();
 
-  // Measure the start-bit LOW duration
-  while (digitalRead(_rxPin) == LOW);
-  unsigned long lowDuration = micros() - tStart;
+  while (digitalRead(_rxPin) == LOW) {
+    if (micros() - tStart > THRESHOLD) {
+      // debugPrintln(F("✅ LOW > 100ms, 5-baud detected"));
+      break;
+    }
+  }
 
-  // debugPrint(F("Bit duration: "));
-  // debugPrintln(lowDuration / 1000.00);
-
-  if (lowDuration < 150000 || lowDuration > 300000) {
-    // debugPrintln(F("Not 5-baud, ignored"));
+  if (digitalRead(_rxPin) == HIGH && (micros() - tStart <= THRESHOLD)) {
+    // debugPrintln(F("❌ No 5 Baud data detected."));
+    setSerial(true);
     return -1;
   }
 
   debugPrint(F("✅ Received 5 Baud data - "));
   uint8_t bits[10];
 
-  delay(100);
+  delay(200);
   for (int i = 1; i < 10; i++) {
     bits[i] = digitalRead(_rxPin);
     delay(200);
@@ -744,10 +749,11 @@ int OBD2_KLine::read5baud() {
   debugPrintHex(data);
 
   if ((ones & 1) == 0)
-    debugPrintln(F(", Parity ERROR (odd expected)"));
+    debugPrintln(F(", ❌ Parity ERROR (odd expected)"));
   else
-    debugPrintln(F(", Parity OK"));
+    debugPrintln(F(", ✅ Parity OK"));
   // debugPrintln();
+  setSerial(true);
 
   return data;
 }
