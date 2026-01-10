@@ -803,7 +803,7 @@ uint8_t OBD2_KLine::checksum8_Modulo256(const uint8_t *dataArray, int length) {
   for (int i = 0; i < length; i++) {
     sum += dataArray[i];
   }
-  return (byte)(sum % 256);  // veya (byte)sum; çünkü uint8_t overflow da mod 256 etkisi verir
+  return (byte)(sum % 256);  // or (byte)sum; because uint8_t overflow also gives a mod 256 effect.
 }
 
 uint8_t OBD2_KLine::checksum8_TwosComplement(const uint8_t *dataArray, int length) {
