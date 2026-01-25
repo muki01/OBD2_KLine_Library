@@ -128,11 +128,11 @@ class OBD2_KLine {
   bool isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value);
   String convertBytesToHexString(const uint8_t *dataArray, uint8_t length);
   String convertHexToAscii(const uint8_t *dataArray, uint8_t length);
-  void clearEcho(int length);
   void debugPrint(const char *msg);
   void debugPrint(const __FlashStringHelper *msg);
   void debugPrintln(const char *msg);
   void debugPrintln(const __FlashStringHelper *msg);
+  void clearEcho(uint8_t length);
   void debugPrintHex(uint8_t val);    // Hexadecimal output
   void debugPrintHexln(uint8_t val);  // Hexadecimal + newline
 };

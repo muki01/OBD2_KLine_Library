@@ -150,7 +150,7 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t 
 
   for (size_t i = 0; i < totalLength; i++) {
     _serial->write(sendData[i]);
-    delay(_byteWriteInterval);
+    if (i < totalLength - 1) delay(_byteWriteInterval);
   }
 
   clearEcho(totalLength);
@@ -188,7 +188,7 @@ void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
 
   for (size_t i = 0; i < fullDataLength; i++) {
     _serial->write(message[i]);
-    delay(_byteWriteInterval);
+    if (i < fullDataLength - 1) delay(_byteWriteInterval);
   }
 
   clearEcho(fullDataLength);
@@ -234,20 +234,40 @@ uint8_t OBD2_KLine::readData() {
   return 0;
 }
 
-void OBD2_KLine::clearEcho(int length) {
-  int result = _serial->available();
-  if (result > 0) {
-    debugPrint(F("🗑️ Cleared Echo Data: "));
-    for (int i = 0; i < length; i++) {
-      uint8_t readedByte = _serial->read();
-      debugPrintHex(readedByte);
-      debugPrint(F(" "));
+void OBD2_KLine::clearEcho(uint8_t length) {
+  const unsigned long byteTimeoutMs = 100;
+
+  // Wait for the first byte
+  unsigned long startTime = millis();
+  while (_serial->available() == 0) {
+    if (millis() - startTime >= byteTimeoutMs) {
+      debugPrintln(F("❌ Echo not received"));
+      return;
     }
-    debugPrintln(F(""));
-    // debugPrintln(F("Echo Data Cleared"));
-  } else {
-    debugPrintln(F("❌ Not Received Echo Data"));
+    delayMicroseconds(100);
   }
+
+  // First byte received, now read the rest
+  debugPrint(F("🗑️ Cleared Echo Data: "));
+
+  uint8_t readedByte;
+  for (size_t readCount = 0; readCount < length; readCount++) {
+    startTime = millis();
+
+    while (_serial->available() == 0) {
+      if (millis() - startTime >= byteTimeoutMs) {
+        debugPrintln(F("\n❌ Echo incomplete"));
+        return;
+      }
+      delayMicroseconds(100);
+    }
+
+    readedByte = _serial->read();
+    debugPrintHex(readedByte);
+    debugPrint(F(" "));
+  }
+
+  debugPrintln(F(""));
 }
 
 bool OBD2_KLine::compareData(const uint8_t *dataArray, uint8_t length) {
