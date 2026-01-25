@@ -46,8 +46,14 @@ class OBD2_KLine {
   bool initOBD2(uint8_t moduleAddress = defaultInitAddress);
   bool trySlowInit(uint8_t moduleAddress = defaultInitAddress);
   bool tryFastInit(uint8_t moduleAddress = defaultInitAddress);
-  void writeData(uint8_t mode, uint8_t pid);
   void writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t checksumType);
+  void writeData(const uint8_t* data, uint8_t length);
+
+  template <size_t N>
+  void writeData(const uint8_t (&dataArray)[N]) {
+    writeData(dataArray, N);
+  }
+
   uint8_t readData();
   bool compareData(const uint8_t *dataArray, uint8_t length);
   void send5baud(uint8_t data);

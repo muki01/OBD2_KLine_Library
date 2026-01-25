@@ -94,7 +94,7 @@ bool OBD2_KLine::tryFastInit(uint8_t moduleAddress) {
 
   initMsg[1] = moduleAddress;
   setSerial(true);
-  writeRawData(initMsg, sizeof(initMsg), 2);
+  writeData((uint8_t[]){0x81});
 
   if (!readData()) return false;
 
@@ -157,42 +157,42 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t 
   clearEcho(totalLength);
 }
 
-void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
-  uint8_t message[7] = {0};
-  size_t length = (mode == read_FreezeFrame || mode == test_OxygenSensors)                    ? 7 :
-                  (mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 :
-                                                                                                6;
+void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
+  uint8_t headerLength = 3;
+  uint8_t actualLengthByteCount = useLengthInHeader ? 0 : 1;
+  uint8_t fullDataLength = headerLength + actualLengthByteCount + dataLength + 1;  // +1 for checksum
+  uint8_t message[fullDataLength];
 
   if (connectedProtocol == "ISO9141") {
-    message[0] = (mode == read_FreezeFrame || mode == test_OxygenSensors) ? 0x69 : 0x68;
-    message[1] = 0x6A;
-  } else if (connectedProtocol == "ISO14230_Fast" || connectedProtocol == "ISO14230_Slow") {
-    message[0] = (mode == read_FreezeFrame || mode == test_OxygenSensors)                    ? 0xC3 :
-                 (mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 0xC1 :
-                                                                                               0xC2;
-    message[1] = 0x33;
+    memcpy(message, header_ISO9141, headerLength);
+  } else if (connectedProtocol == "ISO14230_Fast" || connectedProtocol == "ISO14230_Slow" || connectionStatus == false) {
+    memcpy(message, header_ISO14230_Fast, headerLength);
+
+    if (useLengthInHeader) {
+      message[0] += dataLength;
+    } else {
+      message[3] = dataLength;
+    }
   }
 
-  message[2] = 0xF1;
-  message[3] = mode;
-  if (length > 5) message[4] = pid;
-  if (length == 7) message[5] = 0x00;
+  uint8_t dataStartOffset = headerLength + actualLengthByteCount;
+  memcpy(&message[dataStartOffset], data, dataLength);
 
-  message[length - 1] = checksum8_Modulo256(message, length - 1);
+  message[fullDataLength - 1] = checksum8_Modulo256(message, fullDataLength - 1);
 
   debugPrint(F("\n➡️ Sending Data: "));
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; i < fullDataLength; i++) {
     debugPrintHex(message[i]);
     debugPrint(F(" "));
   }
   debugPrintln(F(""));
 
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; i < fullDataLength; i++) {
     _serial->write(message[i]);
     delay(_byteWriteInterval);
   }
 
-  clearEcho(length);
+  clearEcho(fullDataLength);
 }
 
 uint8_t OBD2_KLine::readData() {
@@ -273,7 +273,12 @@ float OBD2_KLine::getFreezeFrame(uint8_t pid) {
 float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
   // example Request: C2 33 F1 01 0C F3
   // example Response: 84 F1 11 41 0C 0D 58 38
-  writeData(mode, pid);
+  if (mode == read_LiveData) {
+    writeData((uint8_t[]){mode, pid});
+  } else if (mode == read_FreezeFrame) {
+    writeData((uint8_t[]){mode, pid, 0x00});
+  }
+
   int len = readData();
 
   if (len <= 0) return -1;                // Data not received
@@ -471,7 +476,7 @@ uint8_t OBD2_KLine::readDTCs(uint8_t mode) {
     return -1;  // Invalid mode
   }
 
-  writeData(mode, 0x00);
+  writeData((uint8_t[]){mode});
 
   int len = readData();
   if (len >= 3) {
@@ -499,7 +504,7 @@ String OBD2_KLine::getPendingDTC(uint8_t index) {
 }
 
 bool OBD2_KLine::clearDTCs() {
-  writeData(clear_DTCs, 0x00);
+  writeData((uint8_t[]){clear_DTCs});
   int len = readData();
   if (len >= 3) {
     if (resultBuffer[3] == 0x44) {
@@ -529,9 +534,9 @@ String OBD2_KLine::getVehicleInfo(uint8_t pid) {
     messageCount = 5;
   } else if (pid == 0x04 || pid == 0x06) {
     if (pid == 0x04) {
-      writeData(read_VehicleInfo, read_ID_Length);
+      writeData((uint8_t[]){read_VehicleInfo, read_ID_Length});
     } else if (pid == 0x06) {
-      writeData(read_VehicleInfo, read_ID_Num_Length);
+      writeData((uint8_t[]){read_VehicleInfo, read_ID_Num_Length});
     } else {
       return "";
     }
@@ -543,7 +548,7 @@ String OBD2_KLine::getVehicleInfo(uint8_t pid) {
     }
   }
 
-  writeData(read_VehicleInfo, pid);
+  writeData((uint8_t[]){read_VehicleInfo, pid});
 
   if (readData()) {
     for (int j = 0; j < messageCount; j++) {
@@ -626,7 +631,7 @@ uint8_t OBD2_KLine::readSupportedData(uint8_t mode) {
     // Group 0 is always processed, others must be checked
     if (n != 0 && !isInArray(targetArray, 32, pidCmds[n])) break;
 
-    writeData(mode, pidCmds[n]);
+    writeData((uint8_t[]){mode, pidCmds[n]});
     if (readData() && resultBuffer[3] == 0x40 + mode) {
       for (int i = 0; i < 4; i++) {
         uint8_t value = resultBuffer[i + startByte];
