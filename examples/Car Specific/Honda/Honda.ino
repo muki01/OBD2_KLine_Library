@@ -20,6 +20,11 @@ void setup() {
   KLine.setInterByteTimeout(60);  // Optional: sets the maximum inter-byte timeout (ms) while receiving data
   KLine.setReadTimeout(1000);     // Optional: maximum time (ms) to wait for a response after sending a request
 
+  //KLine.setInitAddress(0x33);                 // Optional: Sets the target ECU address used during the 5-baud Slow Init sequence.
+  //KLine.setISO9141Header(0x68, 0x6A, 0xF1);   // Optional: Configures the 3-byte header (Priority, Receiver, Transmitter) for ISO9141.
+  //KLine.setISO14230Header(0xC0, 0x33, 0xF1);  // Optional: Configures the 3-byte header (Format, Receiver, Transmitter) for KWP2000.
+  //KLine.setLengthMode(true);                  // Optional: Defines if data length is embedded in the header or sent as a separate byte.
+
   Serial.println("Honda Code.");
 }
 
@@ -29,19 +34,19 @@ void loop() {
 
 void Honda_Simulator() {
   if (KLine.readData()) {
-    if (KLine.compareData(hondaEngine, sizeof(hondaEngine))) KLine.writeRawData(hondaEngine_Response, sizeof(hondaEngine_Response), 0);
-    else if (KLine.compareData(hondaEngine2, sizeof(hondaEngine2))) KLine.writeRawData(hondaEngine_Response, sizeof(hondaEngine_Response), 0);
-    else if (KLine.compareData(hondaEngine_LiveData1, sizeof(hondaEngine_LiveData1))) KLine.writeRawData(hondaEngine_LiveData1_R, sizeof(hondaEngine_LiveData1_R), 0);
-    else if (KLine.compareData(hondaEngine_LiveData2, sizeof(hondaEngine_LiveData2))) KLine.writeRawData(hondaEngine_LiveData2_R, sizeof(hondaEngine_LiveData2_R), 3);
-    else if (KLine.compareData(hondaEngine_LiveData3, sizeof(hondaEngine_LiveData3))) KLine.writeRawData(hondaEngine_LiveData3_R, sizeof(hondaEngine_LiveData3_R), 0);
-    else if (KLine.compareData(hondaEngine_LiveData4, sizeof(hondaEngine_LiveData4))) KLine.writeRawData(hondaEngine_LiveData4_R, sizeof(hondaEngine_LiveData4_R), 0);
-    else if (KLine.compareData(hondaEngine_LiveData5, sizeof(hondaEngine_LiveData5))) KLine.writeRawData(hondaEngine_LiveData5_R, sizeof(hondaEngine_LiveData5_R), 0);
-    else if (KLine.compareData(hondaEngine_LiveData6, sizeof(hondaEngine_LiveData6))) KLine.writeRawData(hondaEngine_LiveData6_R, sizeof(hondaEngine_LiveData6_R), 0);
-    else if (KLine.compareData(hondaEngine_LiveData7, sizeof(hondaEngine_LiveData7))) KLine.writeRawData(hondaEngine_LiveData7_R, sizeof(hondaEngine_LiveData7_R), 0);
-    else if (KLine.compareData(hondaEngine_LiveData8, sizeof(hondaEngine_LiveData8))) KLine.writeRawData(hondaEngine_LiveData8_R, sizeof(hondaEngine_LiveData8_R), 0);
-    else if (KLine.compareData(hondaEngine_LiveData9, sizeof(hondaEngine_LiveData9))) KLine.writeRawData(hondaEngine_LiveData9_R, sizeof(hondaEngine_LiveData9_R), 0);
-    else if (KLine.compareData(hondaEngine_ReadDTCs, sizeof(hondaEngine_ReadDTCs))) KLine.writeRawData(hondaEngine_ReadDTCs_R, sizeof(hondaEngine_ReadDTCs_R), 0);
-    else if (KLine.compareData(hondaEngine_ClearDTCs, sizeof(hondaEngine_ClearDTCs))) KLine.writeRawData(hondaEngine_ClearDTCs_R, sizeof(hondaEngine_ClearDTCs_R), 0);
-    //else if (KLine.compareData(hondaABS, sizeof(hondaABS))) KLine.writeRawData(hondaABS_Response, sizeof(hondaABS_Response), false);
+    if (KLine.compareData(hondaEngine)) KLine.writeRawData(hondaEngine_Response, 0);
+    else if (KLine.compareData(hondaEngine2)) KLine.writeRawData(hondaEngine_Response, 0);
+    else if (KLine.compareData(hondaEngine_LiveData1)) KLine.writeRawData(hondaEngine_LiveData1_R, 0);
+    else if (KLine.compareData(hondaEngine_LiveData2)) KLine.writeRawData(hondaEngine_LiveData2_R, 3);
+    else if (KLine.compareData(hondaEngine_LiveData3)) KLine.writeRawData(hondaEngine_LiveData3_R, 0);
+    else if (KLine.compareData(hondaEngine_LiveData4)) KLine.writeRawData(hondaEngine_LiveData4_R, 0);
+    else if (KLine.compareData(hondaEngine_LiveData5)) KLine.writeRawData(hondaEngine_LiveData5_R, 0);
+    else if (KLine.compareData(hondaEngine_LiveData6)) KLine.writeRawData(hondaEngine_LiveData6_R, 0);
+    else if (KLine.compareData(hondaEngine_LiveData7)) KLine.writeRawData(hondaEngine_LiveData7_R, 0);
+    else if (KLine.compareData(hondaEngine_LiveData8)) KLine.writeRawData(hondaEngine_LiveData8_R, 0);
+    else if (KLine.compareData(hondaEngine_LiveData9)) KLine.writeRawData(hondaEngine_LiveData9_R, 0);
+    else if (KLine.compareData(hondaEngine_ReadDTCs)) KLine.writeRawData(hondaEngine_ReadDTCs_R, 0);
+    else if (KLine.compareData(hondaEngine_ClearDTCs)) KLine.writeRawData(hondaEngine_ClearDTCs_R, 0);
+    //else if (KLine.compareData(hondaABS)) KLine.writeRawData(hondaABS_Response, false);
   }
 }

@@ -1,6 +1,6 @@
 #include "OBD2_KLine.h"
 
-OBD2_KLine::OBD2_KLine(SerialType &serialPort, uint32_t baudRate, uint8_t rxPin, uint8_t txPin)
+OBD2_KLine::OBD2_KLine(SerialType& serialPort, uint32_t baudRate, uint8_t rxPin, uint8_t txPin)
     : _serial(&serialPort), _rxPin(rxPin), _txPin(txPin), _baudRate(baudRate) {
   // Start serial
   setSerial(true);
@@ -47,7 +47,7 @@ bool OBD2_KLine::trySlowInit() {
 
   setSerial(false);
   delay(5500);
-  send5baud(slowInitByte);
+  send5baud(defaultInitAddress);
   setSerial(true);
 
   setInterByteTimeout(30);
@@ -81,6 +81,8 @@ bool OBD2_KLine::trySlowInit() {
 }
 
 bool OBD2_KLine::tryFastInit() {
+  // example Request: C1 33 F1 81 66
+  // example Response: 83 F1 11 C1 EF 8F C4
   debugPrintln(F("🔁 Trying ISO14230_Fast"));
 
   setSerial(false);
@@ -92,7 +94,7 @@ bool OBD2_KLine::tryFastInit() {
   delay(25);
 
   setSerial(true);
-  writeRawData(initMsg, sizeof(initMsg), 2);
+  writeData((uint8_t[]){0x81});
 
   if (!readData()) return false;
 
@@ -109,7 +111,7 @@ bool OBD2_KLine::tryFastInit() {
 
 // ----------------------------------- Basic Read/Write functions -----------------------------------
 
-void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t checksumType) {
+void OBD2_KLine::writeRawData(const uint8_t* dataArray, uint8_t length, uint8_t checksumType) {
   uint8_t totalLength = length;  // default no checksum
   uint8_t checksum = 0;
 
@@ -149,52 +151,52 @@ void OBD2_KLine::writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t 
 
   for (size_t i = 0; i < totalLength; i++) {
     _serial->write(sendData[i]);
-    delay(_byteWriteInterval);
+    if (i < totalLength - 1) delay(_byteWriteInterval);
   }
 
   clearEcho(totalLength);
 }
 
-void OBD2_KLine::writeData(uint8_t mode, uint8_t pid) {
-  uint8_t message[7] = {0};
-  size_t length = (mode == read_FreezeFrame || mode == test_OxygenSensors)                    ? 7 :
-                  (mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 5 :
-                                                                                                6;
+void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
+  uint8_t headerLength = 3;
+  uint8_t actualLengthByteCount = useLengthInHeader ? 0 : 1;
+  uint8_t fullDataLength = headerLength + actualLengthByteCount + dataLength + 1;  // +1 for checksum
+  uint8_t message[fullDataLength];
 
   if (connectedProtocol == "ISO9141") {
-    message[0] = (mode == read_FreezeFrame || mode == test_OxygenSensors) ? 0x69 : 0x68;
-    message[1] = 0x6A;
-  } else if (connectedProtocol == "ISO14230_Fast" || connectedProtocol == "ISO14230_Slow") {
-    message[0] = (mode == read_FreezeFrame || mode == test_OxygenSensors)                    ? 0xC3 :
-                 (mode == read_storedDTCs || mode == clear_DTCs || mode == read_pendingDTCs) ? 0xC1 :
-                                                                                               0xC2;
-    message[1] = 0x33;
+    memcpy(message, header_ISO9141, headerLength);
+  } else if (connectedProtocol == "ISO14230_Fast" || connectedProtocol == "ISO14230_Slow" || connectionStatus == false) {
+    memcpy(message, header_ISO14230_Fast, headerLength);
+
+    if (useLengthInHeader) {
+      message[0] += dataLength;
+    } else {
+      message[3] = dataLength;
+    }
   }
 
-  message[2] = 0xF1;
-  message[3] = mode;
-  if (length > 5) message[4] = pid;
-  if (length == 7) message[5] = 0x00;
+  uint8_t dataStartOffset = headerLength + actualLengthByteCount;
+  memcpy(&message[dataStartOffset], data, dataLength);
 
-  message[length - 1] = checksum8_Modulo256(message, length - 1);
+  message[fullDataLength - 1] = checksum8_Modulo256(message, fullDataLength - 1);
 
   debugPrint(F("\n➡️ Sending Data: "));
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; i < fullDataLength; i++) {
     debugPrintHex(message[i]);
     debugPrint(F(" "));
   }
   debugPrintln(F(""));
 
-  for (size_t i = 0; i < length; i++) {
+  for (size_t i = 0; i < fullDataLength; i++) {
     _serial->write(message[i]);
-    delay(_byteWriteInterval);
+    if (i < fullDataLength - 1) delay(_byteWriteInterval);
   }
 
-  clearEcho(length);
+  clearEcho(fullDataLength);
 }
 
 uint8_t OBD2_KLine::readData() {
-  debugPrintln(F("Reading..."));
+  debugPrint(F("Reading Data ... "));
   unsigned long startMillis = millis();
   int bytesRead = 0;
 
@@ -222,7 +224,8 @@ uint8_t OBD2_KLine::readData() {
         }
       }
 
-      debugPrintln(F("\n✅ Data reception completed."));
+      debugPrintln(F(""));
+      // debugPrintln(F("\n✅ Data reception completed."));
       return bytesRead;
     }
   }
@@ -233,23 +236,43 @@ uint8_t OBD2_KLine::readData() {
   return 0;
 }
 
-void OBD2_KLine::clearEcho(int length) {
-  int result = _serial->available();
-  if (result > 0) {
-    debugPrint(F("🗑️ Cleared Echo Data: "));
-    for (int i = 0; i < length; i++) {
-      uint8_t readedByte = _serial->read();
-      debugPrintHex(readedByte);
-      debugPrint(F(" "));
+void OBD2_KLine::clearEcho(uint8_t length) {
+  const unsigned long byteTimeoutMs = 100;
+
+  // Wait for the first byte
+  unsigned long startTime = millis();
+  while (_serial->available() == 0) {
+    if (millis() - startTime >= byteTimeoutMs) {
+      debugPrintln(F("❌ Echo not received"));
+      return;
     }
-    debugPrintln(F(""));
-    // debugPrintln(F("Echo Data Cleared"));
-  } else {
-    debugPrintln(F("❌ Not Received Echo Data"));
+    delayMicroseconds(100);
   }
+
+  // First byte received, now read the rest
+  debugPrint(F("🗑️ Cleared Echo Data: "));
+
+  uint8_t readedByte;
+  for (size_t readCount = 0; readCount < length; readCount++) {
+    startTime = millis();
+
+    while (_serial->available() == 0) {
+      if (millis() - startTime >= byteTimeoutMs) {
+        debugPrintln(F("\n❌ Echo incomplete"));
+        return;
+      }
+      delayMicroseconds(100);
+    }
+
+    readedByte = _serial->read();
+    debugPrintHex(readedByte);
+    debugPrint(F(" "));
+  }
+
+  debugPrintln(F(""));
 }
 
-bool OBD2_KLine::compareData(const uint8_t *dataArray, uint8_t length) {
+bool OBD2_KLine::compareData(const uint8_t* dataArray, uint8_t length) {
   for (size_t i = 0; i < length; i++) {
     if (dataArray[i] != resultBuffer[i]) {
       return false;
@@ -269,7 +292,14 @@ float OBD2_KLine::getFreezeFrame(uint8_t pid) {
 }
 
 float OBD2_KLine::getPID(uint8_t mode, uint8_t pid) {
-  writeData(mode, pid);
+  // example Request: C2 33 F1 01 0C F3
+  // example Response: 84 F1 11 41 0C 0D 58 38
+  if (mode == read_LiveData) {
+    writeData((uint8_t[]){mode, pid});
+  } else if (mode == read_FreezeFrame) {
+    writeData((uint8_t[]){mode, pid, 0x00});
+  }
+
   int len = readData();
 
   if (len <= 0) return -1;                // Data not received
@@ -457,7 +487,7 @@ uint8_t OBD2_KLine::readDTCs(uint8_t mode) {
   // example Response: 87 F1 11 43 01 70 01 34 00 00 72
   // example Response: 87 F1 11 43 00 00 CC
   int dtcCount = 0;
-  String *targetArray = nullptr;
+  String* targetArray = nullptr;
 
   if (mode == read_storedDTCs) {
     targetArray = storedDTCBuffer;
@@ -467,7 +497,7 @@ uint8_t OBD2_KLine::readDTCs(uint8_t mode) {
     return -1;  // Invalid mode
   }
 
-  writeData(mode, 0x00);
+  writeData((uint8_t[]){mode});
 
   int len = readData();
   if (len >= 3) {
@@ -495,7 +525,7 @@ String OBD2_KLine::getPendingDTC(uint8_t index) {
 }
 
 bool OBD2_KLine::clearDTCs() {
-  writeData(clear_DTCs, 0x00);
+  writeData((uint8_t[]){clear_DTCs});
   int len = readData();
   if (len >= 3) {
     if (resultBuffer[3] == 0x44) {
@@ -525,9 +555,9 @@ String OBD2_KLine::getVehicleInfo(uint8_t pid) {
     messageCount = 5;
   } else if (pid == 0x04 || pid == 0x06) {
     if (pid == 0x04) {
-      writeData(read_VehicleInfo, read_ID_Length);
+      writeData((uint8_t[]){read_VehicleInfo, read_ID_Length});
     } else if (pid == 0x06) {
-      writeData(read_VehicleInfo, read_ID_Num_Length);
+      writeData((uint8_t[]){read_VehicleInfo, read_ID_Num_Length});
     } else {
       return "";
     }
@@ -539,7 +569,7 @@ String OBD2_KLine::getVehicleInfo(uint8_t pid) {
     }
   }
 
-  writeData(read_VehicleInfo, pid);
+  writeData((uint8_t[]){read_VehicleInfo, pid});
 
   if (readData()) {
     for (int j = 0; j < messageCount; j++) {
@@ -592,7 +622,7 @@ uint8_t OBD2_KLine::readSupportedData(uint8_t mode) {
   int pidIndex = 0;
   int startByte = 0;
   int arraySize = 32;  // Size of supported data arrays
-  uint8_t *targetArray = nullptr;
+  uint8_t* targetArray = nullptr;
 
   if (mode == read_LiveData) {  // Mode 01
     startByte = 5;
@@ -622,7 +652,7 @@ uint8_t OBD2_KLine::readSupportedData(uint8_t mode) {
     // Group 0 is always processed, others must be checked
     if (n != 0 && !isInArray(targetArray, 32, pidCmds[n])) break;
 
-    writeData(mode, pidCmds[n]);
+    writeData((uint8_t[]){mode, pidCmds[n]});
     if (readData() && resultBuffer[3] == 0x40 + mode) {
       for (int i = 0; i < 4; i++) {
         uint8_t value = resultBuffer[i + startByte];
@@ -689,70 +719,95 @@ void OBD2_KLine::setReadTimeout(uint16_t timeoutMs) {
   _readTimeout = timeoutMs;
 }
 
-void OBD2_KLine::setProtocol(const String &protocolName) {
+void OBD2_KLine::setProtocol(const String& protocolName) {
   selectedProtocol = protocolName;
   connectionStatus = false;  // Reset connection status
   connectedProtocol = "";    // Reset connected protocol
-  debugPrintln(("Protocol set to: " + selectedProtocol).c_str());
+  debugPrint(F("Protocol set to: "));
+  debugPrintln((selectedProtocol).c_str());
+}
+
+void OBD2_KLine::setConnectionStatus(bool status) {
+  connectionStatus = status;
 }
 
 // 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
-uint8_t OBD2_KLine::read5baud() {
-  unsigned long t0 = millis();
-  while (digitalRead(_rxPin) == HIGH) {
-    if (millis() - t0 > 2000) return -1;
-  }
+int OBD2_KLine::read5baud() {
+  // debugPrintln(F("Waiting for 5-baud init..."));
+  setSerial(false);
+  const unsigned long THRESHOLD = 100000;
 
-  setSerial(false);  // Disable serial to read 5 baud data
+  // HIGH -> LOW (start bit decrease)
+  while (digitalRead(_rxPin) == HIGH);
 
-  uint8_t bits[10];
-  uint8_t data = 0;
-  int ones = 0;
-  delayMicroseconds(100000);
+  // debugPrintln(F("Transition detected. Measuring start bit... "));
+  unsigned long tStart = micros();
 
-  for (int i = 0; i < 10; i++) {  // bits: 0=start, 1..7=data, 8=parity, 9=stop
-    bits[i] = digitalRead(_rxPin) ? 1 : 0;
-
-    if (i >= 1 && i <= 7) {
-      data |= (bits[i] << (i - 1));  // save data bits
-      if (bits[i]) ones++;
-    } else if (i == 8) {  // parity bit
-      if (bits[i]) ones++;
-    } else if (i == 9) {  // stop bit
+  while (digitalRead(_rxPin) == LOW) {
+    if (micros() - tStart > THRESHOLD) {
+      // debugPrintln(F("✅ LOW > 100ms, 5-baud detected"));
       break;
     }
-
-    delayMicroseconds(200000);
   }
 
-  // Parity control (Odd)
-  if (ones % 2 == 0) {
-    debugPrintln(F("Parity error!"));
-    return -2;
+  if (digitalRead(_rxPin) == HIGH && (micros() - tStart <= THRESHOLD)) {
+    // debugPrintln(F("❌ No 5 Baud data detected."));
+    setSerial(true);
+    return -1;
   }
 
-  debugPrint(F("Received 5 Baud Data: "));
-  debugPrintln(String(data, HEX).c_str());
+  debugPrint(F("✅ Received 5 Baud data - "));
+  uint8_t bits[10];
 
-  setSerial(true);  // Re-enable serial after reading 5 baud data
+  delay(200);
+  for (int i = 1; i < 10; i++) {
+    bits[i] = digitalRead(_rxPin);
+    delay(200);
+  }
+
+  debugPrint(F("Bits: "));
+  for (int i = 0; i < 10; i++) {
+    debugPrint(bits[i] ? "1" : "0");
+  }
+
+  uint8_t data = 0;
+  int ones = 0;
+  for (int i = 1; i <= 7; i++) {
+    data |= (bits[i] << (i - 1));
+    if (bits[i]) ones++;
+  }
+  if (bits[8]) ones++;
+
+  debugPrint(F(", DATA: 0x"));
+  debugPrintHex(data);
+
+  if ((ones & 1) == 0)
+    debugPrintln(F(", ❌ Parity ERROR (odd expected)"));
+  else
+    debugPrintln(F(", ✅ Parity OK"));
+  // debugPrintln();
+  setSerial(true);
+
   return data;
 }
 
 // 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
 void OBD2_KLine::send5baud(uint8_t data) {
-  uint8_t even = 1;  // for calculating parity bit
   uint8_t bits[10];
-
   bits[0] = 0;  // start bit
   bits[9] = 1;  // stop bit
 
-  // 7-bit data and parity calculation
-  for (int i = 1; i <= 7; i++) {
-    bits[i] = (data >> (i - 1)) & 1;
-    even ^= bits[i];
+  // 7-bit data
+  for (int i = 0; i < 7; i++) {
+    bits[i + 1] = (data >> i) & 1;
   }
 
-  bits[8] = (even == 0) ? 1 : 0;  // parity bit
+  // Odd parity calculation
+  uint8_t ones = 0;
+  for (int i = 1; i <= 7; i++) {
+    if (bits[i]) ones++;
+  }
+  bits[8] = (ones % 2 == 0) ? 1 : 0;  // parity bit
 
   debugPrint(F("➡️ 5 Baud Init for Module 0x"));
   debugPrintHex(data);
@@ -770,7 +825,7 @@ void OBD2_KLine::send5baud(uint8_t data) {
   debugPrintln(F(""));
 }
 
-uint8_t OBD2_KLine::checksum8_XOR(const uint8_t *dataArray, int length) {
+uint8_t OBD2_KLine::checksum8_XOR(const uint8_t* dataArray, int length) {
   uint8_t checksum = 0;
   for (int i = 0; i < length; i++) {
     checksum ^= dataArray[i];  // XOR operation
@@ -778,15 +833,15 @@ uint8_t OBD2_KLine::checksum8_XOR(const uint8_t *dataArray, int length) {
   return checksum;
 }
 
-uint8_t OBD2_KLine::checksum8_Modulo256(const uint8_t *dataArray, int length) {
+uint8_t OBD2_KLine::checksum8_Modulo256(const uint8_t* dataArray, int length) {
   unsigned int sum = 0;
   for (int i = 0; i < length; i++) {
     sum += dataArray[i];
   }
-  return (byte)(sum % 256);  // veya (byte)sum; çünkü uint8_t overflow da mod 256 etkisi verir
+  return (byte)(sum % 256);  // or (byte)sum; because uint8_t overflow also gives a mod 256 effect.
 }
 
-uint8_t OBD2_KLine::checksum8_TwosComplement(const uint8_t *dataArray, int length) {
+uint8_t OBD2_KLine::checksum8_TwosComplement(const uint8_t* dataArray, int length) {
   unsigned int sum = 0;
   for (int i = 0; i < length; i++) {
     sum += dataArray[i];
@@ -809,7 +864,7 @@ String OBD2_KLine::decodeDTC(uint8_t input_byte1, uint8_t input_byte2) {
   return ErrorCode;
 }
 
-bool OBD2_KLine::isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value) {
+bool OBD2_KLine::isInArray(const uint8_t* dataArray, uint8_t length, uint8_t value) {
   for (int i = 0; i < length; i++) {
     if (dataArray[i] == value) {
       return true;
@@ -818,7 +873,7 @@ bool OBD2_KLine::isInArray(const uint8_t *dataArray, uint8_t length, uint8_t val
   return false;
 }
 
-String OBD2_KLine::convertHexToAscii(const uint8_t *dataArray, uint8_t length) {
+String OBD2_KLine::convertHexToAscii(const uint8_t* dataArray, uint8_t length) {
   String asciiString = "";
   for (int i = 0; i < length; i++) {
     uint8_t b = dataArray[i];
@@ -829,7 +884,7 @@ String OBD2_KLine::convertHexToAscii(const uint8_t *dataArray, uint8_t length) {
   return asciiString;
 }
 
-String OBD2_KLine::convertBytesToHexString(const uint8_t *dataArray, uint8_t length) {
+String OBD2_KLine::convertBytesToHexString(const uint8_t* dataArray, uint8_t length) {
   String hexString = "";
   for (int i = 0; i < length; i++) {
     if (dataArray[i] < 0x10) hexString += "0";  // Pad leading zero
@@ -841,23 +896,23 @@ String OBD2_KLine::convertBytesToHexString(const uint8_t *dataArray, uint8_t len
 
 // ----------------------------------- Debug Functions -----------------------------------
 
-void OBD2_KLine::setDebug(Stream &serial) {
+void OBD2_KLine::setDebug(Stream& serial) {
   _debugSerial = &serial;
 }
 
-void OBD2_KLine::debugPrint(const char *msg) {
+void OBD2_KLine::debugPrint(const char* msg) {
   if (_debugSerial) _debugSerial->print(msg);
 }
 
-void OBD2_KLine::debugPrint(const __FlashStringHelper *msg) {
+void OBD2_KLine::debugPrint(const __FlashStringHelper* msg) {
   if (_debugSerial) _debugSerial->print(msg);
 }
 
-void OBD2_KLine::debugPrintln(const char *msg) {
+void OBD2_KLine::debugPrintln(const char* msg) {
   if (_debugSerial) _debugSerial->println(msg);
 }
 
-void OBD2_KLine::debugPrintln(const __FlashStringHelper *msg) {
+void OBD2_KLine::debugPrintln(const __FlashStringHelper* msg) {
   if (_debugSerial) _debugSerial->println(msg);
 }
 
@@ -873,4 +928,31 @@ void OBD2_KLine::debugPrintHexln(uint8_t val) {
     debugPrintHex(val);
     _debugSerial->println();
   }
+}
+
+void OBD2_KLine::setInitAddress(uint8_t address) {
+  defaultInitAddress = address;
+  // ISO14230 Header'ındaki hedef adresini de otomatik güncellemek isteyebilirsiniz:
+  header_ISO14230_Fast[1] = address;
+  debugPrint(F("✅ New Init Address set to: "));
+  debugPrintHex(address);
+  debugPrintln(F(""));
+}
+
+void OBD2_KLine::setISO9141Header(uint8_t h1, uint8_t h2, uint8_t h3) {
+  header_ISO9141[0] = h1;
+  header_ISO9141[1] = h2;
+  header_ISO9141[2] = h3;
+  debugPrintln(F("✅ ISO9141 Header Updated."));
+}
+
+void OBD2_KLine::setISO14230Header(uint8_t h1, uint8_t h2, uint8_t h3) {
+  header_ISO14230_Fast[0] = h1;
+  header_ISO14230_Fast[1] = h2;
+  header_ISO14230_Fast[2] = h3;
+  debugPrintln(F("✅ ISO14230 Header Updated."));
+}
+
+void OBD2_KLine::setLengthMode(bool inHeader) {
+  useLengthInHeader = inHeader;
 }

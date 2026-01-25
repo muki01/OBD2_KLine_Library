@@ -35,22 +35,37 @@ const uint8_t read_ID = 0x04;             // Read Calibration ID
 const uint8_t read_ID_Num_Length = 0x05;  // Read Calibration ID Number Length
 const uint8_t read_ID_Num = 0x06;         // Read Calibration ID Number
 
-
 class OBD2_KLine {
  public:
-  OBD2_KLine(SerialType &serialStream, uint32_t baudRate, uint8_t rxPin, uint8_t txPin);
+  OBD2_KLine(SerialType& serialStream, uint32_t baudRate, uint8_t rxPin, uint8_t txPin);
 
-  void setDebug(Stream &serial);
+  void setDebug(Stream& serial);
   void setSerial(bool enabled);
   bool initOBD2();
   bool trySlowInit();
   bool tryFastInit();
-  void writeData(uint8_t mode, uint8_t pid);
-  void writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t checksumType);
+  void writeRawData(const uint8_t* dataArray, uint8_t length, uint8_t checksumType);
+  void writeData(const uint8_t* data, uint8_t length);
+
+  template <size_t N>
+  void writeData(const uint8_t (&dataArray)[N]) {
+    writeData(dataArray, N);
+  }
+
+  template <size_t N>
+  void writeRawData(const uint8_t (&dataArray)[N], uint8_t checksumType) {
+    writeRawData(dataArray, N, checksumType);
+  }
+
+  template <size_t N>
+  bool compareData(const uint8_t (&dataArray)[N]) {
+    return compareData(dataArray, N);
+  }
+
   uint8_t readData();
-  bool compareData(const uint8_t *dataArray, uint8_t length);
+  bool compareData(const uint8_t* dataArray, uint8_t length);
   void send5baud(uint8_t data);
-  uint8_t read5baud();
+  int read5baud();
 
   float getPID(uint8_t mode, uint8_t pid);
   float getLiveData(uint8_t pid);
@@ -78,18 +93,26 @@ class OBD2_KLine {
   void setByteWriteInterval(uint16_t interval);
   void setInterByteTimeout(uint16_t interval);
   void setReadTimeout(uint16_t timeoutMs);
-  void setProtocol(const String &protocolName);
+  void setProtocol(const String& protocolName);
   void updateConnectionStatus(bool messageReceived);
+  void setConnectionStatus(bool status);
 
-  uint8_t initMsg[4] = {0xC1, 0x33, 0xF1, 0x81};  // ISO14230-Fast init message
-  uint8_t slowInitByte = 0x33;                    // ISO9141/ISO14230-Slow init byte
+  void setInitAddress(uint8_t address);
+  void setISO9141Header(uint8_t h1, uint8_t h2, uint8_t h3);
+  void setISO14230Header(uint8_t h1, uint8_t h2, uint8_t h3);
+  void setLengthMode(bool inHeader);
 
  private:
-  SerialType *_serial;
+  SerialType* _serial;
   uint32_t _baudRate;
   uint8_t _rxPin;
   uint8_t _txPin;
-  Stream *_debugSerial = nullptr;  // Debug serial port
+  Stream* _debugSerial = nullptr;  // Debug serial port
+
+  uint8_t defaultInitAddress = 0x33;
+  uint8_t header_ISO9141[3] = {0x68, 0x6A, 0xF1};
+  uint8_t header_ISO14230_Fast[3] = {0xC0, 0x33, 0xF1};
+  bool useLengthInHeader = true;
 
   uint8_t resultBuffer[160] = {0};
   uint8_t unreceivedDataCount = 0;
@@ -110,19 +133,19 @@ class OBD2_KLine {
   uint8_t supportedControlComponents[32];
   uint8_t supportedVehicleInfo[32];
 
-  uint8_t checksum8_XOR(const uint8_t *dataArray, int length);
-  uint8_t checksum8_Modulo256(const uint8_t *dataArray, int length);
-  uint8_t checksum8_TwosComplement(const uint8_t *dataArray, int length);
+  uint8_t checksum8_XOR(const uint8_t* dataArray, int length);
+  uint8_t checksum8_Modulo256(const uint8_t* dataArray, int length);
+  uint8_t checksum8_TwosComplement(const uint8_t* dataArray, int length);
 
   String decodeDTC(uint8_t input_byte1, uint8_t input_byte2);
-  bool isInArray(const uint8_t *dataArray, uint8_t length, uint8_t value);
-  String convertBytesToHexString(const uint8_t *dataArray, uint8_t length);
-  String convertHexToAscii(const uint8_t *dataArray, uint8_t length);
-  void clearEcho(int length);
-  void debugPrint(const char *msg);
-  void debugPrint(const __FlashStringHelper *msg);
-  void debugPrintln(const char *msg);
-  void debugPrintln(const __FlashStringHelper *msg);
+  bool isInArray(const uint8_t* dataArray, uint8_t length, uint8_t value);
+  String convertBytesToHexString(const uint8_t* dataArray, uint8_t length);
+  String convertHexToAscii(const uint8_t* dataArray, uint8_t length);
+  void clearEcho(uint8_t length);
+  void debugPrint(const char* msg);
+  void debugPrint(const __FlashStringHelper* msg);
+  void debugPrintln(const char* msg);
+  void debugPrintln(const __FlashStringHelper* msg);
   void debugPrintHex(uint8_t val);    // Hexadecimal output
   void debugPrintHexln(uint8_t val);  // Hexadecimal + newline
 };

@@ -5,20 +5,19 @@
 AltSoftSerial Alt_Serial;
 OBD2_KLine KLine(Alt_Serial, 10400, 8, 9);  // Uses AltSoftSerial at 10400 baud, with RX on pin 8 and TX on pin 9.
 #elif defined(ESP32)
-OBD2_KLine KLine(Serial1, 10400, 10, 11);  // Uses Hardware Serial (Serial1) at 10400 baud, with RX on pin 10 and TX on pin 11.
+OBD2_KLine KLine(Serial1, 9600, 10, 11);  // Uses Hardware Serial (Serial1) at 10400 baud, with RX on pin 10 and TX on pin 11.
 #else
 #error "Unsupported board! This library currently supports Arduino Uno, Nano, Mega, and ESP32. Please select a compatible board in your IDE."
 #endif
 
 void setup() {
   Serial.begin(115200);  // Start the default serial (for logging/debugging)
-  Serial.println("OBD2 K-Line Clear DTC Example");
+  Serial.println("OBD2 K-Line Sniffing Example");
 
-  KLine.setDebug(Serial);          // Optional: outputs debug messages to the selected serial port
-  KLine.setProtocol("Automatic");  // Optional: communication protocol (default: Automatic; supported: ISO9141, ISO14230_Slow, ISO14230_Fast, Automatic)
-  KLine.setByteWriteInterval(5);   // Optional: delay (ms) between bytes when writing
-  KLine.setInterByteTimeout(60);   // Optional: sets the maximum inter-byte timeout (ms) while receiving data
-  KLine.setReadTimeout(1000);      // Optional: maximum time (ms) to wait for a response after sending a request
+  KLine.setDebug(Serial);         // Optional: outputs debug messages to the selected serial port
+  KLine.setByteWriteInterval(5);  // Optional: delay (ms) between bytes when writing
+  KLine.setInterByteTimeout(20);  // Optional: sets the maximum inter-byte timeout (ms) while receiving data
+  KLine.setReadTimeout(1000);     // Optional: maximum time (ms) to wait for a response after sending a request
 
   KLine.setInitAddress(0x33);                 // Optional: Sets the target ECU address used during the 5-baud Slow Init sequence.
   KLine.setISO9141Header(0x68, 0x6A, 0xF1);   // Optional: Configures the 3-byte header (Priority, Receiver, Transmitter) for ISO9141.
@@ -29,9 +28,7 @@ void setup() {
 }
 
 void loop() {
-  // Attempt to initialize OBD2 communication
-  if (KLine.initOBD2()) {
-    KLine.clearDTCs();  // Clear Diagnostic Trouble Codes (DTCs)
-    delay(1000);
-  }
+  // int result = KLine.read5baud();
+  // if (result < 0) KLine.readData();
+  KLine.readData();
 }

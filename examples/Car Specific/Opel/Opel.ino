@@ -17,33 +17,38 @@ int kw81_Stage = 0;
 void setup() {
   Serial.begin(115200);  // Start the default serial (for logging/debugging)
 
-  KLine.setDebug(Serial);  // Optional: outputs debug messages to the selected serial port
-  //KLine.setProtocol("ISO14230_Fast");  // Optional: communication protocol (default: Automatic; supported: ISO9141, ISO14230_Slow, ISO14230_Fast, Automatic)
-  KLine.setByteWriteInterval(5);  // Optional: delay (ms) between bytes when writing
-  KLine.setInterByteTimeout(60);  // Optional: sets the maximum inter-byte timeout (ms) while receiving data
-  KLine.setReadTimeout(1000);     // Optional: maximum time (ms) to wait for a response after sending a request
+  KLine.setDebug(Serial);              // Optional: outputs debug messages to the selected serial port
+  KLine.setProtocol("ISO14230_Fast");  // Optional: communication protocol (default: Automatic; supported: ISO9141, ISO14230_Slow, ISO14230_Fast, Automatic)
+  KLine.setByteWriteInterval(5);       // Optional: delay (ms) between bytes when writing
+  KLine.setInterByteTimeout(60);       // Optional: sets the maximum inter-byte timeout (ms) while receiving data
+  KLine.setReadTimeout(1000);          // Optional: maximum time (ms) to wait for a response after sending a request
+
+  //KLine.setInitAddress(0x33);                 // Optional: Sets the target ECU address used during the 5-baud Slow Init sequence.
+  //KLine.setISO9141Header(0x68, 0x6A, 0xF1);   // Optional: Configures the 3-byte header (Priority, Receiver, Transmitter) for ISO9141.
+  KLine.setISO14230Header(0x80, 0x11, 0xF1);  // Optional: Configures the 3-byte header (Format, Receiver, Transmitter) for KWP2000.
+  //KLine.setLengthMode(true);                  // Optional: Defines if data length is embedded in the header or sent as a separate byte.
 
   Serial.println("Opel Code.");
 }
 
 void loop() {
-  //Opel_Vectra_Test1();
+  //KLine.read5baud();
+  Opel_Vectra_Test1();
   //Opel_Vectra_Test2();
 
-  Opel_Vectra_Simulator1();
+  //Opel_Vectra_Simulator1();  //Engine and Immobilizer
   //Opel_Vectra_Simulator2();  //Instrument Cluster Simulator (Select 4800 Baud)
 }
 
 void Opel_Vectra_Test1() {
   if (KLine.initOBD2()) {
-    KLine.writeRawData(imoKeepalive, sizeof(imoKeepalive), 2), KLine.readData();
-    KLine.writeRawData(imoReadLiveData, sizeof(imoReadLiveData), 2), KLine.readData();
+    KLine.writeRawData(engineReadLiveData1, 2), KLine.readData();
+    KLine.writeRawData(engineReadLiveData2, 2), KLine.readData();
+    KLine.writeRawData(engineReadLiveData3, 2), KLine.readData();
 
-    KLine.writeRawData(imoKeepalive, sizeof(imoKeepalive), 2), KLine.readData();
-    KLine.writeRawData(imoReadDTCs, sizeof(imoReadDTCs), 2), KLine.readData();
-
-    KLine.writeRawData(imoKeepalive, sizeof(imoKeepalive), 2), KLine.readData();
-    KLine.writeRawData(imoClearDTCs, sizeof(imoClearDTCs), 2), KLine.readData();
+    // KLine.writeRawData(imoReadLiveData, 2), KLine.readData();
+    // KLine.writeRawData(imoReadDTCs, 2), KLine.readData();
+    // KLine.writeRawData(imoClearDTCs, 2), KLine.readData();
   }
 }
 
@@ -56,17 +61,17 @@ void Opel_Vectra_Test2() {
 
 void Opel_Vectra_Simulator1() {
   if (KLine.readData()) {
-    if (KLine.compareData(engineInit0, sizeof(engineInit0)) || KLine.compareData(engineInit, sizeof(engineInit))) KLine.writeRawData(engineInit_Response, sizeof(engineInit_Response), 2);
-    else if (KLine.compareData(engineCheckConnection, sizeof(engineCheckConnection))) KLine.writeRawData(engineCheckConnection_Response, sizeof(engineCheckConnection_Response), 2);
-    else if (KLine.compareData(engineReadLiveData1, sizeof(engineReadLiveData1))) KLine.writeRawData(engineReadLiveData1_Response, sizeof(engineReadLiveData1_Response), 2);
-    else if (KLine.compareData(engineReadLiveData2, sizeof(engineReadLiveData2))) KLine.writeRawData(engineReadLiveData2_Response, sizeof(engineReadLiveData2_Response), 2);
-    else if (KLine.compareData(engineReadLiveData3, sizeof(engineReadLiveData3))) KLine.writeRawData(engineReadLiveData3_Response, sizeof(engineReadLiveData3_Response), 2);
+    if (KLine.compareData(engineInit0) || KLine.compareData(engineInit)) KLine.writeRawData(engineInit_Response, 2);
+    else if (KLine.compareData(engineCheckConnection)) KLine.writeRawData(engineCheckConnection_Response, 2);
+    else if (KLine.compareData(engineReadLiveData1)) KLine.writeRawData(engineReadLiveData1_Response, 2);
+    else if (KLine.compareData(engineReadLiveData2)) KLine.writeRawData(engineReadLiveData2_Response, 2);
+    else if (KLine.compareData(engineReadLiveData3)) KLine.writeRawData(engineReadLiveData3_Response, 2);
 
-    if (KLine.compareData(imoInit0, sizeof(imoInit0))) KLine.writeRawData(imoInit_Response, sizeof(imoInit_Response), 2);
-    else if (KLine.compareData(imoKeepalive, sizeof(imoKeepalive))) KLine.writeRawData(imoKeepalive_Response, sizeof(imoKeepalive_Response), 2);
-    else if (KLine.compareData(imoReadLiveData, sizeof(imoReadLiveData))) KLine.writeRawData(imoReadLiveData_Response, sizeof(imoReadLiveData_Response), 2);
-    else if (KLine.compareData(imoReadDTCs, sizeof(imoReadDTCs))) KLine.writeRawData(imoReadDTCs_Response, sizeof(imoReadDTCs_Response), 2);
-    else if (KLine.compareData(imoClearDTCs, sizeof(imoClearDTCs))) KLine.writeRawData(imoClearDTCs_Response2, sizeof(imoClearDTCs_Response2), 2);
+    if (KLine.compareData(imoInit0)) KLine.writeRawData(imoInit_Response, 2);
+    else if (KLine.compareData(imoKeepalive)) KLine.writeRawData(imoKeepalive_Response, 2);
+    else if (KLine.compareData(imoReadLiveData)) KLine.writeRawData(imoReadLiveData_Response, 2);
+    else if (KLine.compareData(imoReadDTCs)) KLine.writeRawData(imoReadDTCs_Response, 2);
+    else if (KLine.compareData(imoClearDTCs)) KLine.writeRawData(imoClearDTCs_Response2, 2);
   }
 }
 
@@ -74,17 +79,17 @@ void Opel_Vectra_Simulator2() {
   if (connectionStatus == false) {
     if (KLine.read5baud() == 0x60) {
       connectionStatus = true;
-      KLine.writeRawData(instumentClusterInit_Response, sizeof(instumentClusterInit_Response), 0);
+      KLine.writeRawData(instumentClusterInit_Response, 0);
     }
   }
   if (connectionStatus == true) {
-    if (kw81_Stage == 0) KLine.writeRawData(instumentClusterECUID_Response, sizeof(instumentClusterECUID_Response), 0);
-    else if (kw81_Stage == 1) KLine.writeRawData(instumentClusterLiveData_Response, sizeof(instumentClusterLiveData_Response), 0);
+    if (kw81_Stage == 0) KLine.writeRawData(instumentClusterECUID_Response, 0);
+    else if (kw81_Stage == 1) KLine.writeRawData(instumentClusterLiveData_Response, 0);
     else if (kw81_Stage == 2) {}
 
     if (KLine.readData()) {
-      if (KLine.compareData(instumentClusterLiveData, sizeof(instumentClusterLiveData))) kw81_Stage = 1;
-      else if (KLine.compareData(instumentClusterClearDTC, sizeof(instumentClusterClearDTC))) kw81_Stage = 2;
+      if (KLine.compareData(instumentClusterLiveData)) kw81_Stage = 1;
+      else if (KLine.compareData(instumentClusterClearDTC)) kw81_Stage = 2;
     }
   }
 }
