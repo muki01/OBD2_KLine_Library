@@ -24,17 +24,17 @@ void OBD2_KLine::setSerial(bool enabled) {
   }
 }
 
-bool OBD2_KLine::initOBD2(uint8_t moduleAddress) {
+bool OBD2_KLine::initOBD2() {
   if (connectionStatus) return true;
 
   debugPrintln(F("Initializing OBD2..."));
 
   if (selectedProtocol == "Automatic" || selectedProtocol == "ISO14230_Slow" || selectedProtocol == "ISO9141") {
-    if (trySlowInit(moduleAddress)) return true;
+    if (trySlowInit()) return true;
   }
 
   if (selectedProtocol == "Automatic" || selectedProtocol == "ISO14230_Fast") {
-    if (tryFastInit(moduleAddress)) return true;
+    if (tryFastInit()) return true;
   }
 
   debugPrintln(F("❌ No Protocol Matched. Initialization Failed."));
@@ -42,12 +42,12 @@ bool OBD2_KLine::initOBD2(uint8_t moduleAddress) {
   return false;
 }
 
-bool OBD2_KLine::trySlowInit(uint8_t moduleAddress) {
+bool OBD2_KLine::trySlowInit() {
   debugPrintln(F("🔁 Trying ISO9141 / ISO14230_Slow"));
 
   setSerial(false);
   delay(5500);
-  send5baud(moduleAddress);
+  send5baud(defaultInitAddress);
   setSerial(true);
 
   setInterByteTimeout(30);
@@ -80,8 +80,8 @@ bool OBD2_KLine::trySlowInit(uint8_t moduleAddress) {
   }
 }
 
-bool OBD2_KLine::tryFastInit(uint8_t moduleAddress) {
   // 83 F1 11 C1 EF 8F C4
+bool OBD2_KLine::tryFastInit() {
   debugPrintln(F("🔁 Trying ISO14230_Fast"));
 
   setSerial(false);
@@ -92,7 +92,6 @@ bool OBD2_KLine::tryFastInit(uint8_t moduleAddress) {
   digitalWrite(_txPin, HIGH);
   delay(25);
 
-  initMsg[1] = moduleAddress;
   setSerial(true);
   writeData((uint8_t[]){0x81});
 

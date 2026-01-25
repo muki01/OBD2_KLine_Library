@@ -35,17 +35,12 @@ const uint8_t read_ID = 0x04;             // Read Calibration ID
 const uint8_t read_ID_Num_Length = 0x05;  // Read Calibration ID Number Length
 const uint8_t read_ID_Num = 0x06;         // Read Calibration ID Number
 
-const uint8_t defaultInitAddress = 0x33;
-
 class OBD2_KLine {
  public:
   OBD2_KLine(SerialType &serialStream, uint32_t baudRate, uint8_t rxPin, uint8_t txPin);
 
   void setDebug(Stream &serial);
   void setSerial(bool enabled);
-  bool initOBD2(uint8_t moduleAddress = defaultInitAddress);
-  bool trySlowInit(uint8_t moduleAddress = defaultInitAddress);
-  bool tryFastInit(uint8_t moduleAddress = defaultInitAddress);
   void writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t checksumType);
   void writeData(const uint8_t* data, uint8_t length);
 
