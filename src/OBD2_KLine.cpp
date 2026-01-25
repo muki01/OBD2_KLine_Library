@@ -793,19 +793,21 @@ int OBD2_KLine::read5baud() {
 
 // 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
 void OBD2_KLine::send5baud(uint8_t data) {
-  uint8_t even = 1;  // for calculating parity bit
   uint8_t bits[10];
-
   bits[0] = 0;  // start bit
   bits[9] = 1;  // stop bit
 
-  // 7-bit data and parity calculation
-  for (int i = 1; i <= 7; i++) {
-    bits[i] = (data >> (i - 1)) & 1;
-    even ^= bits[i];
+  // 7-bit data
+  for (int i = 0; i < 7; i++) {
+    bits[i + 1] = (data >> i) & 1;
   }
 
-  bits[8] = (even == 0) ? 1 : 0;  // parity bit
+  // Odd parity calculation
+  uint8_t ones = 0;
+  for (int i = 1; i <= 7; i++) {
+    if (bits[i]) ones++;
+  }
+  bits[8] = (ones % 2 == 0) ? 1 : 0;  // parity bit
 
   debugPrint(F("➡️ 5 Baud Init for Module 0x"));
   debugPrintHex(data);
