@@ -727,6 +727,10 @@ void OBD2_KLine::setProtocol(const String& protocolName) {
   debugPrintln((selectedProtocol).c_str());
 }
 
+void OBD2_KLine::setConnectionStatus(bool status) {
+  connectionStatus = status;
+}
+
 // 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
 int OBD2_KLine::read5baud() {
   // debugPrintln(F("Waiting for 5-baud init..."));

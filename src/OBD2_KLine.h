@@ -85,6 +85,7 @@ class OBD2_KLine {
   void setReadTimeout(uint16_t timeoutMs);
   void setProtocol(const String& protocolName);
   void updateConnectionStatus(bool messageReceived);
+  void setConnectionStatus(bool status);
 
   void setInitAddress(uint8_t address);
   void setISO9141Header(uint8_t h1, uint8_t h2, uint8_t h3);
