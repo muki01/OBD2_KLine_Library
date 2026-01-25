@@ -23,10 +23,10 @@ void setup() {
   KLine.setInterByteTimeout(60);       // Optional: sets the maximum inter-byte timeout (ms) while receiving data
   KLine.setReadTimeout(1000);          // Optional: maximum time (ms) to wait for a response after sending a request
 
-  KLine.setInitAddress(0x33);                 // Optional: Sets the target ECU address used during the 5-baud Slow Init sequence.
-  KLine.setISO9141Header(0x68, 0x6A, 0xF1);   // Optional: Configures the 3-byte header (Priority, Receiver, Transmitter) for ISO9141.
-  KLine.setISO14230Header(0xC0, 0x33, 0xF1);  // Optional: Configures the 3-byte header (Format, Receiver, Transmitter) for KWP2000.
-  KLine.setLengthMode(true);                  // Optional: Defines if data length is embedded in the header or sent as a separate byte.
+  //KLine.setInitAddress(0x33);                 // Optional: Sets the target ECU address used during the 5-baud Slow Init sequence.
+  //KLine.setISO9141Header(0x68, 0x6A, 0xF1);   // Optional: Configures the 3-byte header (Priority, Receiver, Transmitter) for ISO9141.
+  KLine.setISO14230Header(0x80, 0x11, 0xF1);  // Optional: Configures the 3-byte header (Format, Receiver, Transmitter) for KWP2000.
+  //KLine.setLengthMode(true);                  // Optional: Defines if data length is embedded in the header or sent as a separate byte.
 
   Serial.println("Opel Code.");
 }
