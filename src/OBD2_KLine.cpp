@@ -196,7 +196,7 @@ void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
 }
 
 uint8_t OBD2_KLine::readData() {
-  debugPrintln(F("Reading..."));
+  debugPrint(F("Reading Data ... "));
   unsigned long startMillis = millis();
   int bytesRead = 0;
 
@@ -224,7 +224,8 @@ uint8_t OBD2_KLine::readData() {
         }
       }
 
-      debugPrintln(F("\n✅ Data reception completed."));
+      debugPrintln(F(""));
+      // debugPrintln(F("\n✅ Data reception completed."));
       return bytesRead;
     }
   }
@@ -722,7 +723,8 @@ void OBD2_KLine::setProtocol(const String& protocolName) {
   selectedProtocol = protocolName;
   connectionStatus = false;  // Reset connection status
   connectedProtocol = "";    // Reset connected protocol
-  debugPrintln(("Protocol set to: " + selectedProtocol).c_str());
+  debugPrint(F("Protocol set to: "));
+  debugPrintln((selectedProtocol).c_str());
 }
 
 // 5 Baud 7O1 (1 start, 7 data, 1 parity, 1 stop)
