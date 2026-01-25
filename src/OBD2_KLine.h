@@ -52,6 +52,16 @@ class OBD2_KLine {
     writeData(dataArray, N);
   }
 
+  template <size_t N>
+  void writeRawData(const uint8_t (&dataArray)[N], uint8_t checksumType) {
+    writeRawData(dataArray, N, checksumType);
+  }
+
+  template <size_t N>
+  bool compareData(const uint8_t (&dataArray)[N]) {
+    return compareData(dataArray, N);
+  }
+
   uint8_t readData();
   bool compareData(const uint8_t* dataArray, uint8_t length);
   void send5baud(uint8_t data);
