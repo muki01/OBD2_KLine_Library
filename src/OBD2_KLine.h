@@ -42,6 +42,9 @@ class OBD2_KLine {
   void setDebug(Stream &serial);
   void setSerial(bool enabled);
   void writeRawData(const uint8_t *dataArray, uint8_t length, uint8_t checksumType);
+  bool initOBD2();
+  bool trySlowInit();
+  bool tryFastInit();
   void writeData(const uint8_t* data, uint8_t length);
 
   template <size_t N>
