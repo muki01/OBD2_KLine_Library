@@ -896,3 +896,30 @@ void OBD2_KLine::debugPrintHexln(uint8_t val) {
     _debugSerial->println();
   }
 }
+
+void OBD2_KLine::setInitAddress(uint8_t address) {
+  defaultInitAddress = address;
+  // ISO14230 Header'ındaki hedef adresini de otomatik güncellemek isteyebilirsiniz:
+  header_ISO14230_Fast[1] = address;
+  debugPrint(F("✅ New Init Address set to: "));
+  debugPrintHex(address);
+  debugPrintln(F(""));
+}
+
+void OBD2_KLine::setISO9141Header(uint8_t h1, uint8_t h2, uint8_t h3) {
+  header_ISO9141[0] = h1;
+  header_ISO9141[1] = h2;
+  header_ISO9141[2] = h3;
+  debugPrintln(F("✅ ISO9141 Header Updated."));
+}
+
+void OBD2_KLine::setISO14230Header(uint8_t h1, uint8_t h2, uint8_t h3) {
+  header_ISO14230_Fast[0] = h1;
+  header_ISO14230_Fast[1] = h2;
+  header_ISO14230_Fast[2] = h3;
+  debugPrintln(F("✅ ISO14230 Header Updated."));
+}
+
+void OBD2_KLine::setLengthMode(bool inHeader) {
+  useLengthInHeader = inHeader;
+}

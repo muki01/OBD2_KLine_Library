@@ -91,6 +91,11 @@ class OBD2_KLine {
   uint8_t _txPin;
   Stream *_debugSerial = nullptr;  // Debug serial port
 
+  uint8_t defaultInitAddress = 0x33;
+  uint8_t header_ISO9141[3] = {0x68, 0x6A, 0xF1};
+  uint8_t header_ISO14230_Fast[3] = {0xC0, 0x33, 0xF1};
+  bool useLengthInHeader = true;
+
   uint8_t resultBuffer[160] = {0};
   uint8_t unreceivedDataCount = 0;
   bool connectionStatus = false;
