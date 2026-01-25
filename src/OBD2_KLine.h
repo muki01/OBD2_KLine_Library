@@ -89,6 +89,10 @@ class OBD2_KLine {
   void updateConnectionStatus(bool messageReceived);
 
   uint8_t initMsg[4] = {0xC1, defaultInitAddress, 0xF1, 0x81};  // ISO14230-Fast init message
+  void setInitAddress(uint8_t address);
+  void setISO9141Header(uint8_t h1, uint8_t h2, uint8_t h3);
+  void setISO14230Header(uint8_t h1, uint8_t h2, uint8_t h3);
+  void setLengthMode(bool inHeader);
 
  private:
   SerialType *_serial;
