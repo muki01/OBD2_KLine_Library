@@ -956,3 +956,7 @@ void OBD2_KLine::setISO14230Header(uint8_t h1, uint8_t h2, uint8_t h3) {
 void OBD2_KLine::setLengthMode(bool inHeader) {
   useLengthInHeader = inHeader;
 }
+
+void OBD2_KLine::setChecksumType(uint8_t checksum) {
+  checksumType = checksum;
+}
