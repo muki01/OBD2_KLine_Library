@@ -160,7 +160,8 @@ void OBD2_KLine::writeRawData(const uint8_t* dataArray, uint8_t length, uint8_t 
 void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
   uint8_t headerLength = 3;
   uint8_t actualLengthByteCount = useLengthInHeader ? 0 : 1;
-  uint8_t fullDataLength = headerLength + actualLengthByteCount + dataLength + 1;  // +1 for checksum
+  uint8_t checksumLength = (checksumType == 0) ? 0 : 1;
+  uint8_t fullDataLength = headerLength + actualLengthByteCount + dataLength + checksumLength;  // +1 for checksum
   uint8_t message[fullDataLength];
 
   if (connectedProtocol == "ISO9141") {
@@ -178,7 +179,30 @@ void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
   uint8_t dataStartOffset = headerLength + actualLengthByteCount;
   memcpy(&message[dataStartOffset], data, dataLength);
 
-  message[fullDataLength - 1] = checksum8_Modulo256(message, fullDataLength - 1);
+  // Compute checksum if enabled
+  if (checksumType != 0) {
+    uint8_t checksum = 0;
+
+    switch (checksumType) {
+      case 1:
+        checksum = checksum8_XOR(message, fullDataLength - 1);
+        break;
+
+      case 2:
+        checksum = checksum8_Modulo256(message, fullDataLength - 1);
+        break;
+
+      case 3:
+        checksum = checksum8_TwosComplement(message, fullDataLength - 1);
+        break;
+
+      default:
+        checksum = 0;
+        break;
+    }
+
+    message[fullDataLength - 1] = checksum;
+  }
 
   debugPrint(F("\n➡️ Sending Data: "));
   for (size_t i = 0; i < fullDataLength; i++) {
