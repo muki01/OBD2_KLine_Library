@@ -24,6 +24,7 @@ void setup() {
   KLine.setISO9141Header(0x68, 0x6A, 0xF1);   // Optional: Configures the 3-byte header (Priority, Receiver, Transmitter) for ISO9141.
   KLine.setISO14230Header(0xC0, 0x33, 0xF1);  // Optional: Configures the 3-byte header (Format, Receiver, Transmitter) for KWP2000.
   KLine.setLengthMode(true);                  // Optional: Defines if data length is embedded in the header or sent as a separate byte.
+  KLine.setChecksumType(2);                   // Optional: Selects checksum method (0: None, 1: XOR, 2: Modulo 256, 3: Two's Complement).
 
   Serial.println("OBD2 Starting.");
 }

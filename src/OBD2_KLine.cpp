@@ -64,7 +64,6 @@ bool OBD2_KLine::trySlowInit() {
 
   debugPrintln(F("Writing inverted KW2"));
   _serial->write(~resultBuffer[2]);
-  delay(_byteWriteInterval);
   clearEcho(1);
 
   setInterByteTimeout(60);
@@ -160,7 +159,8 @@ void OBD2_KLine::writeRawData(const uint8_t* dataArray, uint8_t length, uint8_t 
 void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
   uint8_t headerLength = 3;
   uint8_t actualLengthByteCount = useLengthInHeader ? 0 : 1;
-  uint8_t fullDataLength = headerLength + actualLengthByteCount + dataLength + 1;  // +1 for checksum
+  uint8_t checksumLength = (checksumType == 0) ? 0 : 1;
+  uint8_t fullDataLength = headerLength + actualLengthByteCount + dataLength + checksumLength;  // +1 for checksum
   uint8_t message[fullDataLength];
 
   if (connectedProtocol == "ISO9141") {
@@ -178,7 +178,30 @@ void OBD2_KLine::writeData(const uint8_t* data, uint8_t dataLength) {
   uint8_t dataStartOffset = headerLength + actualLengthByteCount;
   memcpy(&message[dataStartOffset], data, dataLength);
 
-  message[fullDataLength - 1] = checksum8_Modulo256(message, fullDataLength - 1);
+  // Compute checksum if enabled
+  if (checksumType != 0) {
+    uint8_t checksum = 0;
+
+    switch (checksumType) {
+      case 1:
+        checksum = checksum8_XOR(message, fullDataLength - 1);
+        break;
+
+      case 2:
+        checksum = checksum8_Modulo256(message, fullDataLength - 1);
+        break;
+
+      case 3:
+        checksum = checksum8_TwosComplement(message, fullDataLength - 1);
+        break;
+
+      default:
+        checksum = 0;
+        break;
+    }
+
+    message[fullDataLength - 1] = checksum;
+  }
 
   debugPrint(F("\n➡️ Sending Data: "));
   for (size_t i = 0; i < fullDataLength; i++) {
@@ -807,7 +830,7 @@ void OBD2_KLine::send5baud(uint8_t data) {
   for (int i = 1; i <= 7; i++) {
     if (bits[i]) ones++;
   }
-  bits[8] = (ones % 2 == 0) ? 1 : 0;  // parity bit
+  bits[8] = (ones % 2 == 0) ? 0 : 1;  // parity bit
 
   debugPrint(F("➡️ 5 Baud Init for Module 0x"));
   debugPrintHex(data);
@@ -955,4 +978,8 @@ void OBD2_KLine::setISO14230Header(uint8_t h1, uint8_t h2, uint8_t h3) {
 
 void OBD2_KLine::setLengthMode(bool inHeader) {
   useLengthInHeader = inHeader;
+}
+
+void OBD2_KLine::setChecksumType(uint8_t checksum) {
+  checksumType = checksum;
 }
