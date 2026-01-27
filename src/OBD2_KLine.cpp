@@ -64,7 +64,6 @@ bool OBD2_KLine::trySlowInit() {
 
   debugPrintln(F("Writing inverted KW2"));
   _serial->write(~resultBuffer[2]);
-  delay(_byteWriteInterval);
   clearEcho(1);
 
   setInterByteTimeout(60);
