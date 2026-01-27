@@ -831,7 +831,7 @@ void OBD2_KLine::send5baud(uint8_t data) {
   for (int i = 1; i <= 7; i++) {
     if (bits[i]) ones++;
   }
-  bits[8] = (ones % 2 == 0) ? 1 : 0;  // parity bit
+  bits[8] = (ones % 2 == 0) ? 0 : 1;  // parity bit
 
   debugPrint(F("➡️ 5 Baud Init for Module 0x"));
   debugPrintHex(data);
