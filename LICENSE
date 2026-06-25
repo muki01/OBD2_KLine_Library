@@ -1,21 +1,30 @@
-MIT License
+# OBD2 K-Line Library - Licensing Agreement
 
-Copyright (c) 2025 Muksin Muksin
+## 1. PERSONAL AND EDUCATIONAL USE (FREE)
+This library is provided as "Source-Available" software. You are granted a limited license to use, modify, and distribute this software for personal, research, and non-commercial educational purposes only, free of charge.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 2. COMMERCIAL USE (PAID)
+A MANDATORY commercial license is required for any use of this software, in whole or in part, within:
+- Any commercial product, hardware or software, offered for sale or lease.
+- Internal tools or services used for commercial or profit-making purposes.
+- Integration into diagnostic tools, automotive hardware, or professional tuning software.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+**Commercial use without a valid license agreement from the author is strictly prohibited and constitutes copyright infringement.**
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## 3. HOW TO GET A COMMERCIAL LICENSE?
+If you intend to use this library in a commercial capacity or to build a profit-making product, please contact the author for a single-use or high-volume commercial license agreement.
+
+**Contact for Commercial Licensing:**
+- Author: Muksin Muksin
+- Email: muksin.muksin04@gmail.com
+- Subject: Commercial License Inquiry - MukiTech
+
+## 4. RESTRICTIONS
+- You may not remove the original author's copyright notice from the source code.
+- You may not sub-license this software to third parties.
+- Derivative works built for commercial use must obtain a separate license from the author.
+
+## 5. DISCLAIMER
+This software is provided "as is", without warranty of any kind, express or implied. In no event shall the authors be liable for any damage or other liability, whether in an action of contract, tort or otherwise, arising from the use of this software on a motor vehicle.
+
+Copyright (c) 2025 Muksin Muksin. All rights reserved.
