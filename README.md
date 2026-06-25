@@ -211,6 +211,16 @@ If you enjoy my projects and want to support me, you can do so through the links
 
 ---
 
+## ⚖️ License & Commercial Usage
+
+This library is **Dual-Licensed** by **MukiTech**:
+- **Personal / Educational:** Free for non-commercial research and testing.
+- **Commercial / Professional:** Any usage in commercial products, for-profit services, or mass-produced hardware **requires a mandatory Commercial License**.
+
+Unauthorized commercial distribution or integration into proprietary diagnostic tools is strictly prohibited and protected by international copyright laws.
+
+---
+
 ## 📬 Contact
 
 For information, job offers, collaboration, sponsorship, or purchasing my devices, you can contact me via email.
