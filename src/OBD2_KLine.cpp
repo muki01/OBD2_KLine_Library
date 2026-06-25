@@ -1,3 +1,21 @@
+/*
+ * OBD2_KLine Library - MukiTech
+ * -----------------------------
+ * A professional Arduino library for OBD2 communication via K-Line (ISO 9141-2 and ISO 14230-4).
+ * 
+ * Developed by: Muksin Muksin (MukiTech)
+ * GitHub: https://github.com/muki01/OBD2_KLine_Library
+ * Email: muksin.muksin04@gmail.com
+ * 
+ * This library is designed for automotive diagnostics, supporting various 
+ * microcontrollers including Arduino AVR and ESP32.
+ * 
+ * LICENSE: DUAL-LICENSED
+ * 1. PERSONAL/RESEARCH: Free for non-commercial use.
+ * 2. COMMERCIAL: Mandatory paid license required for any for-profit usage.
+ * Copyright (c) 2025 MukiTech. All rights reserved.
+ */
+
 #include "OBD2_KLine.h"
 
 OBD2_KLine::OBD2_KLine(SerialType& serialPort, uint32_t baudRate, uint8_t rxPin, uint8_t txPin)
