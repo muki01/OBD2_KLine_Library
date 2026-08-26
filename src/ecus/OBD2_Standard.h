@@ -54,7 +54,6 @@ const uint8_t read_ID_Num = 0x06;         // Read Calibration ID Number
 
 class OBD2_Standard : public KLine_Protocol {
  public:
-  // uint32_t getPIDRaw(uint8_t mode, uint8_t pid);
   float getPID(uint8_t mode, uint8_t pid);
   float getLiveData(uint8_t pid);
   float getFreezeFrame(uint8_t pid);

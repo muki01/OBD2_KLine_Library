@@ -85,7 +85,7 @@ static const OBD2ProtocolConfig ISO14230_CONFIG = {
     Checksum_Modulo256,  // checksum
     true,                // verifyChecksum
 
-    Init_Fast,       // initType (VARSAYILAN - setInitType() ezer)
+    Init_Fast,       // initType (the DEFAULT - setInitType() overrides it)
     Parity_Even,     // initParity (used if Init_5Baud is selected)
     0x33,            // initAddress
     KWP2000_HEADER,  // header

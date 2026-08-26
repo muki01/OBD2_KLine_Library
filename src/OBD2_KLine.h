@@ -1,7 +1,22 @@
 /*
  * OBD2_KLine Library - MukiTech
  * -----------------------------
- * A professional Arduino library for OBD2 communication via K-Line (ISO 9141-2 and ISO 14230-4).
+ * A professional Arduino library for vehicle diagnostics over the K-Line.
+ *
+ * SUPPORTED PROTOCOLS
+ *   ISO 9141-2     Header, no length byte, Modulo-256 checksum
+ *   ISO 14230-4    KWP2000. Length embedded in the header, Modulo-256 checksum
+ *   KW1281         VAG block protocol - no header or checksum, every byte
+ *                  acknowledged with its complement
+ *   DS2            BMW. Separate length byte counting the whole frame, XOR
+ *   KW82           Opel. No header, separate length byte, Modulo-256
+ *   Custom         No preset at all - the sketch defines the framing itself
+ *   Automatic      Tries the known protocols until one connects
+ *
+ * The connection method is a SEPARATE axis from the packet format: 5 baud slow
+ * init, fast init, a simple ping or no handshake at all. Any of them can be
+ * combined with any protocol through setInitType(), so "ISO14230 + fast init"
+ * is not a protocol of its own but a combination of settings.
  *
  * Developed by: Muksin Muksin
  * GitHub: https://github.com/muki01/OBD2_KLine_Library
@@ -71,11 +86,5 @@
 #include "OBD2_KLine_Core.h"
 #include "KLine_Protocol.h"
 #include "KLine_Functions.h"
-
-// The files under "ecus/" are deliberately NOT included here. Every sketch
-// includes only the diagnostic vocabulary it uses, so unused tables never
-// reach the flash:
-//   #include "ecus/OBD2_Standard.h"   -> OBD2_KLine
-//   #include "ecus/Simtec71.h"        -> Simtec71
 
 #endif  // OBD2_KLINE_H

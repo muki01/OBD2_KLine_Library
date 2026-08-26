@@ -1,208 +1,208 @@
-# OBD2 KLine Library
+<div align="center">
+
+# 🚗 OBD2 K-Line Library <br>(ISO 9141 · KWP2000 · KW1281 · DS2 · KW82)
+
+**A professional, high-performance Arduino/ESP32 library for vehicle diagnostics over K-Line — universal OBD-II (ISO 9141-2, ISO 14230-4/KWP2000) plus manufacturer-specific deep access for VAG KW1281, BMW DS2 and Opel KW82.**
 
 ![GitHub forks](https://img.shields.io/github/forks/muki01/OBD2_KLine_Library?style=flat)
 ![GitHub Repo stars](https://img.shields.io/github/stars/muki01/OBD2_KLine_Library?style=flat)
 ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/muki01/OBD2_KLine_Library?style=flat)
 ![GitHub License](https://img.shields.io/github/license/muki01/OBD2_KLine_Library?style=flat)
 ![GitHub last commit](https://img.shields.io/github/last-commit/muki01/OBD2_KLine_Library)
+![ESP32](https://img.shields.io/badge/ESP32-000000?logo=espressif&logoColor=red)
+![Arduino](https://img.shields.io/badge/Arduino-00979D?logo=arduino&logoColor=white)
 [![PlatformIO Registry](https://badges.registry.platformio.org/packages/muki01/library/OBD2%20K-Line.svg)](https://registry.platformio.org/libraries/muki01/OBD2%20K-Line)
 [![Arduino IDE Library Manager](https://www.ardu-badge.com/badge/OBD2%20K-Line.svg)](https://www.ardu-badge.com/OBD2%20K-Line)
 
-
-**OBD2_KLine** is a lightweight yet powerful Arduino-compatible library that enables direct communication with vehicles using the **K-Line** (ISO 9141 / ISO 14230 - KWP2000).
-
-This library is designed for microcontrollers such as **Arduino**, **ESP32**, and similar platforms. It allows your device to communicate directly with a vehicle that uses the **K-Line**.  
-If you're curious about which types of data are supported, you can find a full list of features below.
-
-K-Line is a legacy protocol used in many **European and Japanese vehicles manufactured between ~1987 and 2010**, especially before CAN became mandatory in newer models.  
-This makes the library ideal for working with older cars that still rely on ISO9141 or KWP2000 communication standards.
-
-You can also see my other car projects:
-1. [Тhis](https://github.com/muki01/I-K_Bus) project is for BMW with I/K bus system. 
-2. [Тhis](https://github.com/muki01/OBD2_CAN_Bus_Reader) project is for Cars with CAN Bus.
-3. [Тhis](https://github.com/muki01/OBD2_K-line_Reader) project is for Cars with ISO9141 and ISO14230 protocols.
-4. [Тhis](https://github.com/muki01/OBD2_CAN_Bus_Library) is my OBD2 CAN Bus Communication Library for Arduino IDE.
-5. [Тhis](https://github.com/muki01/OBD2_KLine_Library) is my OBD2 K-Line Communication Library for Arduino IDE.
-6. [Тhis](https://github.com/muki01/VAG_KW1281) project is for VAG Cars with KW1281 protocol.
-<!--7. [Тhis](https://github.com/muki01/I-K_Bus_Library) is my I/K Bus Communication Library for Arduino IDE.-->
+</div>
 
 ---
+
+## 📌 Overview
+
+**OBD2_KLine** is a professional, high-performance library for vehicle diagnostics via **K-Line**, supporting **ISO 9141-2, ISO 14230-4 / KWP2000, VAG KW1281, BMW DS2 and Opel KW82**. Designed for **Arduino, ESP32** and similar microcontrollers, it lets your device talk directly to a vehicle's ECU over the K-Line.
+
+K-Line is a legacy protocol used in many **European and Japanese vehicles built between ~1987 and 2010**, especially before CAN became mandatory — making this library ideal for both **generic OBD-II diagnostics** and **manufacturer-specific deep system access** (VAG, BMW, Opel).
 
 ## ❓ Does Your Vehicle Support K-Line?
 
-Before using this library, it's important to confirm whether your vehicle supports the **K-Line** protocol.
+Confirm your car speaks K-Line by checking the OBD-II connector pins:
 
-K-Line vehicles typically have **Pin 7** on the OBD-II connector connected.  
-If your vehicle’s OBD-II connector has **Pins 6 and 14 connected**, it uses the **CAN bus** protocol instead of K-Line.
+- ✅ **Pin 7 connected → K-Line** (ISO 9141 / ISO 14230). This library will work.
+- ❌ **Pins 6 & 14 connected → CAN bus.** Use my [OBD2 CAN Bus Library](https://github.com/muki01/OBD2_CAN_Bus_Library) instead.
 
-✅ **Pin 7 (K-Line)**: Your vehicle likely supports ISO 9141 or ISO 14230 (KWP2000) — this library will work.  
-❌ **Pin 6 and 14 (CAN bus)**: Your vehicle uses CAN — consider a different library.
+**Example OBD-II connectors** (left: K-Line with pin 7 · right: CAN with pins 6 & 14):
 
-### Example photos of OBD2 Connector
 <p>
-<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20KLine.jpg" width=40% alt="OBD2 Connector Pin 7 K-Line">
-<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20CanBus.jpg" width=40% alt="OBD2 Connector Pin 6 and 14 CAN Bus">
+<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20KLine.jpg" width="40%" alt="OBD2 Connector Pin 7 K-Line">
+<img src="https://github.com/muki01/OBD2_KLine_Library/blob/main/images/OBD2%20CanBus.jpg" width="40%" alt="OBD2 Connector Pin 6 and 14 CAN Bus">
 </p>
-
-In the first image, the OBD2 socket includes pin 7, which indicates it operates using the K-Line protocol.
-In the second image, pins 6 and 14 are present, meaning it uses the CAN Bus protocol.
-
----
 
 ## 🚀 Key Features
 
-- **Universal Compatibility:** Works with Arduino (Uno, Nano, Mega), ESP32, and other popular microcontrollers.
-- **Protocol Mastery:** Supports both **ISO 9141-2** and **ISO 14230-4 (KWP2000)**.
-- **Advanced Initialization:** Features both **5-Baud (Slow Init)** and **Fast Init** methods.
-- **Smart Detection:** Automatic protocol detection logic.
-- **Full Diagnostics:** - Read real-time sensor data (PIDs).
-  - Retrieve and Clear Stored/Pending DTCs (Diagnostic Trouble Codes).
-  - Access Vehicle Info (VIN, Calibration IDs).
-  - Monitor Oxygen Sensor and On-board test results.
-- **Developer Friendly:** Integrated debug output for real-time monitoring.
+- **Universal compatibility** — Arduino (Uno, Nano, Mega), ESP32 and other popular MCUs.
+- **Six protocols, one API** — the packet format is a setting, not a rewrite of your sketch.
 
----
+  | Category | Supported Protocols |
+  | :--- | :--- |
+  | **Universal OBD2** | ISO 9141-2, ISO 14230-4 (KWP2000) |
+  | **VAG (VW/Audi/Seat/Škoda)** | **KW1281** (legacy block protocol) |
+  | **BMW** | **DS2** (Diagnostic System 2) |
+  | **Opel / Vauxhall** | **KW82** |
+  | **Anything else** | **Custom** — define the framing yourself |
 
-## 📡 Supported OBD-II Modes
-The table below lists the **standard OBD-II modes** supported by this library. These are universal for most vehicles.
+- **Flexible initialization** — **5-Baud (Slow Init)**, **Fast Init**, ping and handshake-free modes, each selectable independently of the protocol.
+- **Automatic detection** — finds the protocol on its own when you do not yet know what the car speaks.
+- **Handles the plumbing** — headers, length bytes, checksums and handshake timings are built and verified for you.
+- **Developer friendly** — integrated debug output showing every byte on the bus.
 
-| Mode | Description                                      |
-|------|--------------------------------------------------|
-| 01   | Read current live data (sensor values)           |
-| 02   | Read freeze frame data                           |
-| 03   | Read stored Diagnostic Trouble Codes (DTCs)      |
-| 04   | Clear DTCs and MIL reset                         |
-| 05   | Oxygen sensor test results                       |
-| 06   | On-board monitoring test results                 |
-| 07   | Read pending Diagnostic Trouble Codes            |
-| 09   | Retrieve vehicle information (VIN, calibration)  |
+## 🔍 What You Can Read & Control
 
-> 💡 **Advanced Users:** These modes are standard for OBD2. However, if you have documentation for **manufacturer-specific PIDs** or custom communication commands for your specific vehicle, you can use the library's core functions to send those custom requests as well.
+### 🔹 Standard OBD-II — works on any compliant car
 
----
+Generic diagnostics defined by **SAE J1979**. No car-specific configuration needed — plug in and read:
 
-### 📊 Typical Data Rates
+| Mode | Description |
+| ---- | ----------- |
+| 01 | Live data — real-time sensor values (RPM, coolant temp, speed, throttle, fuel trims…) |
+| 02 | Freeze frame — the sensor snapshot stored when a fault appeared |
+| 03 | Read stored Diagnostic Trouble Codes (DTCs) |
+| 04 | Clear DTCs and reset the MIL |
+| 05 | Oxygen sensor test results |
+| 06 | On-board monitoring test results |
+| 07 | Read pending Diagnostic Trouble Codes |
+| 09 | Vehicle information — VIN, Calibration IDs, Calibration Verification Numbers |
 
-Each protocol has its own timing characteristics, which affect how many responses you can expect per second when reading data from the ECU. The values below reflect **actual performance measurements** based on this library’s real-world testing.
+DTCs come back as readable codes (`P0123` style), and a **supported-PID scan** lets you ask the ECU
+which PIDs it actually implements before requesting them.
 
-| Protocol     | Average Responses per Second |
-|--------------|-------------------------------|
-| ISO 9141-2   | ~7–8 responses/sec            |
-| ISO 14230-4  | ~8–9 responses/sec            |
+### 🔸 Manufacturer protocols — deeper, car-specific access
 
-> 🔎 Note: Tese values represent average conditions based on real-world testing. The actual throughput can vary depending on the ECU’s internal processing time, the specific data being requested (e.g. PID type), and system latency.
+The manufacturer protocols reach data and functions that generic OBD-II never exposes:
 
----
+- **Extended live data** — manufacturer measurement blocks carrying far more channels than the standard PIDs, decoded into named values with real units (injection time, ignition advance, idle actuator steps, engine load, lambda, and so on). One request returns the whole block, so a dozen values cost a single message.
+- **Vehicle control & actuator tests** — command the ECU to drive real hardware: MIL and service lamps, fuel pump relay, A/C relay, throttle actuator, tank vent valve, and per-cylinder ignition coil or injection cut-off.
+- **Full ECU identification** — VIN, part number, supplier, hardware version, software number and engine code.
+- **ECU memory & flash reading** — read the ECU's internal memory block by block across the whole flash range, streamed over the debug port so you can capture the dump to a file on your PC for analysis.
+- **Raw service access** — send any manufacturer service by hand; the library still adds the header, length byte and checksum for you.
+- **Discovery tools** — scan which identifiers an ECU answers and dump responses as offset tables, so you can map an ECU nobody has documented yet.
 
-## 🛠️Schematics for communication
+> 💡 Manufacturer-specific access is provided through **ECU definition files**. The generic OBD-II layer ships with the library; car-specific definitions (Opel Simtec 71 / Bosch M1.5.5 / Bosch ME7.5, BMW Bosch BMS 46 and others) are maintained separately — see the **Contact** section below.
 
-These schematics are essential because K-Line communication operates at different voltage and signal levels than microcontroller pins.
-The circuits ensure proper level shifting and protection for safe, stable operation.
+## 📊 Typical Data Rates
 
-You can choose one of the following approaches depending on your project:
+Real-world throughput measured with this library:
 
-### 🔹 Transistor-Based Schematic
-<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Transistor%20Schematic.png" width=70%>
+| Protocol | Average responses per second |
+| -------- | ---------------------------- |
+| ISO 9141-2 | ~8–9 responses/sec |
+| ISO 14230-4 | ~9–10 responses/sec |
 
-This schematic uses a discrete transistor-based approach to interface the K-Line with a microcontroller.
-It is a simple and low-cost solution suitable for basic implementations and prototyping.
-
-The **R6** resistor in this schematic is designed for **3.3V** microcontrollers. If you are using a **5V** microcontroller, you need to change the **R6** value to **5.3kΩ**.
-
-### 🔹 Comparator-Based Schematic
-<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Comparator.png" width=70%>
-
-This design uses a low-cost comparator IC to process the K-Line signal and convert it into a clean digital level for the microcontroller.
-It offers a good balance between cost, simplicity, and signal reliability.
-
-- Can be implemented using cheap and widely available comparators such as LM393
-- Better noise immunity than discrete transistor-based designs
-- Provides well-defined logic thresholds
-- Suitable for low-budget projects that require improved signal stability
-- Slightly higher component count compared to the transistor solution, but still cost-effective
-
-### 🔹 Dedicated Automotive IC Schematic
-<p align="start">
-  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/L9637D.png" width="45%" alt="L9637D"/>
-  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/MC33290.png" width="42%" alt="MC33290"/>
-</p>
-
-<p align="start">
-  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Si9241.png" width="43%" alt="SI9241"/>
-  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/SN65HVDA195.png" width="45%" alt="SN65HVDA195"/>
-</p>
-
-
-This schematic category uses dedicated automotive communication ICs (e.g. L9637D, MCZ33290, Si9241, SN65HVDA195 etc.) specifically designed for K-Line / ISO 9141 applications.
-
-- Built-in voltage level shifting and protection
-- Fully compliant with automotive communication standards
-- Highest reliability and signal stability
-- Recommended for production-grade and long-term use designs
-
----
+> 🔎 Actual throughput varies with the ECU's internal processing time, the requested PID type and system latency.
 
 ## 📦 Installation
 
-### Arduino Library Manager (Recommended)
+### Arduino Library Manager (recommended)
 1. Open the **Arduino IDE**.
-2. Go to **Sketch** -> **Include Library** -> **Manage Libraries...**
+2. Go to **Sketch → Include Library → Manage Libraries…**
 3. Search for **"OBD2 K-Line"**.
 4. Click **Install**.
 
-### Manual Installation
-Alternatively, download this repo as a `.zip` file and include it via **Sketch** -> **Include Library** -> **Add .ZIP Library...**
+### Manual
+Download this repo as a `.zip` and add it via **Sketch → Include Library → Add .ZIP Library…**
 
----
+## ⚡ Basic Usage — Read Live Data
 
-## ⚡ Basic Usage: Get Live Data
-
-This example demonstrates how to read Engine RPM, Coolant Temperature, and Vehicle Speed. The library automatically handles different board architectures (AVR/ESP32).
+Read Engine RPM, Coolant Temperature and Vehicle Speed. The library automatically handles different board architectures (AVR / ESP32):
 
 ```cpp
-#include "OBD2_KLine.h"
+#include "OBD2_KLine.h"          // core: connection + protocol layer
+#include "ecus/OBD2_Standard.h"  // standard OBD2 diagnostics -> OBD2_KLine
 
-// Check for board compatibility and define Serial interface
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega2560__)
+OBD2_KLine KLine;
+
+// Uno / Nano have no spare hardware serial, so they fall back to AltSoftSerial
+// on its fixed pins (RX 8, TX 9). Every other board uses Serial1.
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
   #include <AltSoftSerial.h>
-  AltSoftSerial Alt_Serial;
-  OBD2_KLine KLine(Alt_Serial, 10400, 8, 9); // AVR: RX 8, TX 9
-#elif defined(ESP32)
-  OBD2_KLine KLine(Serial1, 10400, 10, 11); // ESP32: RX 10, TX 11
+  AltSoftSerial altSerial;
+  #define OBD_SERIAL  altSerial
+#else
+  #define OBD_SERIAL  Serial1
 #endif
+
+#define OBD_RX_PIN  5
+#define OBD_TX_PIN  4
 
 void setup() {
   Serial.begin(115200);
-  
-  KLine.setDebug(Serial);           // View communication logs
-  KLine.setProtocol("Automatic");  // Supports ISO9141, ISO14230_Slow, ISO14230_Fast
-  
+
+  KLine.setSerial(OBD_SERIAL);
+  KLine.setPins(OBD_RX_PIN, OBD_TX_PIN);
+
+  KLine.setDebug(Serial);        // View communication logs
+  KLine.setProtocol(Automatic);  // Automatic, ISO9141, ISO14230, KW1281, DS2, KW82, Custom
+
   Serial.println("OBD2 System Starting...");
 }
 
 void loop() {
-  if (KLine.initOBD2()) {
-    int rpm = KLine.getLiveData(0x0C);        // PID 0x0C: Engine RPM
-    int coolant = KLine.getLiveData(0x05);    // PID 0x05: Coolant Temp
-    int speed = KLine.getLiveData(0x0D);      // PID 0x0D: Vehicle Speed
+  if (!KLine.isConnected() && !KLine.connect()) return;
 
-    Serial.print("RPM: "); Serial.println(rpm);
-    Serial.print("Temp: "); Serial.print(coolant); Serial.println(" C");
-    Serial.print("Speed: "); Serial.print(speed); Serial.println(" km/h");
-  }
+  float rpm     = KLine.getLiveData(0x0C);  // PID 0x0C: Engine RPM
+  float coolant = KLine.getLiveData(0x05);  // PID 0x05: Coolant Temp
+  float speed   = KLine.getLiveData(0x0D);  // PID 0x0D: Vehicle Speed
+
+  Serial.print("RPM: ");   Serial.println(rpm);
+  Serial.print("Temp: ");  Serial.print(coolant); Serial.println(" C");
+  Serial.print("Speed: "); Serial.print(speed);   Serial.println(" km/h");
 }
-
 ```
 
+## 🛠️ Schematics for Communication
+
+K-Line operates at different voltage/signal levels than microcontroller pins. These circuits provide level shifting and protection for safe, stable operation. Pick the approach that suits your project:
+
+### 🔹 Transistor-based
+<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Transistor%20Schematic.png" width="70%">
+
+Simple, low-cost discrete-transistor interface for basic builds and prototyping. **R6** is sized for **3.3V** MCUs — for a **5V** MCU, change **R6** to **5.3 kΩ**.
+
+### 🔹 Comparator-based
+<img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Comparator.png" width="70%">
+
+Uses a cheap comparator IC (e.g. **LM393**) for a clean digital level — better noise immunity and well-defined thresholds than the transistor design, at a slightly higher component count.
+
+### 🔹 Dedicated automotive IC
+<p align="start">
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/L9637D.png" width="45%" alt="L9637D"/>
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/MC33290.png" width="42%" alt="MC33290"/>
+</p>
+<p align="start">
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/Si9241.png" width="43%" alt="Si9241"/>
+  <img src="https://github.com/muki01/OBD2_K-line_Reader/blob/main/Schematics/SN65HVDA195.png" width="45%" alt="SN65HVDA195"/>
+</p>
+
+Purpose-built K-Line / ISO 9141 transceiver ICs (**L9637D, MC33290, Si9241, SN65HVDA195**, etc.) with built-in level shifting and protection — highest reliability, recommended for production-grade designs.
+
 ## 📷 Gallery
+
 Custom PCBs designed for this library:
 
-<img width=36% src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" alt="OBD2 K-Line PCB 1"/>
-<img width=39% src="https://github.com/user-attachments/assets/1a794aea-b9b8-4cdd-bebb-17b25fe7fd7b" alt="OBD2 K-Line PCB 2"/>
+<img width="36%" src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" alt="OBD2 K-Line PCB 1"/>
+<img width="39%" src="https://github.com/user-attachments/assets/1a794aea-b9b8-4cdd-bebb-17b25fe7fd7b" alt="OBD2 K-Line PCB 2"/>
 
-> 🛠️ **Custom Hardware & PCBs:** If you are looking for ready-to-use devices or custom-made PCBs based on this project, feel free to reach out to me via email in the **Contact** section below.
+> 🛠️ **Custom hardware & PCBs:** looking for ready-to-use devices or custom-made PCBs based on this project? Reach out via email in the **Contact** section below.
 
----
+## 🔗 Related Projects
+
+Part of a full OBD2 / automotive diagnostics ecosystem:
+
+| Firmware & Readers | Libraries | Manufacturer Protocols | UI |
+|--------------------|-----------|------------------------|-----|
+| [OBD2 K-line Reader](https://github.com/muki01/OBD2_K-line_Reader) | [OBD2 K-Line Library](https://github.com/muki01/OBD2_KLine_Library) | [BMW I/K Bus](https://github.com/muki01/I-K_Bus) | [OBD2 Diagnostic UI](https://github.com/muki01/OBD2-Diagnostic-UI) |
+| [OBD2 CAN Bus Reader](https://github.com/muki01/OBD2_CAN_Bus_Reader) | [OBD2 CAN Bus Library](https://github.com/muki01/OBD2_CAN_Bus_Library) | [VAG KW1281](https://github.com/muki01/VAG_KW1281) | |
+
 
 ## ☕ Support My Work
 
@@ -214,16 +214,6 @@ If you enjoy my projects and want to support me, you can do so through the links
 
 ---
 
-## ⚖️ License & Commercial Usage
-
-This library is **Dual-Licensed** by **MukiTech**:
-- **Personal / Educational:** Free for non-commercial research and testing.
-- **Commercial / Professional:** Any usage in commercial products, for-profit services, or mass-produced hardware **requires a mandatory Commercial License**.
-
-Unauthorized commercial distribution or integration into proprietary diagnostic tools is strictly prohibited and protected by international copyright laws.
-
----
-
 ## 📬 Contact
 
 For information, job offers, collaboration, sponsorship, or purchasing my devices, you can contact me via email.
@@ -231,3 +221,9 @@ For information, job offers, collaboration, sponsorship, or purchasing my device
 📧 Email: muksin.muksin04@gmail.com
 
 ---
+
+<div align="center">
+
+Created by [**Muki**](https://github.com/muki01) · If you find this useful, consider giving it a ⭐
+
+</div>

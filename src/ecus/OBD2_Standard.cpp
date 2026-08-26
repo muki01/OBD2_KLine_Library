@@ -59,35 +59,35 @@ float OBD2_Standard::getPID(uint8_t mode, uint8_t pid) {
     case 0x01:                                      // Monitor Status Since DTC Cleared (bit encoded)
     case 0x02:                                      // Monitor Status Since DTC Cleared (bit encoded)
     case 0x03:                                      // Fuel System Status (bit encoded)
-      return A;                                     //
+      return A;
     case 0x04:                                      // Engine Load (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x05:                                      // Coolant Temperature (°C)
-      return A - 40.0f;                             //
+      return A - 40.0f;
     case 0x06:                                      // Short Term Fuel Trim Bank 1 (%)
     case 0x07:                                      // Long Term Fuel Trim Bank 1 (%)
     case 0x08:                                      // Short Term Fuel Trim Bank 2 (%)
     case 0x09:                                      // Long Term Fuel Trim Bank 2 (%)
-      return A * 100.0f / 128.0f - 100.0f;          //
+      return A * 100.0f / 128.0f - 100.0f;
     case 0x0A:                                      // Fuel Pressure (kPa)
-      return A * 3.0f;                              //
+      return A * 3.0f;
     case 0x0B:                                      // Intake Manifold Absolute Pressure (kPa)
-      return A;                                     //
+      return A;
     case 0x0C:                                      // RPM
-      return ((A * 256.0f) + B) / 4.0f;             //
+      return ((A * 256.0f) + B) / 4.0f;
     case 0x0D:                                      // Speed (km/h)
-      return A;                                     //
+      return A;
     case 0x0E:                                      // Timing Advance (°)
-      return A / 2.0f - 64.0f;                      //
+      return A / 2.0f - 64.0f;
     case 0x0F:                                      // Intake Air Temperature (°C)
-      return A - 40.0f;                             //
+      return A - 40.0f;
     case 0x10:                                      // MAF Flow Rate (grams/sec)
-      return ((A * 256.0f) + B) / 100.0f;           //
+      return ((A * 256.0f) + B) / 100.0f;
     case 0x11:                                      // Throttle Position (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x12:                                      // Commanded Secondary Air Status (bit encoded)
     case 0x13:                                      // Oxygen Sensors Present 2 Banks (bit encoded)
-      return A;                                     //
+      return A;
     case 0x14:                                      // Oxygen Sensor 1A Voltage (V, %)
     case 0x15:                                      // Oxygen Sensor 2A Voltage (V, %)
     case 0x16:                                      // Oxygen Sensor 3A Voltage (V, %)
@@ -100,14 +100,14 @@ float OBD2_Standard::getPID(uint8_t mode, uint8_t pid) {
     case 0x1C:                                      // OBD Standards This Vehicle Conforms To (bit encoded)
     case 0x1D:                                      // Oxygen Sensors Present 4 Banks (bit encoded)
     case 0x1E:                                      // Auxiliary Input Status (bit encoded)
-      return A;                                     //
+      return A;
     case 0x1F:                                      // Run Time Since Engine Start (seconds)
     case 0x21:                                      // Distance Traveled With MIL On (km)
-      return (A * 256.0f) + B;                      //
+      return (A * 256.0f) + B;
     case 0x22:                                      // Fuel Rail Pressure (kPa)
-      return ((A * 256.0f) + B) * 0.079f;           //
+      return ((A * 256.0f) + B) * 0.079f;
     case 0x23:                                      // Fuel Rail Gauge Pressure (kPa)
-      return ((A * 256.0f) + B) / 10.0f;            //
+      return ((A * 256.0f) + B) / 10.0f;
     case 0x24:                                      // Oxygen Sensor 1B (ratio, voltage)
     case 0x25:                                      // Oxygen Sensor 2B (ratio, voltage)
     case 0x26:                                      // Oxygen Sensor 3B (ratio, voltage)
@@ -118,20 +118,20 @@ float OBD2_Standard::getPID(uint8_t mode, uint8_t pid) {
     case 0x2B:                                      // Oxygen Sensor 8B (ratio, voltage)
       return ((A * 256.0f) + B) / 32768.0f;         // ratio
     case 0x2C:                                      // Commanded EGR (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x2D:                                      // EGR Error (%)
-      return A * 100.0f / 128.0f - 100.0f;          //
+      return A * 100.0f / 128.0f - 100.0f;
     case 0x2E:                                      // Commanded Evaporative Purge (%)
     case 0x2F:                                      // Fuel Tank Level Input (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x30:                                      // Warm-ups Since Codes Cleared (count)
-      return A;                                     //
+      return A;
     case 0x31:                                      // Distance Traveled Since Codes Cleared (km)
-      return (A * 256.0f) + B;                      //
+      return (A * 256.0f) + B;
     case 0x32:                                      // Evap System Vapor Pressure (Pa)
-      return ((A * 256.0f) + B) / 4.0f;             //
+      return ((A * 256.0f) + B) / 4.0f;
     case 0x33:                                      // Absolute Barometric Pressure (kPa)
-      return A;                                     //
+      return A;
     case 0x34:                                      // Oxygen Sensor 1C (current)
     case 0x35:                                      // Oxygen Sensor 2C
     case 0x36:                                      // Oxygen Sensor 3C
@@ -145,116 +145,66 @@ float OBD2_Standard::getPID(uint8_t mode, uint8_t pid) {
     case 0x3D:                                      // Catalyst Temperature Bank 2 Sensor 1 (°C)
     case 0x3E:                                      // Catalyst Temperature Bank 1 Sensor 2 (°C)
     case 0x3F:                                      // Catalyst Temperature Bank 2 Sensor 2 (°C)
-      return ((A * 256.0f) + B) / 10.0f - 40.0f;    //
+      return ((A * 256.0f) + B) / 10.0f - 40.0f;
     case 0x41:                                      // Monitor status this drive cycle (bit encoded)
-      return A;                                     //
+      return A;
     case 0x42:                                      // Control module voltage (V)
-      return ((A * 256.0f) + B) / 1000.0f;          //
+      return ((A * 256.0f) + B) / 1000.0f;
     case 0x43:                                      // Absolute load value (%)
-      return ((A * 256.0f) + B) * 100.0f / 255.0f;  //
+      return ((A * 256.0f) + B) * 100.0f / 255.0f;
     case 0x44:                                      // Fuel/Air commanded equivalence ratio (lambda)
       return ((A * 256.0f) + B) / 32768.0f;         // ratio
     case 0x45:                                      // Relative throttle position (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x46:                                      // Ambient air temp (°C)
-      return A - 40.0f;                             //
+      return A - 40.0f;
     case 0x47:                                      // Absolute throttle position B (%)
     case 0x48:                                      // Absolute throttle position C (%)
     case 0x49:                                      // Accelerator pedal position D (%)
     case 0x4A:                                      // Accelerator pedal position E (%)
     case 0x4B:                                      // Accelerator pedal position F (%)
     case 0x4C:                                      // Commanded throttle actuator (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x4D:                                      // Time run with MIL on (min)
     case 0x4E:                                      // Time since trouble codes cleared (min)
-      return (A * 256.0f) + B;                      //
+      return (A * 256.0f) + B;
     case 0x4F:                                      // Max values for sensors (ratio, V, mA, kPa)
     case 0x50:                                      // Maximum value for air flow rate from mass air flow sensor (g/s)
     case 0x51:                                      // Fuel Type (bit encoded)
-      return A;                                     //
+      return A;
     case 0x52:                                      // Ethanol fuel (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x53:                                      // Absolute evap system pressure (kPa)
-      return ((A * 256.0f) + B) / 200.0f;           //
+      return ((A * 256.0f) + B) / 200.0f;
     case 0x54:                                      // Evap system vapor pressure (Pa)
-      return (A * 256.0f) + B;                      //
+      return (A * 256.0f) + B;
     case 0x55:                                      // Short term secondary oxygen sensor trim, A: bank 1, B: bank 3 (%)
     case 0x56:                                      // Long term primary oxygen sensor trim, A: bank 1, B: bank 3 (%)
     case 0x57:                                      // Short term secondary oxygen sensor trim, A: bank 2, B: bank 4 (%)
     case 0x58:                                      // Long term secondary oxygen sensor trim, A: bank 2, B: bank 4 (%)
-      return A * 100.0f / 128.0f - 100.0f;          //
+      return A * 100.0f / 128.0f - 100.0f;
     case 0x59:                                      // Fuel rail absolute pressure (kPa)
-      return ((A * 256.0f) + B) * 10.0f;            //
+      return ((A * 256.0f) + B) * 10.0f;
     case 0x5A:                                      // Relative accelerator pedal position (%)
     case 0x5B:                                      // Hybrid battery pack remaining life (%)
-      return A * 100.0f / 255.0f;                   //
+      return A * 100.0f / 255.0f;
     case 0x5C:                                      // Engine oil temperature (°C)
-      return A - 40.0f;                             //
+      return A - 40.0f;
     case 0x5D:                                      // Fuel injection timing (°)
-      return ((A * 256.0f) + B) / 128.0f - 210.0f;  //
+      return ((A * 256.0f) + B) / 128.0f - 210.0f;
     case 0x5E:                                      // Engine fuel rate (L/h)
-      return ((A * 256.0f) + B) / 20.0f;            //
+      return ((A * 256.0f) + B) / 20.0f;
     case 0x5F:                                      // Emission requirements to which vehicle is designed (bit encoded)
-      return A;                                     //
+      return A;
     case 0x61:                                      // Driver's demand engine - percent torque (%)
     case 0x62:                                      // Actual engine - percent torque (%)
-      return A - 125.0f;                            //
+      return A - 125.0f;
     case 0x63:                                      // Engine reference torque (Nm)
-      return (A * 256.0f) + B;                      //
-    default:                                        //
+      return (A * 256.0f) + B;
+    default:
       return -4;                                    // Unknown PID
   }
 }
-
-// uint32_t OBD2_Standard::getPIDRaw(uint8_t mode, uint8_t pid) {
-//   if (mode == read_LiveData) {
-//     writeData((uint8_t[]){mode, pid});
-//   } else if (mode == read_FreezeFrame) {
-//     writeData((uint8_t[]){mode, pid, 0x00});
-//   }
-//   int len = readData();
-
-//   if (len <= 0) return 0xFFFFFFFF;                // Data not received
-//   if (resultBuffer[4] != pid) return 0xFFFFFFFE;  // Unexpected PID
-
-//   uint8_t A = 0, B = 0, C = 0, D = 0;
-//   int dataBytesLen = 0;
-
-//   if (mode == read_LiveData) {
-//     dataBytesLen = len - 6;
-//     A = (dataBytesLen >= 1) ? resultBuffer[5] : 0;
-//     B = (dataBytesLen >= 2) ? resultBuffer[6] : 0;
-//     C = (dataBytesLen >= 3) ? resultBuffer[7] : 0;
-//     D = (dataBytesLen >= 4) ? resultBuffer[8] : 0;
-//   } else if (mode == read_FreezeFrame) {
-//     dataBytesLen = len - 7;
-//     A = (dataBytesLen >= 1) ? resultBuffer[6] : 0;
-//     B = (dataBytesLen >= 2) ? resultBuffer[7] : 0;
-//     C = (dataBytesLen >= 3) ? resultBuffer[8] : 0;
-//     D = (dataBytesLen >= 4) ? resultBuffer[9] : 0;
-//   }
-
-//   uint32_t value = 0;
-//   switch (dataBytesLen) {
-//     case 1:
-//       value = A;
-//       break;
-//     case 2:
-//       value = ((uint32_t)A << 8) | B;
-//       break;
-//     case 3:
-//       value = ((uint32_t)A << 16) | ((uint32_t)B << 8) | C;
-//       break;
-//     case 4:
-//       value = ((uint32_t)A << 24) | ((uint32_t)B << 16) | ((uint32_t)C << 8) | D;
-//       break;
-//     default:  // if (dataBytesLen <= 0)
-//       value = A;
-//       break;
-//   }
-
-//   return value;
-// }
 
 // ----------------------------------- DTCs -----------------------------------
 
