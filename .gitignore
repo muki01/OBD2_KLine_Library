@@ -3,7 +3,6 @@
 # ---------------------------------------------------------------------------
 
 # ECU definitions: only the standard OBD2 one and the README are public.
-# Every other ECU file stays local.
 src/ecus/*
 !src/ecus/README.md
 !src/ecus/OBD2_Standard.h
@@ -14,24 +13,7 @@ examples/02_ECU_Specific/*
 !examples/02_ECU_Specific/README.md
 
 # ---------------------------------------------------------------------------
-#  Working files
-# ---------------------------------------------------------------------------
-
-# Notes, captures and datasheets kept next to the library while mapping ECUs
-*.pdf
-*.lnk
-ASTRA_MAPA_*.md
-COMMERCIAL_STRATEGY.md
-
-# Scratch copies that some file managers create
-*[Cc]opy/
-*[Cc]opy.*
-* - *[Кк]опие*/
-*.bak
-*.orig
-
-# ---------------------------------------------------------------------------
-#  Build / editor / OS
+#  Build output
 # ---------------------------------------------------------------------------
 
 build/
@@ -42,10 +24,21 @@ build/
 *.bin
 *.map
 
+# ---------------------------------------------------------------------------
+#  Editor
+# ---------------------------------------------------------------------------
+
 .vscode/
 .idea/
 *.code-workspace
+*.bak
+*.orig
+
+# ---------------------------------------------------------------------------
+#  OS
+# ---------------------------------------------------------------------------
 
 .DS_Store
 Thumbs.db
 desktop.ini
+*.lnk
