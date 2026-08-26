@@ -1,0 +1,151 @@
+###########################################
+# Syntax Coloring Map For OBD2_KLine
+###########################################
+
+###########################################
+# Datatypes (KEYWORD1)
+###########################################
+
+OBD2_KLine	KEYWORD1
+OBD2_Standard	KEYWORD1
+KLine_Protocol	KEYWORD1
+KLine_Core	KEYWORD1
+OBD2ProtocolConfig	KEYWORD1
+OBD2Protocol	KEYWORD1
+OBD2InitType	KEYWORD1
+OBD2Checksum	KEYWORD1
+OBD2LengthMode	KEYWORD1
+OBD2Parity	KEYWORD1
+
+###########################################
+# Methods and Functions (KEYWORD2)
+###########################################
+
+begin	KEYWORD2
+setDebug	KEYWORD2
+setSerial	KEYWORD2
+setPins	KEYWORD2
+setBaudRate	KEYWORD2
+setSerialConfig	KEYWORD2
+toggleSerial	KEYWORD2
+connect	KEYWORD2
+trySlowInit	KEYWORD2
+tryFastInit	KEYWORD2
+writeRawData	KEYWORD2
+writeData	KEYWORD2
+sendBytes	KEYWORD2
+buildFrame	KEYWORD2
+readData	KEYWORD2
+compareData	KEYWORD2
+decodeDTC	KEYWORD2
+isInArray	KEYWORD2
+convertBytesToHexString	KEYWORD2
+convertHexToAscii	KEYWORD2
+send5baud	KEYWORD2
+read5baud	KEYWORD2
+sendFastInitPulse	KEYWORD2
+writeByte	KEYWORD2
+writeBlock	KEYWORD2
+readByte	KEYWORD2
+readBlock	KEYWORD2
+getPID	KEYWORD2
+getLiveData	KEYWORD2
+getFreezeFrame	KEYWORD2
+readDTCs	KEYWORD2
+readStoredDTCs	KEYWORD2
+readPendingDTCs	KEYWORD2
+getStoredDTC	KEYWORD2
+getPendingDTC	KEYWORD2
+clearDTCs	KEYWORD2
+getVehicleInfo	KEYWORD2
+readSupportedLiveData	KEYWORD2
+readSupportedFreezeFrame	KEYWORD2
+readSupportedOxygenSensors	KEYWORD2
+readSupportedOtherComponents	KEYWORD2
+readSupportedOnBoardComponents	KEYWORD2
+readSupportedVehicleInfo	KEYWORD2
+readSupportedData	KEYWORD2
+getSupportedData	KEYWORD2
+setP1Time	KEYWORD2
+setP2Time	KEYWORD2
+setP3Time	KEYWORD2
+setP4Time	KEYWORD2
+setWakeUpDelay	KEYWORD2
+isConnected	KEYWORD2
+setProtocol	KEYWORD2
+setConnectionStatus	KEYWORD2
+updateConnectionStatus	KEYWORD2
+setMaxRetryCount	KEYWORD2
+getConnectedProtocol	KEYWORD2
+getProtocolName	KEYWORD2
+getProtocolConfig	KEYWORD2
+getResultBuffer	KEYWORD2
+getResultLength	KEYWORD2
+setInitAddress	KEYWORD2
+setInitType	KEYWORD2
+getInitType	KEYWORD2
+getInitTypeName	KEYWORD2
+setInitParity	KEYWORD2
+setHeader	KEYWORD2
+setLengthMode	KEYWORD2
+setChecksumType	KEYWORD2
+setChecksumVerify	KEYWORD2
+getChecksumName	KEYWORD2
+calculateChecksum	KEYWORD2
+checksum8_XOR	KEYWORD2
+checksum8_Modulo256	KEYWORD2
+checksum8_TwosComplement	KEYWORD2
+verifyChecksum	KEYWORD2
+
+###########################################
+# Constants (LITERAL1)
+###########################################
+
+Automatic	LITERAL1
+ISO9141	LITERAL1
+ISO14230	LITERAL1
+KW1281	LITERAL1
+DS2	LITERAL1
+KW82	LITERAL1
+Custom	LITERAL1
+None	LITERAL1
+
+Init_None	LITERAL1
+Init_5Baud	LITERAL1
+Init_5Baud_Block	LITERAL1
+Init_Fast	LITERAL1
+Init_Ping	LITERAL1
+
+Checksum_None	LITERAL1
+Checksum_XOR	LITERAL1
+Checksum_Modulo256	LITERAL1
+Checksum_TwosComplement	LITERAL1
+
+Length_None	LITERAL1
+Length_SeparateByte	LITERAL1
+Length_InHeader	LITERAL1
+
+Parity_Even	LITERAL1
+Parity_Odd	LITERAL1
+
+read_LiveData	LITERAL1
+read_FreezeFrame	LITERAL1
+read_storedDTCs	LITERAL1
+clear_DTCs	LITERAL1
+test_OxygenSensors	LITERAL1
+test_OtherComponents	LITERAL1
+read_pendingDTCs	LITERAL1
+control_OnBoardComponents	LITERAL1
+read_VehicleInfo	LITERAL1
+read_PermanentDTCs	LITERAL1
+SUPPORTED_PIDS_1_20	LITERAL1
+SUPPORTED_PIDS_21_40	LITERAL1
+SUPPORTED_PIDS_41_60	LITERAL1
+SUPPORTED_PIDS_61_80	LITERAL1
+SUPPORTED_PIDS_81_100	LITERAL1
+read_VIN_Count	LITERAL1
+read_VIN	LITERAL1
+read_ID_Length	LITERAL1
+read_ID	LITERAL1
+read_ID_Num_Length	LITERAL1
+read_ID_Num	LITERAL1
