@@ -20,16 +20,19 @@
 
 OBD2_KLine KLine;
 
-// #include <AltSoftSerial.h>
-// AltSoftSerial altSerial;
-
-// #include <SoftwareSerial.h>
-// SoftwareSerial softSerial(10, 11);
-
-#define OBD_SERIAL        Serial1
+// Uno / Nano have no spare hardware serial, so they fall back to AltSoftSerial
+// on its fixed pins (RX 8, TX 9). Every other board uses Serial1 on the pins
+// defined below.
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
+  #include <AltSoftSerial.h>
+  AltSoftSerial altSerial;
+  #define OBD_SERIAL      altSerial
+#else
+  #define OBD_SERIAL      Serial1
+#endif
 #define OBD_DEBUG_SERIAL  Serial
-#define OBD_RX_PIN        10
-#define OBD_TX_PIN        11
+#define OBD_RX_PIN        5
+#define OBD_TX_PIN        4
 
 void setup() {
   Serial.begin(115200);
