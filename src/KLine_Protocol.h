@@ -70,11 +70,10 @@ enum OBD2Protocol {
 // Handshake options (which init method is used).
 // Every protocol table has a default; setInitType() overrides it.
 enum OBD2InitType {
-  Init_None = 0,        // No handshake - the bus is assumed ready to use
-  Init_5Baud = 1,       // 5 baud slow init
-  Init_5Baud_Block = 2, // 5 baud slow init (block protocols, KW1281)
-  Init_Fast = 3,        // Fast init (25ms LOW / 25ms HIGH)
-  Init_Ping = 4         // Simple ping packet (DS2)
+  Init_None = 0,   // No handshake - the bus is assumed ready to use
+  Init_5Baud = 1,  // 5 baud slow init
+  Init_Fast = 2,   // Fast init (25ms LOW / 25ms HIGH)
+  Init_Ping = 3    // Simple ping packet (DS2)
 };
 
 // Checksum options
@@ -112,9 +111,9 @@ struct OBD2ProtocolConfig {
 
   // ---- Handshake ----
   OBD2InitType initType;     // Handshake method to use
-  // Parity of the 5 baud address byte. Used ONLY while initType is Init_5Baud /
-  // Init_5Baud_Block - for fast init and ping protocols send5baud() is never
-  // called, so the value is not read (it is still written out in the table).
+  // Parity of the 5 baud address byte. Used ONLY while initType is Init_5Baud -
+  // for fast init and ping protocols send5baud() is never called, so the value
+  // is not read (it is still written out in the table).
   OBD2Parity initParity;
   uint8_t initAddress;       // Default init address (0x33 = standard OBD2)
   const uint8_t* header;     // Default header bytes (nullptr if there is none)
@@ -236,6 +235,12 @@ class KLine_Protocol : public KLine_Core {
   // acknowledged with its complement. Uses the core writeByte / readByte.
   void writeBlock(const uint8_t* dataArray, uint8_t length);
   uint8_t readBlock();
+
+  // Streaming protocols (KW82): the ECU repeats its answer forever without
+  // being asked and the repeats follow each other with little or no gap, so
+  // readData() - which cuts the frame on a gap - can start in the middle of
+  // one. The frame carries its own length, so this reads it length driven.
+  uint8_t readPacket();
 
  protected:
   // The settings of a protocol split into two halves: what the handshake needs

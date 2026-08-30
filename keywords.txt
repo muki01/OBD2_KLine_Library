@@ -112,7 +112,6 @@ None	LITERAL1
 
 Init_None	LITERAL1
 Init_5Baud	LITERAL1
-Init_5Baud_Block	LITERAL1
 Init_Fast	LITERAL1
 Init_Ping	LITERAL1
 

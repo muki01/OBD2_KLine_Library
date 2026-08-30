@@ -588,6 +588,10 @@ void KLine_Protocol::writeBlock(const uint8_t* dataArray, uint8_t length) {
   for (size_t i = 0; i < newLength; i++) {
     writeByte(newArray[i]);
 
+    // The LAST byte of a block (the $03 end marker) is never acknowledged by
+    // the receiver. Waiting for a complement that will never arrive costs a
+    // full P2 timeout on every single block, so it is skipped for that byte.
+    if (i == newLength - 1) break;
     if (readByte() == -1) break;
   }
 
