@@ -117,7 +117,7 @@ static const OBD2ProtocolConfig KW1281_CONFIG = {
     Checksum_None,     // checksum
     false,             // verifyChecksum
 
-    Init_5Baud_Block,  // initType
+    Init_5Baud,        // initType (block framing comes from the protocol, not from here)
     Parity_Odd,        // initParity (5 baud)
     0x01,     // initAddress (Engine ECU)
     nullptr,  // header (none)
@@ -492,7 +492,6 @@ OBD2InitType KLine_Protocol::getInitType() {
 const char* KLine_Protocol::getInitTypeName(OBD2InitType type) {
   switch (type) {
     case Init_5Baud: return "5 Baud Init";
-    case Init_5Baud_Block: return "5 Baud Init (Block)";
     case Init_Fast: return "Fast Init";
     case Init_Ping: return "Ping";
     default: return "None";
@@ -646,6 +645,86 @@ uint8_t KLine_Protocol::readBlock() {
   return 0;
 }
 
+// ----------------------------------- Stream Framing (KW82) -----------------------------------
+// KW82 does not do request / response. Once the handshake is over the ECU
+// starts repeating one answer forever; sending a request only changes WHICH
+// answer it repeats. The repeats follow each other with little or no gap, so
+// the gap based framing of readData() can easily start mid packet.
+//
+// The frame is self delimiting, which makes a length driven read reliable:
+//
+//   [length N] [payload ...] [marker] [checksum]        total = N + 2
+//
+// The checksum is the Modulo-256 sum of the FIRST N bytes - the marker sitting
+// just before it is NOT part of it. Verified on two real packets from an Opel
+// instrument cluster:
+//   ID    : len $20, marker $06, checksum $4F = sum(byte[0..31])
+//   Live  : len $21, marker $05, checksum $F3 = sum(byte[0..32])
+// (The marker is $00 in tester requests and non-zero in ECU answers; what it
+// counts is not known yet.)
+//
+// Because the generic verifyChecksum() sums everything except the last byte it
+// would include the marker and always fail here, which is why the checksum is
+// checked in this function instead.
+//
+// Starting mid stream is expected, so the frame is found with a SLIDING WINDOW
+// rather than by guessing: every arriving byte is asked "does a complete,
+// checksum-correct frame end on you?". Consuming length+2 bytes on a wrong
+// guess instead would stall on the long runs of $00 inside these packets and
+// never line up.
+//
+// Once a frame is found the read stops exactly at its last byte, so the next
+// call starts on a boundary and reads a single packet. Verified against the
+// real repeating stream: it locks on from every one of the 35 possible start
+// offsets, consumes at most 69 bytes doing so, and stays aligned afterwards.
+uint8_t KLine_Protocol::readPacket() {
+  uint16_t filled = 0;
+
+  while (filled < sizeof(resultBuffer)) {
+    const int received = readByte();
+    if (received < 0) break;  // nothing more on the bus
+
+    resultBuffer[filled++] = (uint8_t)received;
+    const uint16_t end = filled - 1;
+
+    // Does a complete frame END on the byte that just arrived? A start only
+    // qualifies if its own length byte points exactly at this position, so the
+    // test is cheap and a wrong boundary is rejected by the checksum.
+    for (uint16_t start = 0; start < end; start++) {
+      const uint8_t declared = resultBuffer[start];
+      if (declared < 1) continue;
+      if (start + (uint16_t)declared + 1 != end) continue;
+      if (checksum8_Modulo256(&resultBuffer[start], declared) != resultBuffer[end]) continue;
+
+      const uint8_t total = declared + 2;
+      if (start > 0) {
+        debugPrint(F("↩️ Stream resynced, skipped "));
+        debugPrint(start);
+        debugPrintln(F(" byte(s)"));
+        memmove(resultBuffer, &resultBuffer[start], total);
+      }
+
+      debugPrint(F("✅ Stream packet: len "));
+      debugPrintHex(declared);
+      debugPrint(F("   marker "));
+      debugPrintHex(resultBuffer[total - 2]);
+      debugPrint(F("   Received: "));
+      for (uint8_t i = 0; i < total; i++) {
+        debugPrintHex(resultBuffer[i]);
+        debugPrint(F(" "));
+      }
+      debugPrintln(F(""));
+
+      _lastReadLength = total;
+      return total;
+    }
+  }
+
+  debugPrintln(F("❌ No valid stream packet found."));
+  _lastReadLength = 0;
+  return 0;
+}
+
 // ----------------------------------- Connection Sequence -----------------------------------
 
 bool KLine_Protocol::connect() {
@@ -760,7 +839,6 @@ bool KLine_Protocol::_tryProtocol(OBD2Protocol p, OBD2InitType init) {
 
   switch (_initType) {
     case Init_5Baud:
-    case Init_5Baud_Block:
       success = trySlowInit();
       break;
     case Init_Fast:
@@ -845,6 +923,27 @@ bool KLine_Protocol::trySlowInit() {
   _serial->write(~resultBuffer[2]);
   clearEcho(1);
   setP1Time(oldP1);
+
+  // KW82 does not answer the inverted keyword with a single byte either: it
+  // starts streaming its identification packet straight away and repeats it
+  // forever. Reading one COMPLETE packet is what proves the ECU is there.
+  if (currentProtocol == KW82) {
+    debugPrintln(F("✅ Stream protocol handshake done - reading first packet."));
+    setChecksumVerify(oldChecksumVerify);
+    if (!readPacket()) return false;
+    connectedProtocol = currentProtocol;
+    connectionStatus = true;
+    return true;
+  }
+
+  if (currentProtocol == KW1281) {
+    debugPrintln(F("✅ Block protocol handshake done - ECU will now send blocks."));
+    setChecksumVerify(oldChecksumVerify);
+    blockMessageCount = 0;
+    connectedProtocol = currentProtocol;
+    connectionStatus = true;
+    return true;
+  }
 
   // Even if we fail here we MUST turn verification back on: it was switched off
   // for the handshake, and if it is left off every packet from now on would be
