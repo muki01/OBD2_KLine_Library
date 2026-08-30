@@ -1,15 +1,77 @@
 /*
  * OBD2_KLine Library - MukiTech
  * -----------------------------
- * A professional Arduino library for OBD2 communication via K-Line (ISO 9141-2 and ISO 14230-4).
- * 
- * Developed by: Muksin Muksin (MukiTech)
+ * A professional Arduino library for vehicle diagnostics over the K-Line.
+ *
+ * SUPPORTED PROTOCOLS
+ *   ISO 9141-2     Header, no length byte, Modulo-256 checksum
+ *   ISO 14230-4    KWP2000. Length embedded in the header, Modulo-256 checksum
+ *   KW1281         VAG block protocol - no header or checksum, every byte
+ *                  acknowledged with its complement
+ *   DS2            BMW. Separate length byte counting the whole frame, XOR
+ *   KW82           Opel. No header, separate length byte, Modulo-256
+ *   Custom         No preset at all - the sketch defines the framing itself
+ *   Automatic      Tries the known protocols until one connects
+ *
+ * The connection method is a SEPARATE axis from the packet format: 5 baud slow
+ * init, fast init, a simple ping or no handshake at all. Any of them can be
+ * combined with any protocol through setInitType(), so "ISO14230 + fast init"
+ * is not a protocol of its own but a combination of settings.
+ *
+ * Developed by: Muksin Muksin
  * GitHub: https://github.com/muki01/OBD2_KLine_Library
  * Email: muksin.muksin04@gmail.com
- * 
- * This library is designed for automotive diagnostics, supporting various 
+ *
+ * This library is designed for automotive diagnostics, supporting various
  * microcontrollers including Arduino AVR and ESP32.
- * 
+ *
+ * FILE STRUCTURE
+ * --------------
+ *   OBD2_KLine_Core.h/.cpp     KLine_Core - Microcontroller side only: serial port, pins,
+ *                              sending a ready made packet / receiving data, single byte
+ *                              access, the P1..P4 byte timings, the raw init signals
+ *                              (5 baud pattern, fast init pulse) and the debug output.
+ *                              This header depends on nothing but Arduino.h.
+ *   KLine_Protocol.h/.cpp      KLine_Protocol - Protocol layer. The top of the header holds
+ *                              the shared type vocabulary every layer speaks (OBD2Protocol,
+ *                              OBD2InitType, OBD2Checksum, OBD2LengthMode, OBD2Parity) - these
+ *                              describe what the bus looks like, so they belong here.
+ *                              The top of the .cpp holds the default settings of EVERY
+ *                              protocol (baud rate, checksum type, parity, header, length byte
+ *                              mode, timings and which handshake it uses) as one table per
+ *                              protocol: ISO9141, ISO14230 Slow/Fast, KW1281, UDS_KLine, DS2,
+ *                              KW82. The rest is protocol selection, packet building (header,
+ *                              length byte, checksum), the block framing used by KW1281, the
+ *                              handshake settings (init address, init parity, W1..W4, wake-up
+ *                              delay) and the connection logic (slow / fast init).
+ *   KLine_Functions.h/.cpp     Shared helpers as plain free functions, no object and no state:
+ *                              checksum arithmetic (XOR, Modulo256, Two's Complement),
+ *                              byte array comparison (compareData) and conversion / decoding
+ *                              (decodeDTC, isInArray, convertBytesToHexString,
+ *                              convertHexToAscii). Any layer may call them.
+ *   ecus/OBD2_Standard.h/.cpp  OBD2_Standard - Standard OBD2 diagnostics (generic 0x33 address):
+ *                              live data, freeze frame, DTCs, vehicle info, supported PIDs.
+ *                              Defined by SAE J1979, so it works on any car - but it lives
+ *                              under "ecus/" like every other diagnostic vocabulary and is
+ *                              only compiled when a sketch includes it.
+ *   ecus/<Ecu>.h/.cpp          One self contained file pair per ECU. Holds its own connection
+ *                              settings, its own service requests and its own response layout
+ *                              (which byte means what). Manufacturer services are NOT shared
+ *                              between ECUs on purpose - addresses, sub functions and
+ *                              identifiers differ from car to car.
+ *                              Include only the one you need:
+ *                                #include "ecus/Simtec71.h"
+ *
+ * The core (this file and the three next to it) is always compiled. Everything under "ecus/"
+ * is opt in: including this header alone gives you the connection, not a diagnostic
+ * vocabulary. Pick the one you need:
+ *
+ *   #include "OBD2_KLine.h"
+ *   #include "ecus/OBD2_Standard.h"   // standard OBD2, any car    -> OBD2_KLine
+ *   #include "ecus/Simtec71.h"        // Opel / Vauxhall Simtec 71 -> Simtec71
+ *
+ * Unused ECU tables never reach the flash this way.
+ *
  * LICENSE: DUAL-LICENSED
  * 1. PERSONAL/RESEARCH: Free for non-commercial use.
  * 2. COMMERCIAL: Mandatory paid license required for any for-profit usage.
@@ -19,155 +81,10 @@
 #ifndef OBD2_KLINE_H
 #define OBD2_KLINE_H
 
-#include <Arduino.h>
-
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
-#include <AltSoftSerial.h>
-#define SerialType AltSoftSerial
-#else
-#define SerialType HardwareSerial
-#endif
-
-// ==== OBD2 Mods ====
-const uint8_t read_LiveData = 0x01;              // Show current live data
-const uint8_t read_FreezeFrame = 0x02;           // Show freeze frame data
-const uint8_t read_storedDTCs = 0x03;            // Show stored Diagnostic Trouble Codes (DTCs)
-const uint8_t clear_DTCs = 0x04;                 // Clear Diagnostic Trouble Codes and stored values
-const uint8_t test_OxygenSensors = 0x05;         // Test results, oxygen sensor monitoring (non-CAN only)
-const uint8_t test_OtherComponents = 0x06;       // Test results, other component/system monitoring (for CAN)
-const uint8_t read_pendingDTCs = 0x07;           // Show pending Diagnostic Trouble Codes
-const uint8_t control_OnBoardComponents = 0x08;  // Control operation of on-board component/system
-const uint8_t read_VehicleInfo = 0x09;           // Request vehicle information
-const uint8_t read_PermanentDTCs = 0x0A;         // Show permanent Diagnostic Trouble Codes
-
-const uint8_t SUPPORTED_PIDS_1_20 = 0x00;
-const uint8_t SUPPORTED_PIDS_21_40 = 0x20;
-const uint8_t SUPPORTED_PIDS_41_60 = 0x40;
-const uint8_t SUPPORTED_PIDS_61_80 = 0x60;
-const uint8_t SUPPORTED_PIDS_81_100 = 0x80;
-
-const uint8_t read_VIN_Count = 0x01;      // Read VIN Count
-const uint8_t read_VIN = 0x02;            // Read VIN
-const uint8_t read_ID_Length = 0x03;      // Read Calibration ID Length
-const uint8_t read_ID = 0x04;             // Read Calibration ID
-const uint8_t read_ID_Num_Length = 0x05;  // Read Calibration ID Number Length
-const uint8_t read_ID_Num = 0x06;         // Read Calibration ID Number
-
-class OBD2_KLine {
- public:
-  OBD2_KLine(SerialType& serialStream, uint32_t baudRate, uint8_t rxPin, uint8_t txPin);
-
-  void setDebug(Stream& serial);
-  void setSerial(bool enabled);
-  bool initOBD2();
-  bool trySlowInit();
-  bool tryFastInit();
-  void writeRawData(const uint8_t* dataArray, uint8_t length, uint8_t checksumType);
-  void writeData(const uint8_t* data, uint8_t length);
-
-  template <size_t N>
-  void writeData(const uint8_t (&dataArray)[N]) {
-    writeData(dataArray, N);
-  }
-
-  template <size_t N>
-  void writeRawData(const uint8_t (&dataArray)[N], uint8_t checksumType) {
-    writeRawData(dataArray, N, checksumType);
-  }
-
-  template <size_t N>
-  bool compareData(const uint8_t (&dataArray)[N]) {
-    return compareData(dataArray, N);
-  }
-
-  uint8_t readData();
-  bool compareData(const uint8_t* dataArray, uint8_t length);
-  void send5baud(uint8_t data);
-  int read5baud();
-
-  float getPID(uint8_t mode, uint8_t pid);
-  float getLiveData(uint8_t pid);
-  float getFreezeFrame(uint8_t pid);
-
-  uint8_t readDTCs(uint8_t mode);
-  uint8_t readStoredDTCs();
-  uint8_t readPendingDTCs();
-  String getStoredDTC(uint8_t index);
-  String getPendingDTC(uint8_t index);
-
-  bool clearDTCs();
-
-  String getVehicleInfo(uint8_t pid);
-
-  uint8_t readSupportedLiveData();
-  uint8_t readSupportedFreezeFrame();
-  uint8_t readSupportedOxygenSensors();
-  uint8_t readSupportedOtherComponents();
-  uint8_t readSupportedOnBoardComponents();
-  uint8_t readSupportedVehicleInfo();
-  uint8_t readSupportedData(uint8_t mode);
-  uint8_t getSupportedData(uint8_t mode, uint8_t index);
-
-  void setByteWriteInterval(uint16_t interval);
-  void setInterByteTimeout(uint16_t interval);
-  void setReadTimeout(uint16_t timeoutMs);
-  void setProtocol(const String& protocolName);
-  void updateConnectionStatus(bool messageReceived);
-  void setConnectionStatus(bool status);
-
-  void setInitAddress(uint8_t address);
-  void setISO9141Header(uint8_t h1, uint8_t h2, uint8_t h3);
-  void setISO14230Header(uint8_t h1, uint8_t h2, uint8_t h3);
-  void setLengthMode(bool inHeader);
-  void setChecksumType(uint8_t checksumType);
-
- private:
-  SerialType* _serial;
-  uint32_t _baudRate;
-  uint8_t _rxPin;
-  uint8_t _txPin;
-  Stream* _debugSerial = nullptr;  // Debug serial port
-
-  uint8_t defaultInitAddress = 0x33;
-  uint8_t header_ISO9141[3] = {0x68, 0x6A, 0xF1};
-  uint8_t header_ISO14230_Fast[3] = {0xC0, 0x33, 0xF1};
-  bool useLengthInHeader = true;
-  uint8_t checksumType = 2;  // 0: NONE, 1: XOR, 2: Modulo256, 3: Two's Complement
-
-  uint8_t resultBuffer[160] = {0};
-  uint8_t unreceivedDataCount = 0;
-  bool connectionStatus = false;
-
-  String selectedProtocol = "Automatic";
-  String connectedProtocol = "";
-  uint16_t _byteWriteInterval = 5;
-  uint16_t _interByteTimeout = 60;
-  uint16_t _readTimeout = 1000;
-  String storedDTCBuffer[32];
-  String pendingDTCBuffer[32];
-
-  uint8_t supportedLiveData[32];
-  uint8_t supportedFreezeFrame[32];
-  uint8_t supportedOxygenSensor[32];
-  uint8_t supportedOtherComponents[32];
-  uint8_t supportedControlComponents[32];
-  uint8_t supportedVehicleInfo[32];
-
-  uint8_t checksum8_XOR(const uint8_t* dataArray, int length);
-  uint8_t checksum8_Modulo256(const uint8_t* dataArray, int length);
-  uint8_t checksum8_TwosComplement(const uint8_t* dataArray, int length);
-
-  String decodeDTC(uint8_t input_byte1, uint8_t input_byte2);
-  bool isInArray(const uint8_t* dataArray, uint8_t length, uint8_t value);
-  String convertBytesToHexString(const uint8_t* dataArray, uint8_t length);
-  String convertHexToAscii(const uint8_t* dataArray, uint8_t length);
-  void clearEcho(uint8_t length);
-  void debugPrint(const char* msg);
-  void debugPrint(const __FlashStringHelper* msg);
-  void debugPrintln(const char* msg);
-  void debugPrintln(const __FlashStringHelper* msg);
-  void debugPrintHex(uint8_t val);    // Hexadecimal output
-  void debugPrintHexln(uint8_t val);  // Hexadecimal + newline
-};
+// The order matters: Core is the leaf, Protocol defines the shared enums and
+// then pulls in Functions, which needs those enums.
+#include "OBD2_KLine_Core.h"
+#include "KLine_Protocol.h"
+#include "KLine_Functions.h"
 
 #endif  // OBD2_KLINE_H

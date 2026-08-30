@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+#  Private content - kept locally, never published
+# ---------------------------------------------------------------------------
+
+# ECU definitions: only the standard OBD2 one and the README are public.
+src/ecus/*
+!src/ecus/README.md
+!src/ecus/OBD2_Standard.h
+!src/ecus/OBD2_Standard.cpp
+
+# ECU specific examples: only the README is public.
+examples/02_ECU_Specific/*
+!examples/02_ECU_Specific/README.md
+
+# ---------------------------------------------------------------------------
+#  Build output
+# ---------------------------------------------------------------------------
+
+build/
+*.o
+*.d
+*.elf
+*.hex
+*.bin
+*.map
+
+# ---------------------------------------------------------------------------
+#  Editor
+# ---------------------------------------------------------------------------
+
+.vscode/
+.idea/
+*.code-workspace
+*.bak
+*.orig
+
+# ---------------------------------------------------------------------------
+#  OS
+# ---------------------------------------------------------------------------
+
+.DS_Store
+Thumbs.db
+desktop.ini
+*.lnk
