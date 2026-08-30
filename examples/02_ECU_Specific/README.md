@@ -12,6 +12,7 @@ vehicle, feel free to get in touch.
 - Bosch Motronic M1.5.5
 - Bosch BMS 46
 - Bosch ME7.5
+- Bosch EDC15VM+
 
 ### In progress
 
