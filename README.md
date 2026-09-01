@@ -189,9 +189,9 @@ Purpose-built K-Line / ISO 9141 transceiver ICs (**L9637D, MC33290, Si9241, SN65
 
 Custom PCBs designed for this library:
 
-<img width="27%" src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" />
-<img width="29%" src="https://github.com/user-attachments/assets/1a794aea-b9b8-4cdd-bebb-17b25fe7fd7b" />
-<img width="36%" src="https://github.com/user-attachments/assets/f2bfb41b-f75f-4a12-8223-ec67dbc38678" />
+<img width="26%" src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" />
+<img width="35%" src="https://github.com/user-attachments/assets/935a801a-722a-49b1-afa2-417eeee0fc73" />
+<img width="35%" src="https://github.com/user-attachments/assets/f2bfb41b-f75f-4a12-8223-ec67dbc38678" />
 
 > 🛠️ **Custom hardware & PCBs:** looking for ready-to-use devices or custom-made PCBs based on this project? Reach out via email in the **Contact** section below.
 
