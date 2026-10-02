@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 🚙 CAN bus vehicles
+    url: https://github.com/muki01/OBD2_CAN_Bus_Library
+    about: Cars without a K-Line (pin 7) use CAN. See the OBD2 CAN Bus Library.
+  - name: 🧰 Ready-to-flash scan tool
+    url: https://github.com/muki01/OBD2_K-line_Reader
+    about: Looking for finished firmware with a web dashboard? See the OBD2 K-Line Reader.
+  - name: 💼 ECU-specific code, commercial licenses and custom development
+    url: mailto:muksin.muksin04@gmail.com
+    about: Get in touch by email.

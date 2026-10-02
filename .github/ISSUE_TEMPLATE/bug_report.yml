@@ -1,0 +1,73 @@
+name: 🐛 Bug report
+description: Something isn't working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill in as much as you can. The debug output is the most helpful part.
+  - type: input
+    id: version
+    attributes:
+      label: Library version
+      placeholder: e.g. 2.0.0, or the commit you are using
+    validations:
+      required: true
+  - type: input
+    id: board
+    attributes:
+      label: Board
+      placeholder: e.g. ESP32-S3 DevKitC-1, Arduino Nano
+    validations:
+      required: true
+  - type: dropdown
+    id: interface
+    attributes:
+      label: K-Line interface
+      options:
+        - Transistor-based
+        - Comparator (LM393)
+        - L9637D
+        - MC33290
+        - Si9241
+        - SN65HVDA195
+        - Other / custom PCB
+    validations:
+      required: true
+  - type: input
+    id: vehicle
+    attributes:
+      label: Vehicle
+      placeholder: Make, model, year and engine
+  - type: dropdown
+    id: protocol
+    attributes:
+      label: Selected protocol
+      options:
+        - Automatic
+        - ISO9141
+        - ISO14230
+        - KW1281
+        - DS2
+        - KW82
+        - Custom
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug output
+      description: Enable `setDebug()` and paste the log (sent and received bytes). Remove your VIN if you prefer.
+      render: text
