@@ -1,3 +1,5 @@
+<a id="readme-top"></a>
+
 <div align="center">
 
 <img src="images/obd2-kline-library-banner.svg" alt="OBD2 K-Line Library — Arduino and ESP32 library for K-Line vehicle diagnostics, showing an ISO 9141-2 request frame 68 6A F1 01 0C D0" width="100%">
@@ -7,24 +9,24 @@
 **Vehicle diagnostics over the K-Line for Arduino and ESP32.**<br>
 One library for universal OBD-II (ISO 9141-2, ISO 14230-4 / KWP2000) and for manufacturer protocols — VAG KW1281, BMW DS2 and Opel KW82. It handles the handshake, framing, checksums and timing, so your sketch only asks for the data.
 
-[![Stars](https://img.shields.io/github/stars/muki01/OBD2_KLine_Library?style=flat-square&logo=github&color=22d3ee)](https://github.com/muki01/OBD2_KLine_Library/stargazers)
-[![Forks](https://img.shields.io/github/forks/muki01/OBD2_KLine_Library?style=flat-square&logo=github&color=38bdf8)](https://github.com/muki01/OBD2_KLine_Library/forks)
-[![Issues](https://img.shields.io/github/issues/muki01/OBD2_KLine_Library?style=flat-square)](https://github.com/muki01/OBD2_KLine_Library/issues)
-[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue?style=flat-square)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/muki01/OBD2_KLine_Library?style=flat-square)](https://github.com/muki01/OBD2_KLine_Library/commits/main)
-[![Build](https://img.shields.io/github/actions/workflow/status/muki01/OBD2_KLine_Library/arduino-ci.yml?style=flat-square&label=build)](https://github.com/muki01/OBD2_KLine_Library/actions/workflows/arduino-ci.yml)
-[![Arduino Library Manager](https://www.ardu-badge.com/badge/OBD2%20K-Line.svg)](https://www.ardu-badge.com/OBD2%20K-Line)
-[![PlatformIO Registry](https://badges.registry.platformio.org/packages/muki01/library/OBD2%20K-Line.svg)](https://registry.platformio.org/libraries/muki01/OBD2%20K-Line)
-![Arduino](https://img.shields.io/badge/Arduino-00979D?style=flat-square&logo=arduino&logoColor=white)
-![ESP32](https://img.shields.io/badge/ESP32-E7352C?style=flat-square&logo=espressif&logoColor=white)
+<p>
+  <a href="https://github.com/muki01/OBD2_KLine_Library/stargazers"><img alt="GitHub stars" height="28" src="https://img.shields.io/github/stars/muki01/OBD2_KLine_Library?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2"></a>
+  <a href="https://github.com/muki01/OBD2_KLine_Library/network/members"><img alt="GitHub forks" height="28" src="https://img.shields.io/github/forks/muki01/OBD2_KLine_Library?style=flat&logo=github&logoColor=white&label=Forks&labelColor=1f2328&color=2563eb"></a>
+  <a href="https://github.com/muki01/OBD2_KLine_Library/issues"><img alt="GitHub issues" height="28" src="https://img.shields.io/github/issues/muki01/OBD2_KLine_Library?style=flat&logo=github&logoColor=white&label=Issues&labelColor=1f2328&color=6366f1"></a>
+  <a href="LICENSE"><img alt="GPL-3.0 license" height="28" src="https://img.shields.io/badge/License-GPL--3.0-16a34a?style=flat&logo=opensourceinitiative&logoColor=white&labelColor=1f2328"></a>
+  <a href="https://github.com/muki01/OBD2_KLine_Library/commits/main"><img alt="Last commit" height="28" src="https://img.shields.io/github/last-commit/muki01/OBD2_KLine_Library?style=flat&logo=git&logoColor=white&label=Last%20commit&labelColor=1f2328&color=9333ea"></a>
+  <a href="https://github.com/muki01/OBD2_KLine_Library/actions/workflows/arduino-ci.yml"><img alt="Build status" height="28" src="https://img.shields.io/github/actions/workflow/status/muki01/OBD2_KLine_Library/arduino-ci.yml?style=flat&logo=githubactions&logoColor=white&label=Build&labelColor=1f2328"></a>
+</p>
 
-[Installation](#-installation) ·
-[Quick Start](#-quick-start) ·
-[Protocols](#-supported-protocols) ·
-[API](#-api-reference) ·
-[Wiring](#-wiring) ·
-[Examples](#-examples) ·
-[License](#-license)
+<p>
+  <a href="https://github.com/muki01/OBD2_KLine_Library/releases/latest"><img alt="Latest release" height="24" src="https://img.shields.io/github/v/release/muki01/OBD2_KLine_Library?style=flat&logo=github&logoColor=white&label=Release&labelColor=1f2328&color=0891b2"></a>
+  <a href="https://www.ardu-badge.com/OBD2%20K-Line"><img alt="Arduino Library Manager" height="24" src="https://img.shields.io/badge/Arduino-Library%20Manager-00979D?style=flat&logo=arduino&logoColor=white&labelColor=1f2328"></a>
+  <a href="https://registry.platformio.org/libraries/muki01/OBD2%20K-Line"><img alt="PlatformIO Registry" height="24" src="https://img.shields.io/badge/PlatformIO-Registry-2563eb?style=flat&logo=platformio&logoColor=white&labelColor=1f2328"></a>
+  <a href="#-wiring"><img alt="Arduino" height="24" src="https://img.shields.io/badge/Arduino-00979D?style=flat&logo=arduino&logoColor=white"></a>
+  <a href="#-wiring"><img alt="ESP32" height="24" src="https://img.shields.io/badge/ESP32-E7352C?style=flat&logo=espressif&logoColor=white"></a>
+</p>
+
+**[Installation](#-installation)** · **[Quick Start](#-quick-start)** · **[Protocols](#-supported-protocols)** · **[API](#-api-reference)** · **[Wiring](#-wiring)** · **[Examples](#-examples)** · **[License](#-license)**
 
 </div>
 
@@ -249,13 +251,13 @@ K-Line is a single-wire, 12 V bus and cannot be connected directly to a microcon
 
 ### Transistor-based
 
-<img src="images/Transistor%20Schematic.png" alt="K-Line to UART interface schematic using discrete transistors" width="70%">
+<img src="Schematics/Transistor%20Schematic.png" alt="K-Line to UART interface schematic using discrete transistors" width="70%">
 
 A simple, low-cost interface for basic builds and prototyping. **R6** is sized for **3.3 V** microcontrollers; for a **5 V** board, change **R6** to **5.3 kΩ**.
 
 ### Comparator-based
 
-<img src="images/Comparator%20Schematic.png" alt="K-Line interface schematic using an LM393 comparator" width="70%">
+<img src="Schematics/Comparator%20Schematic.png" alt="K-Line interface schematic using an LM393 comparator" width="70%">
 
 A cheap comparator such as the **LM393** gives a clean digital level with well-defined thresholds — better noise immunity than the transistor design at a slightly higher part count.
 
@@ -263,12 +265,12 @@ A cheap comparator such as the **LM393** gives a clean digital level with well-d
 
 <table>
   <tr>
-    <td width="50%"><img src="images/L9637D%20Schematic.png" alt="L9637D K-Line transceiver schematic"></td>
-    <td width="50%"><img src="images/MC33290%20Schematic.png" alt="MC33290 ISO 9141 K-Line transceiver schematic"></td>
+    <td width="50%"><img src="Schematics/L9637D%20Schematic.png" alt="L9637D K-Line transceiver schematic"></td>
+    <td width="50%"><img src="Schematics/MC33290%20Schematic.png" alt="MC33290 ISO 9141 K-Line transceiver schematic"></td>
   </tr>
   <tr>
-    <td><img src="images/Si9241%20Schematic.png" alt="Si9241 K-Line transceiver schematic"></td>
-    <td><img src="images/SN65HVDA195%20Schematic.png" alt="SN65HVDA195 LIN and K-Line transceiver schematic"></td>
+    <td><img src="Schematics/Si9241%20Schematic.png" alt="Si9241 K-Line transceiver schematic"></td>
+    <td><img src="Schematics/SN65HVDA195%20Schematic.png" alt="SN65HVDA195 LIN and K-Line transceiver schematic"></td>
   </tr>
 </table>
 
@@ -325,22 +327,22 @@ This library is part of a family of open-source automotive projects. They share 
   <tr>
     <td width="30%"><a href="https://github.com/muki01/BMW_IBus_KBus"><b>BMW I-Bus / K-Bus Firmware</b></a></td>
     <td>Phone control and key-fob light functions for the BMW E46, on the ESP32 and Arduino.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/BMW_IBus_KBus/stargazers"><img src="https://img.shields.io/github/stars/muki01/BMW_IBus_KBus?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of BMW_IBus_KBus"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/BMW_IBus_KBus/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/BMW_IBus_KBus?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of BMW_IBus_KBus"></a></td>
   </tr>
   <tr>
     <td width="30%"><a href="https://github.com/muki01/OBD2_K-line_Reader"><b>OBD2 K-Line Reader</b></a></td>
     <td>Scan tool for K-Line cars (ISO 9141-2, KWP2000) with a web dashboard, for the ESP32, ESP8266 and Arduino.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/OBD2_K-line_Reader/stargazers"><img src="https://img.shields.io/github/stars/muki01/OBD2_K-line_Reader?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of OBD2_K-line_Reader"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/OBD2_K-line_Reader/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/OBD2_K-line_Reader?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of OBD2_K-line_Reader"></a></td>
   </tr>
   <tr>
     <td width="30%"><a href="https://github.com/muki01/OBD2_CAN_Bus_Reader"><b>OBD2 CAN Bus Reader</b></a></td>
     <td>Scan tool for CAN bus cars (ISO 15765-4) with the same web dashboard, for the ESP32.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/OBD2_CAN_Bus_Reader/stargazers"><img src="https://img.shields.io/github/stars/muki01/OBD2_CAN_Bus_Reader?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of OBD2_CAN_Bus_Reader"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/OBD2_CAN_Bus_Reader/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/OBD2_CAN_Bus_Reader?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of OBD2_CAN_Bus_Reader"></a></td>
   </tr>
   <tr>
     <td width="30%"><a href="https://github.com/muki01/VAG_KW1281"><b>VAG KW1281</b></a></td>
     <td>KW1281 diagnostics for VW, Audi, Škoda and SEAT: ECU information, measuring groups and fault codes.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/VAG_KW1281/stargazers"><img src="https://img.shields.io/github/stars/muki01/VAG_KW1281?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of VAG_KW1281"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/VAG_KW1281/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/VAG_KW1281?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of VAG_KW1281"></a></td>
   </tr>
   <tr>
     <th colspan="3" align="left">Libraries — build your own firmware</th>
@@ -348,17 +350,17 @@ This library is part of a family of open-source automotive projects. They share 
   <tr>
     <td width="30%"><a href="https://github.com/muki01/BMW_IBus_KBus_Library"><b>BMW IBus KBus Library</b></a></td>
     <td>Receives, checks and sends BMW I-Bus and K-Bus messages; the library behind the BMW firmware.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/BMW_IBus_KBus_Library/stargazers"><img src="https://img.shields.io/github/stars/muki01/BMW_IBus_KBus_Library?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of BMW_IBus_KBus_Library"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/BMW_IBus_KBus_Library/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/BMW_IBus_KBus_Library?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of BMW_IBus_KBus_Library"></a></td>
   </tr>
   <tr>
     <td width="30%"><b>OBD2 K-Line Library</b><br><sub>you are here</sub></td>
     <td>K-Line diagnostics behind one API: ISO 9141-2, KWP2000, KW1281, DS2 and KW82.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/OBD2_KLine_Library/stargazers"><img src="https://img.shields.io/github/stars/muki01/OBD2_KLine_Library?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of OBD2_KLine_Library"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/OBD2_KLine_Library/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/OBD2_KLine_Library?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of OBD2_KLine_Library"></a></td>
   </tr>
   <tr>
     <td width="30%"><a href="https://github.com/muki01/OBD2_CAN_Bus_Library"><b>OBD2 CAN Bus Library</b></a></td>
     <td>OBD-II diagnostics over ISO 15765-4 with the ESP32's built-in CAN controller.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/OBD2_CAN_Bus_Library/stargazers"><img src="https://img.shields.io/github/stars/muki01/OBD2_CAN_Bus_Library?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of OBD2_CAN_Bus_Library"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/OBD2_CAN_Bus_Library/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/OBD2_CAN_Bus_Library?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of OBD2_CAN_Bus_Library"></a></td>
   </tr>
   <tr>
     <th colspan="3" align="left">Interface</th>
@@ -366,7 +368,7 @@ This library is part of a family of open-source automotive projects. They share 
   <tr>
     <td width="30%"><a href="https://github.com/muki01/OBD2-Diagnostic-UI"><b>OBD2 Diagnostic UI</b></a></td>
     <td>The web dashboard used by the two OBD2 readers.</td>
-    <td width="96" align="center"><a href="https://github.com/muki01/OBD2-Diagnostic-UI/stargazers"><img src="https://img.shields.io/github/stars/muki01/OBD2-Diagnostic-UI?style=flat-square&label=stars&color=22d3ee" alt="GitHub stars of OBD2-Diagnostic-UI"></a></td>
+    <td width="118" align="center"><a href="https://github.com/muki01/OBD2-Diagnostic-UI/stargazers"><img height="22" src="https://img.shields.io/github/stars/muki01/OBD2-Diagnostic-UI?style=flat&logo=github&logoColor=white&label=Stars&labelColor=1f2328&color=0891b2" alt="GitHub stars of OBD2-Diagnostic-UI"></a></td>
   </tr>
 </table>
 
@@ -397,9 +399,22 @@ For ECU-specific definitions, commercial licenses, custom development, collabora
 
 ## ☕ Support the Project
 
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/muki01)
-[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=SAAH5GHAH6T72)
-[![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-181717?style=for-the-badge&logo=github)](https://github.com/sponsors/muki01)
+If this project helped you, consider supporting its development:
+
+<p>
+  <a href="https://www.buymeacoffee.com/muki01"><img alt="Buy Me a Coffee" height="32" src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buymeacoffee&logoColor=black"></a>
+  <a href="https://www.paypal.com/donate/?hosted_button_id=SAAH5GHAH6T72"><img alt="Donate with PayPal" height="32" src="https://img.shields.io/badge/PayPal-00457C?style=flat&logo=paypal&logoColor=white"></a>
+  <a href="https://github.com/sponsors/muki01"><img alt="GitHub Sponsors" height="32" src="https://img.shields.io/badge/GitHub%20Sponsors-1f2328?style=flat&logo=githubsponsors&logoColor=EA4AAA"></a>
+</p>
+
+## 📈 Star History
+
+<a href="https://star-history.com/#muki01/OBD2_KLine_Library&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=muki01/OBD2_KLine_Library&type=Date&theme=dark">
+    <img alt="Star history chart for OBD2 K-Line Library" src="https://api.star-history.com/svg?repos=muki01/OBD2_KLine_Library&type=Date" width="100%">
+  </picture>
+</a>
 
 ## ⚠️ Disclaimer
 
@@ -423,6 +438,10 @@ Copyright © 2025–2026 Muksin Muksin.
 
 <div align="center">
 
-Created by [**Muki**](https://github.com/muki01) · If this library helped you, please give it a ⭐
+Created by [**Muki**](https://github.com/muki01) · If this project helped you, please give it a ⭐
+
+<sub>OBD2 · OBD-II · K-Line · ISO 9141-2 · ISO 14230 · KWP2000 · KW1281 · DS2 · KW82 · Arduino · ESP32 · car diagnostics · ECU</sub>
+
+**[⬆ Back to top](#readme-top)**
 
 </div>
