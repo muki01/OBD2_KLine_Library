@@ -1,0 +1,28 @@
+name: PlatformIO Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Publish to PlatformIO Registry
+        env:
+          PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
+        run: pio pkg publish . --owner muki01 --no-interactive
