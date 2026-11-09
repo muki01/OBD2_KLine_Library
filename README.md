@@ -304,9 +304,11 @@ Actual throughput depends on the ECU's processing time and the requested PID.
 
 Custom PCBs designed for this library:
 
-<img width="26%" src="https://github.com/user-attachments/assets/3a34b38d-cd39-4f5f-b4dd-d671399bff53" alt="OBD2 K-Line diagnostic board" />
-<img width="35%" src="https://github.com/user-attachments/assets/935a801a-722a-49b1-afa2-417eeee0fc73" alt="ESP32 K-Line diagnostic board with enclosure" />
-<img width="35%" src="https://github.com/user-attachments/assets/f2bfb41b-f75f-4a12-8223-ec67dbc38678" alt="OBD2 diagnostic dongle PCB" />
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/652a4279-050c-4eef-b22d-18bf29ebbbac" alt="MUKITECH OBD2 Diagnostic Tool v1.0 K-Line board with ESP32-C3 module and OBD-II enclosure" width="32%">
+  <img src="https://github.com/user-attachments/assets/935a801a-722a-49b1-afa2-417eeee0fc73" alt="ESP32 K-Line diagnostic board with buzzer, USB-C and 3D-printed enclosure" width="32%">
+  <img src="https://github.com/user-attachments/assets/f2bfb41b-f75f-4a12-8223-ec67dbc38678" alt="MUKITECH OBD2 diagnostic dongle PCB with ESP32-S3 and orange enclosure" width="32%">
+</p>
 
 Ready-to-use devices and custom PCBs based on this project are available — see [Contact](#-contact).
 
