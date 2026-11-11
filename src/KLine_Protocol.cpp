@@ -10,10 +10,12 @@
  * GitHub: https://github.com/muki01/OBD2_KLine_Library
  * Email: muksin.muksin04@gmail.com
  *
- * LICENSE: DUAL-LICENSED
- * 1. PERSONAL/RESEARCH: Free for non-commercial use.
- * 2. COMMERCIAL: Mandatory paid license required for any for-profit usage.
- * Copyright (c) 2025 MukiTech. All rights reserved.
+ * LICENSE: GPL-3.0
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, version 3, as published by the
+ * Free Software Foundation. It comes WITHOUT ANY WARRANTY - see the LICENSE file.
+ * A commercial license is available: muksin.muksin04@gmail.com
+ * Copyright (c) 2025 Muksin Muksin (MukiTech)
  */
 
 #include "KLine_Protocol.h"
